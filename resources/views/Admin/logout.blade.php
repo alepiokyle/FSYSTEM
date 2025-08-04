@@ -1,0 +1,165 @@
+<!-- <x-app-layout>
+    <div class="flex pt-0 pb-12 w-full">
+        @include('Admin.sidebar')
+
+        <main class="flex-1 bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg p-6 text-gray-100">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                
+                <!-- Total Teachers Card -->
+                <div class="bg-gray-800 rounded-lg p-4 shadow">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-medium text-gray-400">Total Teachers</h3>
+                        <i class="fas fa-chalkboard-teacher text-xl text-blue-400"></i>
+                    </div>
+                    <p class="mt-1 text-2xl font-semibold text-white">12</p>
+                    <p class="text-gray-400 text-sm mt-1">Active teachers</p>
+                </div>
+
+                <!-- Total Students Card -->
+                <div class="bg-gray-800 rounded-lg p-4 shadow">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-medium text-gray-400">Total Students</h3>
+                        <i class="fas fa-user-graduate text-xl text-yellow-300"></i>
+                    </div>
+                    <p class="mt-1 text-2xl font-semibold text-white">346</p>
+                    <p class="text-gray-400 text-sm mt-1">Enrolled students</p>
+                </div>
+
+                <!-- Pending Grades Card -->
+                <div class="bg-gray-800 rounded-lg p-4 shadow">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-medium text-gray-400">Pending Grades</h3>
+                        <i class="fas fa-clock text-xl text-orange-400"></i>
+                    </div>
+                    <p class="mt-1 text-2xl font-semibold text-white">24</p>
+                    <p class="text-gray-400 text-sm mt-1">Waiting approval</p>
+                </div>
+
+                <!-- Notifications Card -->
+                <div class="bg-gray-800 rounded-lg p-4 shadow">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-medium text-gray-400">Notifications</h3>
+                        <i class="fas fa-bell text-xl text-green-400"></i>
+                    </div>
+                    <p class="mt-1 text-2xl font-semibold text-white">7</p>
+                    <p class="text-gray-400 text-sm mt-1">Unread alerts</p>
+                </div>
+                
+            </div>
+
+
+                    <div class="bg-gray-800 p-6 rounded-lg shadow mt-6">
+                        <h2 class="text-lg font-semibold text-white mb-4">User Role Statistics</h2>
+                        <canvas id="userBarChart" height="100"></canvas>
+                    </div>
+
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script>
+                        const ctx = document.getElementById('userBarChart').getContext('2d');
+                        const userBarChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['Students', 'Teachers', 'Admins'],
+                                datasets: [{
+                                    label: 'Total Count',
+                                    data: [346, 12, 2], // Replace with dynamic data later
+                                    backgroundColor: [
+                                        '#facc15', // Students - Yellow
+                                        '#3b82f6', // Teachers - Blue
+                                        '#ef4444'  // Admins - Red
+                                    ],
+                                    borderRadius: 6,
+                                    borderSkipped: false,
+                                    barThickness: 40
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            color: 'white'
+                                        },
+                                        grid: {
+                                            color: '#374151' // Tailwind gray-700
+                                        }
+                                    },
+                                    x: {
+                                        ticks: {
+                                            color: 'white'
+                                        },
+                                        grid: {
+                                            color: '#374151'
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: {
+                                            color: 'white'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+                </main>
+            </div>
+        </x-app-layout>
+Add this in your layout (e.g., sidebar logout button) -->
+<!-- Logout Button -->
+<button 
+    @click="showLogoutModal = true" 
+    class="w-full text-left px-4 py-2 text-white hover:bg-red-600 transition bg-red-500 rounded">
+    🔒 Logout
+</button>
+
+<!-- Logout Modal -->
+<div 
+    x-data="{ showLogoutModal: false, showToast: false }" 
+    @keydown.escape.window="showLogoutModal = false"
+>
+    <!-- Overlay -->
+    <div 
+        x-show="showLogoutModal"
+        x-transition.opacity
+        class="fixed inset-0 bg-black bg-opacity-50 z-40"
+    ></div>
+
+    <!-- Modal Box -->
+    <div 
+        x-show="showLogoutModal"
+        x-transition
+        class="fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-80"
+    >
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Logout</h2>
+        <p class="text-gray-600 mb-4">Are you sure you want to logout?</p>
+        <div class="flex justify-end space-x-2">
+            <button 
+                @click="showLogoutModal = false" 
+                class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
+            >
+                Cancel
+            </button>
+            <button 
+                @click="
+                    showLogoutModal = false;
+                    showToast = true;
+                    setTimeout(() => window.location.href = 'logout.php', 1500);
+                "
+                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+            >
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div 
+        x-show="showToast" 
+        x-transition 
+        class="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-3 rounded shadow-lg z-50"
+    >
+        ✅ Logged out successfully!
+    </div>
+</div>
