@@ -3,44 +3,45 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class DeanAccountController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('admin'); // Ensure only admin can access this controller
-    }
-
     /**
-     * Show the form to create a new dean account.
+     * Show the form for creating a new dean account.
+     *
+     * @return \Illuminate\View\View
      */
     public function create()
     {
-        return view('admin.deans.create'); // Make sure this view file exists
+        return view('Admin.dean.create');
     }
 
     /**
-     * Store the new dean account in the database.
+     * Store a newly created dean account.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'dean', // Assign the role as 'dean'
+            'role' => 'dean',
+            'email_verified_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Dean account registered successfully!');
+        return redirect()->route('admin.dashboard')
+            ->with('success', 'Dean account created successfully.');
     }
 }

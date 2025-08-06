@@ -1,7 +1,9 @@
-<x-app-layout>
+@extends('layouts.admin')
+
+@section('content')
     <div class="flex pt-0 pb-12 w-full">
         <!-- Sidebar -->
-        @include('Admin.sidebar')
+       
 
          <main class="flex-1 bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg p-6 text-gray-100">
             <div class="p-6 bg-gray-800 rounded-lg shadow-md">
@@ -40,32 +42,59 @@
                     <button class="bg-blue-600 text-white px-4 py-2 rounded">Search</button>
                 </div>
 
-                <!-- Table -->
-                <div class="overflow-x-auto">
-                    <table class="min-w-full border text-sm text-left text-gray-300">
-                        <thead class="bg-gray-700 text-white">
-                            <tr>
-                                <th class="px-4 py-2">Student ID</th>
-                                <th class="px-4 py-2">Name</th>
-                                <th class="px-4 py-2">Subject</th>
-                                <th class="px-4 py-2">Prelim</th>
-                                <th class="px-4 py-2">Midterm</th>
-                                <th class="px-4 py-2">Semi-Final</th>
-                                <th class="px-4 py-2">Final</th>
-                                <th class="px-4 py-2">Final Grade</th>
-                                <th class="px-4 py-2">Status</th>
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full border text-sm text-left text-gray-300">
+                    <thead class="bg-gray-700 text-white">
+                        <tr>
+                            <th class="px-4 py-2">Student ID</th>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Subject</th>
+                            <th class="px-4 py-2">Prelim</th>
+                            <th class="px-4 py-2">Midterm</th>
+                            <th class="px-4 py-2">Semi-Final</th>
+                            <th class="px-4 py-2">Final</th>
+                            <th class="px-4 py-2">Final Grade</th>
+                            <th class="px-4 py-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($grades as $grade)
+                            <tr class="hover:bg-gray-600">
+                                <td class="px-4 py-2">{{ $grade->student->student_id ?? $grade->student->id }}</td>
+                                <td class="px-4 py-2">{{ $grade->student->name }}</td>
+                                <td class="px-4 py-2">{{ $grade->subject->subject_name }}</td>
+                                <td class="px-4 py-2">{{ $grade->prelim ?? '-' }}</td>
+                                <td class="px-4 py-2">{{ $grade->midterm ?? '-' }}</td>
+                                <td class="px-4 py-2">{{ $grade->semi_final ?? '-' }}</td>
+                                <td class="px-4 py-2">{{ $grade->final ?? '-' }}</td>
+                                <td class="px-4 py-2 font-bold {{ $grade->final_grade >= 75 ? 'text-green-400' : 'text-red-400' }}">
+                                    {{ $grade->final_grade ?? '-' }}
+                                </td>
+                                <td class="px-4 py-2">
+                                    <span class="px-2 py-1 rounded text-xs 
+                                        {{ $grade->status == 'passed' ? 'bg-green-600 text-white' : 
+                                           ($grade->status == 'failed' ? 'bg-red-600 text-white' : 'bg-yellow-600 text-white') }}">
+                                        {{ ucfirst($grade->status) }}
+                                    </span>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <!-- No data yet -->
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="text-center py-4 text-gray-400">
+                                    No grades available. Grades will appear once submitted and approved.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-                <!-- Informative Message -->
+            @if($grades->isEmpty())
                 <p class="text-center text-red-500 mt-4 italic">
-                    No records available. Grades will appear once approved by the Dean.
+                    No records available. Grades will appear once submitted and approved by the Dean.
                 </p>
+            @endif
 
                 <!-- Export buttons -->
                 <div class="mt-4 flex gap-4">
@@ -74,6 +103,4 @@
                     <button class="bg-gray-700 text-white px-4 py-2 rounded">Print</button>
                 </div>
             </div>
-
-
-</x-app-layout>
+@endsection

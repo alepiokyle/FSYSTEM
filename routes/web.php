@@ -1,57 +1,74 @@
 <?php
-use App\Http\Controllers\Admin\AdminController;
+
+use App\Http\Controllers\admin\AdminController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\AdminLoginController;
-use App\Http\Controllers\UploadController;
 use App\Http\Controllers\Admin\DeanAccountController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\GradeController;
+use App\Models\User;
 
-// Redirect to login
-Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
-
-// Main dashboard
-Route::get('/dashboard', function () {
-    if (!Auth::check()) {
-        return redirect()->route('login');
+// Home route - redirect based on authentication status
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
     }
-
-    $studentCount = 346;
-    $teacherCount = 12;
-    $adminCount = 2;
-
-    return view('Admin.Dashboard', compact('studentCount', 'teacherCount', 'adminCount'));
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// Admin routes
-Route::get('/admin', [AdminController::class, 'index']);
-
-// Upload Subjects - Fixed authentication flow
-Route::middleware(['auth'])->group(function () {
-    Route::get('/upload-subjects', [UploadController::class, 'index'])->name('upload.subjects');
-    Route::post('/upload-subjects', [UploadController::class, 'store'])->name('subjects.store');
+    return redirect()->route('login');
 });
 
-// Profile routes
-Route::middleware('auth')->group(function () {
+// Authentication routes - use only custom controller
+Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AdminLoginController::class, 'login']);
+Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
+
+// Register routes
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
+
+// Protected routes for authenticated users
+Route::middleware(['auth'])->group(function () {
+    // Main dashboard
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+
+        switch ($user->role) {
+            case 'admin':
+                $studentCount = User::where('role', 'student')->count();
+                $teacherCount = User::where('role', 'teacher')->count();
+                $adminCount = User::where('role', 'admin')->count();
+                return view('Admin.Dashboard', compact('studentCount', 'teacherCount', 'adminCount'));
+            case 'dean':
+                return view('Dean.deandashboard');
+            case 'teacher':
+                return view('Teacher.teacherdashboard');
+            case 'student':
+                return view('Student.studentdashboard');
+            case 'parent':
+                return view('Parent.parentsdashboard');
+            default:
+                return view('Admin.Dashboard');
+        }
+    })->name('dashboard');
+
+    // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-// Static Admin Views
-Route::middleware(['auth'])->group(function () {
-    Route::get('/viewgrade', fn() => view('Admin.viewgrade'))->name('viewgrade');
+    // Grade Management Routes
+    Route::get('/viewgrade', [GradeController::class, 'viewGrades'])->name('grades.view');
+    Route::get('/grades/create', [GradeController::class, 'create'])->name('grades.create');
+    Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
+    Route::patch('/grades/{grade}/status', [GradeController::class, 'updateStatus'])->name('grades.updateStatus');
+    
+    // Static Admin Views
     Route::get('/dean', fn() => view('Admin.dean'))->name('dean');
     Route::get('/teacher-account', fn() => view('Admin.Teacher'))->name('teacher.account');
     Route::get('/student-account', fn() => view('Admin.student'))->name('student.account');
     Route::get('/parent-account', fn() => view('Admin.parent'))->name('parent.account');
 });
-
-// Auth routes
-Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AdminLoginController::class, 'login']);
 
 // Admin protected routes
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
@@ -60,4 +77,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::post('/deans/store', [DeanAccountController::class, 'store'])->name('admin.deans.store');
 });
 
-require __DIR__ . '/auth.php';
+// Separate route file for Upload Subjects
+require __DIR__ . '/upload.php';
