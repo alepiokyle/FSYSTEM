@@ -1,4 +1,4 @@
-<x-dean-component>
+<x-teacher-component>
      <div class="page-header">
         <div class="page-block">
           <div class="row align-items-center">
@@ -61,7 +61,5 @@
             </div>
           </div>
         </div>
-
-
-      </div>
-</x-dean-component>
+    </div>
+</x-teacher-component>

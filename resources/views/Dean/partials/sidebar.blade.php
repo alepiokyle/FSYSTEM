@@ -1,7 +1,7 @@
     <div class="navbar-content">
       <ul class="pc-navbar">
         <li class="pc-item">
-          <a href="{{ route ('admin.dashboard')}}" class="pc-link">
+          <a href="{{url('admin/admindashboard')}}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
             <span class="pc-mtext">Dashboard</span>
           </a>
@@ -12,15 +12,15 @@
           <i class="ti ti-dashboard"></i>
         </li>
         <li class="pc-item">
-          <a href="{{ route('admin.faculty')}}" class="pc-link">
+          <a href="../elements/bc_typography.html" class="pc-link">
             <span class="pc-micon"><i class="ti ti-typography"></i></span>
-            <span class="pc-mtext">Add Faculty</span>
+            <span class="pc-mtext">Typography</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="{{ route('admin.uploadsubject')}}" class="pc-link">
+          <a href="../elements/bc_color.html" class="pc-link">
             <span class="pc-micon"><i class="ti ti-color-swatch"></i></span>
-            <span class="pc-mtext">Uplaod Subject</span>
+            <span class="pc-mtext">Color</span>
           </a>
         </li>
         <li class="pc-item">

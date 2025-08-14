@@ -1,4 +1,10 @@
 <x-admin-component>
+       <x-slot:page_title>
+        Dasboard
+    </x-slot>
+    <x-slot:page_title>
+        Admin Dashboard
+    </x-slot>
           <div class="page-header">
         <div class="page-block">
           <div class="row align-items-center">

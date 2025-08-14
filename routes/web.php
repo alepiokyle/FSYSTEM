@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\admin\AdminController;
+use App\Http\Controllers\admin\adminController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -11,80 +11,48 @@ use App\Http\Controllers\GradeController;
 use App\Models\User;
 
 
-
-// // Home route - redirect based on authentication status
-// Route::get('/', function () {
-//     if (Auth::check()) {
-//         return redirect()->route('dashboard');
-//     }
-//     return redirect()->route('login');
-// });
-
 Route::get('/', function () {
-    return view('admin.admindashboard');
+    return view('userAuth.login');
 });
 
-// Admin Dashboard Route
-Route::get('/admin/dashboard', [App\Http\Controllers\admin\admindashboardController::class, 'index'])->name('admin.dashboard');
+Route::get('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'index'])->name('register');
 
-// // Authentication routes - use only custom controller
-// Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
-// Route::post('/login', [AdminLoginController::class, 'login']);
-// Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
 
-// // Register routes
-// Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-// Route::post('/register', [RegisteredUserController::class, 'store']);
+// Authentication Routes
+Route::get('/login', [App\Http\Controllers\Auth\loginController::class, 'create'])->name('login');
+Route::post('/signin', [App\Http\Controllers\Auth\loginController::class, 'store'])->name('signin');
+Route::post('/logout', [App\Http\Controllers\Auth\logoutController::class, 'userDestroy'])->name('logout');
 
-// // Protected routes for authenticated users
-// Route::middleware(['auth'])->group(function () {
-//     // Main dashboard
-//     Route::get('/dashboard', function () {
-//         $user = Auth::user();
+// Admin
+Route::prefix('admin')->middleware('auth:web')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
-//         switch ($user->role) {
-//             case 'admin':
-//                 $studentCount = User::where('role', 'student')->count();
-//                 $teacherCount = User::where('role', 'teacher')->count();
-//                 $adminCount = User::where('role', 'admin')->count();
-//                 return view('Admin.Dashboard', compact('studentCount', 'teacherCount', 'adminCount'));
-//             case 'dean':
-//                 return view('Dean.deandashboard');
-//             case 'teacher':
-//                 return view('Teacher.teacherdashboard');
-//             case 'student':
-//                 return view('Student.studentdashboard');
-//             case 'parent':
-//                 return view('Parent.parentsdashboard');
-//             default:
-//                 return view('Admin.Dashboard');
-//         }
-//     })->name('dashboard');
+    Route::get('/faculty', [App\Http\Controllers\Admin\addFacultyController::class, 'index'])->name('admin.faculty');
 
-//     // Profile routes
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/uploadsubject', [App\Http\Controllers\Admin\UploadSubjectController::class, 'index'])->name('admin.uploadsubject');
+});
 
-//     // Grade Management Routes
-//     Route::get('/viewgrade', [GradeController::class, 'viewGrades'])->name('grades.view');
-//     Route::get('/grades/create', [GradeController::class, 'create'])->name('grades.create');
-//     Route::post('/grades', [GradeController::class, 'store'])->name('grades.store');
-//     Route::patch('/grades/{grade}/status', [GradeController::class, 'updateStatus'])->name('grades.updateStatus');
+// Dean
+Route::prefix('dean')->middleware('auth:web')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\dean\dashboardcontroller::class, 'index'])->name('dean.dashboard');
+});
 
-//     // Static Admin Views
-//     Route::get('/dean', fn() => view('Admin.dean'))->name('dean');
-//     Route::get('/teacher-account', fn() => view('Admin.Teacher'))->name('teacher.account');
-//     Route::get('/student-account', fn() => view('Admin.student'))->name('student.account');
-//     Route::get('/parent-account', fn() => view('Admin.parent'))->name('parent.account');
-// });
+// Teacher
+Route::prefix('teacher')->middleware('auth:web')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\teacher\TeacherDashboardController::class, 'index'])->name('teacher.dashboard');
+});
 
-// // Admin protected routes
-// Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-//     Route::get('/dashboard', fn() => view('Admin.Dashboard'))->name('admin.dashboard');
-//     Route::get('/deans/create', [DeanAccountController::class, 'create'])->name('admin.deans.create');
-//     Route::post('/deans/store', [DeanAccountController::class, 'store'])->name('admin.deans.store');
-// });
+// Student
+Route::prefix('student')->middleware('auth:web')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\student\studentDashboardController::class, 'index'])->name('student.dashboard');
+});
 
-// Separate route file for Upload Subjects
+
+//parent
+Route::prefix('parent')->middleware('auth:web')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\parent\parentDashboardController::class, 'index'])->name('parent.dashboard');
+});
+
+
+
 require __DIR__ . '/upload.php';

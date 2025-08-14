@@ -1,4 +1,4 @@
-
+<div class="me-auto pc-mob-drp">
   <ul class="list-unstyled">
     <!-- ======= Menu collapse Icon ===== -->
     <li class="pc-h-item pc-sidebar-collapse">
@@ -51,7 +51,7 @@
         aria-haspopup="false"
         aria-expanded="false"
       >
-        {{-- <i class="ti ti-mail"></i>
+        <i class="ti ti-mail"></i>
       </a>
       <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown">
         <div class="dropdown-header d-flex align-items-center justify-content-between">
@@ -115,7 +115,7 @@
         <div class="text-center py-2">
           <a href="#!" class="link-primary">View all</a>
         </div>
-      </div> --}}
+      </div>
     </li>
     <li class="dropdown pc-h-item header-user-profile">
       <a
@@ -127,14 +127,14 @@
         data-bs-auto-close="outside"
         aria-expanded="false"
       >
-        <img src="{{asset('all/assets/images/user/avatar-2.jpg')}}" alt="user-image" class="user-avtar">
+        <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
         <span>Stebin Ben</span>
       </a>
       <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
         <div class="dropdown-header">
           <div class="d-flex mb-1">
             <div class="flex-shrink-0">
-              <img src="{{asset('all/assets/images/user/avatar-2.jpg')}}" alt="user-image" class="user-avtar wid-35">
+              <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
             </div>
             <div class="flex-grow-1 ms-3">
               <h6 class="mb-1">Stebin Ben</h6>
@@ -217,10 +217,10 @@
             <a href="#!" class="dropdown-item">
               <i class="ti ti-list"></i>
               <span>History</span>
-            </a >
+            </a>
           </div>
         </div>
       </div>
     </li>
   </ul>
-
+</div>
