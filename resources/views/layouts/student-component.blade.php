@@ -87,7 +87,27 @@
         <script src="{{ asset('all/assets/js/fonts/custom-font.js') }}"></script>
         <script src="{{ asset('all/assets/js/pcoded.js') }}"></script>
         <script src="{{ asset('all/assets/js/plugins/feather.min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     </body>
 
+    <script>
+        function logoutConfirm() {
+                Swal.fire({
+                    title: "Are you sure you want to logout?",
+                    text: "You will be logged out of your session!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Logout"
+                }).then((willLogout) => {
+                    if (willLogout.isConfirmed) {
+                        // If confirmed, submit the logout form
+                        document.getElementById('logout-form').submit();
+                    }
+                });
+            }
+ </script>
 </html>
 
