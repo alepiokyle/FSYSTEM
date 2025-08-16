@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_name',
     ];
 
     /**
@@ -47,8 +47,48 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get the role relationship
+     */
     public function role()
     {
         return $this->belongsTo(UserRole::class, 'user_role_id', 'id');
     }
+
+    // /**
+    //  * Check if the user has a specific role
+    //  *
+    //  * @param string|array $roles
+    //  * @return bool
+    //  */
+    // public function hasRole($roles): bool
+    // {
+    //     if (is_array($roles)) {
+    //         return in_array($this->role_name, $roles);
+    //     }
+        
+    //     return $this->role_name === $roles;
+    // }
+
+    // /**
+    //  * Check if the user has any of the given roles
+    //  *
+    //  * @param array $roles
+    //  * @return bool
+    //  */
+    // public function hasAnyRole(array $roles): bool
+    // {
+    //     return in_array($this->role_name, $roles);
+    // }
+
+    // /**
+    //  * Check if the user has all of the given roles
+    //  *
+    //  * @param array $roles
+    //  * @return bool
+    //  */
+    // public function hasAllRoles(array $roles): bool
+    // {
+    //     return empty(array_diff($roles, [$this->role_name]));
+    // }
 }
