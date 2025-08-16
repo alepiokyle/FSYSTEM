@@ -21,8 +21,8 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // guard against missing relation
-        $userRoleName = $user->role->role ?? null;
+        // Check user's role directly from the role_name column
+        $userRoleName = $user->role_name;
 
         if (! $userRoleName) {
             Auth::logout();

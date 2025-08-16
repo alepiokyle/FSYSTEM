@@ -1,110 +1,92 @@
 
     <x-auth-component>
-        <div class="auth-form">
-            <div class="auth-header">
-                <a href="#"><img src="{{ asset('all/assets/images/logo-dark.svg')}}" alt="img"></a>
+ <div class="auth-form d-flex flex-column align-items-center justify-content-center min-vh-100" 
+     style="background: linear-gradient(135deg, #1e3c72, #2a5298); font-family: 'Poppins', sans-serif;">
+    <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 15px;">
+        <div class="card-body p-4">
+
+            <div class="text-center mb-4">
+                <a href="#"><img src="{{ asset('all/assets/images/logo-dark.svg')}}" alt="Logo" style="width: 60px;"></a>
+                <h3 class="mt-3"><b>Login</b></h3>
+                <small class="text-muted">Welcome back! Please login to your account.</small>
             </div>
-            <div class="card my-5">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-end mb-4">
-                        <h3 class="mb-0"><b>Login</b></h3>
-                        <a href="{{ url('register')}}" class="link-primary">Don't have an account?</a>
-                    </div>
 
-                    {{-- Display Error Messages --}}
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            @foreach ($errors->all() as $error)
-                                <div>{{ $error }}</div>
-                            @endforeach
-                        </div>
-                    @endif
+            {{-- Error Messages --}}
+            @if ($errors->any())
+                <div class="alert alert-danger py-2">
+                    @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
 
-                    {{-- Display Success Messages --}}
-                    @if (session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+            {{-- Success Message --}}
+            @if (session('success'))
+                <div class="alert alert-success py-2">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-                    <form method="POST" action="{{ route('signin') }}">
-                        @csrf
-                        <div class="form-group mb-3">
-                            <label class="form-label">Username</label>
-                            <input type="text" name="username" class="form-control @error('username') is-invalid @enderror"
-                                   placeholder="Username" value="{{ old('username') }}" required>
-                            @error('username')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+            <form method="POST" action="{{ route('signin') }}">
+                @csrf
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
-                                   placeholder="Password" required>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="d-flex mt-1 justify-content-between">
-                            <div class="form-check">
-                                <input class="form-check-input input-primary" type="checkbox" name="remember" id="remember">
-                                <label class="form-check-label text-muted" for="remember">Keep me signed in</label>
-                            </div>
-                            <h5 class="text-secondary f-w-400">Forgot Password?</h5>
-                        </div>
-
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary">Login</button>
-                        </div>
-
-                        <div class="saprator mt-3">
-                            <span>Login with</span>
-                        </div>
-                    </form>
-
-                    <div class="row">
-                        <div class="col-4">
-                            <div class="d-grid">
-                                <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                    <img src="../assets/images/authentication/google.svg" alt="img">
-                                    <span class="d-none d-sm-inline-block"> Google</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="d-grid">
-                                <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                    <img src="../assets/images/authentication/twitter.svg" alt="img">
-                                    <span class="d-none d-sm-inline-block"> Twitter</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="d-grid">
-                                <button type="button" class="btn mt-2 btn-light-primary bg-light text-muted">
-                                    <img src="../assets/images/authentication/facebook.svg" alt="img">
-                                    <span class="d-none d-sm-inline-block"> Facebook</span>
-                                </button>
-                            </div>
-                        </div>
+                {{-- Username --}}
+                <div class="form-group mb-3 position-relative">
+                    <label class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fas fa-user text-muted"></i></span>
+                        <input type="text" name="username" class="form-control @error('username') is-invalid @enderror"
+                               placeholder="Enter your username" value="{{ old('username') }}" required>
+                        @error('username')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
-            </div>
 
-            <div class="auth-footer row">
-                <div class="col my-1">
-                    <p class="m-0">Copyright © <a href="#">Codedthemes</a></p>
+                {{-- Password --}}
+                <div class="form-group mb-3 position-relative">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
+                               placeholder="Enter your password" required>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
-                <div class="col-auto my-1">
-                    <ul class="list-inline footer-link mb-0">
-                        <li class="list-inline-item"><a href="#">Home</a></li>
-                        <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
-                        <li class="list-inline-item"><a href="#">Contact us</a></li>
-                    </ul>
+
+                {{-- Remember Me + Forgot --}}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                        <label class="form-check-label" for="remember">Keep me signed in</label>
+                    </div>
+                    <a href="#" class="text-primary small">Forgot Password?</a>
                 </div>
-            </div>
+
+                {{-- Submit --}}
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 10px;">Login</button>
+                </div>
+
+                {{-- Divider --}}
+                <div class="text-center my-3 text-muted">or login with</div>
+
+                {{-- Social Buttons --}}
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="#" class="btn btn-light shadow-sm border"><i class="fab fa-google"></i></a>
+                    <a href="#" class="btn btn-light shadow-sm border"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="btn btn-light shadow-sm border"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </form>
         </div>
+    </div>
+</div>
+
+
+{{-- Font Awesome --}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     </x-auth-component>
 
