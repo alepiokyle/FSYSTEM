@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users_profile', function (Blueprint $table) {
+        Schema::create('parents_profile', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('users_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('parents_profile_id')->constrained('parents_profile')->onDelete('cascade');
-            $table->string('student_id')->unique();
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
-            $table->string('suffix')->nullable();
-            $table->string('date_of_birth')->nullable();
-            $table->string('gender');
+            $table->string('contact_number');
+            $table->date('date_of_birth')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('relationship'); // e.g., Mother, Father, Guardian
+            $table->string('address');
             $table->timestamps();
         });
     }
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users_profile');
+        Schema::dropIfExists('parents_profile');
     }
 };

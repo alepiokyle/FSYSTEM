@@ -133,6 +133,7 @@ return [
     ),
 
     'web_session' => 'web_session_cookie', // For users
+    'parent_session' => 'parent_session_cookie', // For parents
 
 
     /*

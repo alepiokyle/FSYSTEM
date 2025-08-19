@@ -1,6 +1,6 @@
 
     <x-auth-component>
- <div class="auth-form d-flex flex-column align-items-center justify-content-center min-vh-100" 
+ <div class="auth-form d-flex flex-column align-items-center justify-content-center min-vh-100"
      style="background: linear-gradient(135deg, #1e3c72, #2a5298); font-family: 'Poppins', sans-serif;">
     <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 15px;">
         <div class="card-body p-4">
@@ -62,7 +62,7 @@
                         <input class="form-check-input" type="checkbox" name="remember" id="remember">
                         <label class="form-check-label" for="remember">Keep me signed in</label>
                     </div>
-                    <a href="#" class="text-primary small">Forgot Password?</a>
+                    <a href="{{ route('register') }}" class="text-primary small">Don't have an account?</a>
                 </div>
 
                 {{-- Submit --}}

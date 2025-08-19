@@ -16,6 +16,9 @@ Route::get('/', function () {
 });
 
 Route::get('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'index'])->name('register');
+Route::post('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'store'])->name('register.store');
+Route::get('/registration/review', [App\Http\Controllers\Auth\RegistrationController::class, 'view'])->name('review');
+
 
 
 // Authentication Routes
@@ -24,7 +27,7 @@ Route::post('/signin', [App\Http\Controllers\Auth\loginController::class, 'store
 Route::post('/logout', [App\Http\Controllers\Auth\logoutController::class, 'userDestroy'])->name('logout');
 
 // Admin
-Route::prefix('admin')->middleware('auth:web' )->group(function () {
+Route::prefix('admin')->middleware('auth:web')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     Route::controller(App\Http\Controllers\Admin\addFacultyController::class)->group(function () {
@@ -32,35 +35,34 @@ Route::prefix('admin')->middleware('auth:web' )->group(function () {
     });
 
 
-        Route::controller(App\Http\Controllers\Admin\DeanController::class)->group(function () {
+    Route::controller(App\Http\Controllers\Admin\DeanController::class)->group(function () {
         Route::get('/view-dean', 'index')->name('view.dean');
     });
 
-    
-        Route::controller(App\Http\Controllers\Admin\ViewTeacherController::class)->group(function () {
+
+    Route::controller(App\Http\Controllers\Admin\ViewTeacherController::class)->group(function () {
         Route::get('/view-teacher', 'index')->name('view.teacher');
     });
 
-      Route::controller(App\Http\Controllers\Admin\viewstudentController::class)->group(function () {
+    Route::controller(App\Http\Controllers\Admin\viewstudentController::class)->group(function () {
         Route::get('/view-student', 'index')->name('view.student');
     });
 
-     Route::controller(App\Http\Controllers\Admin\ParentAccountController::class)->group(function () {
+    Route::controller(App\Http\Controllers\Admin\ParentAccountController::class)->group(function () {
         Route::get('/view-parent', 'index')->name('view.parent');
     });
 
-        Route::controller(App\Http\Controllers\Admin\ViewAddStaffController::class)->group(function () {
+    Route::controller(App\Http\Controllers\Admin\ViewAddStaffController::class)->group(function () {
         Route::get('/view-addstaff', 'index')->name('view.addstaff');
     });
 
     Route::get('/uploadsubject', [App\Http\Controllers\Admin\UploadSubjectController::class, 'index'])->name('admin.uploadsubject');
-
 });
 
 // dean
-Route::prefix('dean')->middleware('auth:web')->group(function() {
-    Route::get('/admin/deans', [DeanController::class, 'index'])->name('deans.index');
-    Route::post('/admin/deans', [DeanController::class, 'store'])->name('deans.store');
+Route::prefix('dean')->middleware('auth:web')->group(function () {
+    // Route::get('/admin/deans', [DeanController::class, 'index'])->name('deans.index');
+    // Route::post('/admin/deans', [DeanController::class, 'store'])->name('deans.store');
 });
 
 
@@ -75,10 +77,6 @@ Route::prefix('student')->middleware('auth:web')->group(function () {
 });
 
 //parent
-Route::prefix('parent')->middleware('auth:web')->group(function () {
+Route::prefix('parent')->middleware('auth:parent')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\parent\parentDashboardController::class, 'index'])->name('parent.dashboard');
 });
-
-
-
-
