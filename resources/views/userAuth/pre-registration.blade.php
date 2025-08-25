@@ -7,18 +7,18 @@
             <div class="card-body">
 
                 {{-- Student Name Card --}}
-                <div class="card mb-3 border-left-success shadow-sm">
+                {{-- <div class="card mb-3 border-left-success shadow-sm">
                     <div class="card-body">
                         <h5 class="fw-bold mb-0">
                             <H3><b>Student Name</b></H3>
                         </h5>
                     </div>
-                </div>
+                </div> --}}
 
                 {{-- Instruction Notice Card --}}
                 <div class="card mb-3 border-left-warning shadow-sm">
                     <div class="card-body">
-                        <h6 class="mb-0">Please log in to the student voting portal to begin the election process.
+                        <h6 class="mb-0">Here are your login details, please keep them safe.
                         </h6>
                     </div>
                 </div>
