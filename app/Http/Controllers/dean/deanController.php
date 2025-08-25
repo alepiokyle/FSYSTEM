@@ -5,10 +5,9 @@ namespace App\Http\Controllers\dean;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class dashboardcontroller extends Controller
+class deanController extends Controller
 {
-    function index()
-    {
-        return view('dean.deandashboard');
+    Public function index(){
+        return view('Dean.deandashboard');
     }
 }

@@ -42,7 +42,7 @@
 
                  <div class="card mb-4 border-left-primary shadow-sm">
                     <div class="card-body">
-                        <h5 class="fw-bold text-info mb-3">Parent Credentials</h5>
+                         <h5 class="fw-bold text-info mb-3">Parent Credentials</h5>
                         <div class="row mb-2">
                             <div class="col-md-4 fw-bold">Username:</div>
                             <div class="col-md-8"><B>{{ $parentUsername }}</B></div>

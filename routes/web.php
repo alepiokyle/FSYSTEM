@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Admin\DeanAccountController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\GradeController;
+use App\Http\Controllers\dean\DeanController;
 use App\Models\User;
 
 
@@ -35,9 +36,9 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
     });
 
 
-    Route::controller(App\Http\Controllers\Admin\DeanController::class)->group(function () {
-        Route::get('/view-dean', 'index')->name('view.dean');
-    });
+    // Route::controller(App\Http\Controllers\Admin\DeanController::class)->group(function () {
+    //     Route::get('/view-dean', 'index')->name('view.dean');
+    // });
 
 
     Route::controller(App\Http\Controllers\Admin\ViewTeacherController::class)->group(function () {
@@ -61,8 +62,9 @@ Route::prefix('admin')->middleware('auth:web')->group(function () {
 
 // dean
 Route::prefix('dean')->middleware('auth:web')->group(function () {
-    // Route::get('/admin/deans', [DeanController::class, 'index'])->name('deans.index');
-    // Route::post('/admin/deans', [DeanController::class, 'store'])->name('deans.store');
+        Route::get('/dashboard', [App\Http\Controllers\dean\deanController::class, 'index'])->name('dean.dashboard');
+
+//Route::post('/admin/deans', [DeanController::class, 'store'])->name('deans.store');
 });
 
 
