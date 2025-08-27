@@ -31,7 +31,7 @@ class loginController extends Controller
                 return redirect()->route('admin.dashboard')->with('success', 'Logged In Successfully');
             }
             if ($user->user_role_id == 5) {
-                return redirect()->route('dean.dashboard')->with('success', 'Logged In Successfully');
+                return redirect()->route('Dean.deandashboard')->with('success', 'Logged In Successfully');
             }
             if ($user->user_role_id == 6) {
                 return redirect()->route('teacher.dashboard')->with('success', 'Logged In Successfully');

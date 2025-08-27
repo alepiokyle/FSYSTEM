@@ -1,142 +1,177 @@
-<x-auth-component>
-  <div class="auth-form">
-    <div class="auth-header">
-      <a href="#"><img src="{{asset('all/assets/images/logo-dark.svg')}}" alt="img"></a>
-    </div>
+<x-admin-component>
 
-    <form method="POST" action=" {{ route('register.store') }}">
-      @csrf
-      <div class="card my-5">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-end mb-4">
-            <h3 class="mb-0"><b>Sign up</b></h3>
-            <a href="{{ url('/') }}" class="link-primary">Already have an account?</a>
-          </div>
+<style>
+  body { font-family: Arial, sans-serif; background: #f5f6fa; margin: 0; padding: 20px; }
 
-          <!-- Student Information -->
-          <h5 class="mb-3"><b>Student Information</b></h5>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label">Student ID*</label>
-                <input type="text" class="form-control" name="student_id" placeholder="Student ID">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label">First Name*</label>
-                <input type="text" class="form-control" name="first_name" placeholder="First Name">
-              </div>
-            </div>
-          </div>
+  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; position: relative; }
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label">Middle Name*</label>
-                <input type="text" class="form-control" name="middle_name" placeholder="Middle Name">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label">Last Name*</label>
-                <input type="text" class="form-control" name="last_name" placeholder="Last Name">
-              </div>
-            </div>
-          </div>
+  .card h2 { margin: 0 0 20px; font-size: 22px; color: #333; }
 
-          <div class="row">
-            <!-- Gender Radio -->
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label d-block">Gender*</label>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="gender" id="male" value="male">
-                  <label class="form-check-label" for="male">Male</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="gender" id="female" value="female">
-                  <label class="form-check-label" for="female">Female</label>
-                </div>
-              </div>
-            </div>
-          </div>
+  .add-btn {
+    position: absolute; top: 20px; right: 20px;
+    background: none; color: #333; border: 1px solid #ccc; border-radius: 6px;
+    padding: 8px 12px; display: flex; align-items: center; cursor: pointer; font-size: 14px;
+  }
+  .add-btn:hover { background: #f0f0f0; border-color: #999; }
+  .add-btn i { margin-right: 6px; font-size: 16px; }
 
-          <!-- Parent / Guardian Information -->
-          <h5 class="mt-4 mb-3"><b>Parent/Guardian Information</b></h5>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label">First Name*</label>
-                <input type="text" class="form-control" name="parent_first_name" placeholder="First Name">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label">Last Name*</label>
-                <input type="text" class="form-control" name="parent_last_name" placeholder="Last Name">
-              </div>
-            </div>
-          </div>
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+  table th { background: #f0f0f0; color: #333; }
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label">Contact Number*</label>
-                <input type="text" class="form-control" name="parent_contact" placeholder="Contact Number">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group mb-3">
-                <label class="form-label">Email (Optional)</label>
-                <input type="email" class="form-control" name="parent_email" placeholder="Email Address">
-              </div>
-            </div>
-          </div>
+  .status-active { color: green; font-weight: bold; }
+  .status-inactive { color: red; font-weight: bold; }
 
-          <!-- Relationship Radio -->
-          <div class="col-md-12">
-            <div class="form-group mb-3">
-              <label class="form-label d-block">Relationship*</label>
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="relationship" id="guardian" value="guardian">
-                    <label class="form-check-label" for="guardian">Guardian</label>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="relationship" id="mother" value="mother">
-                    <label class="form-check-label" for="mother">Mother</label>
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="relationship" id="father" value="father">
-                    <label class="form-check-label" for="father">Father</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+  /* Actions container for buttons in a row */
+  .actions {
+    display: flex;
+    gap: 5px;
+  }
+  .actions button { padding: 5px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .actions .edit { background: #2196F3; color: white; }
+  .actions .suspend { background: #ff9800; color: white; }
+  .actions .delete { background: #f44336; color: white; }
 
-          <div class="form-group mb-3">
-            <label class="form-label">Address*</label>
-            <input type="text" class="form-control" name="address" placeholder="Complete Address">
-          </div>
+  /* Modal */
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+  .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 400px; position: relative; }
+  .modal-content h3 { margin: 0 0 15px; }
+  .modal-content label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; }
+  .modal-content input, .modal-content select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; }
+  .modal-content button { margin-top: 15px; background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; }
+  .modal-content button:hover { background: #45a049; }
 
-          <p class="mt-4 text-sm text-muted">
-            By Signing up, you agree to our
-            <a href="#" class="text-primary"> Terms of Service </a> and
-            <a href="#" class="text-primary"> Privacy Policy</a>
-          </p>
+  .close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 18px; font-weight: bold; color: #555; }
+  .close-btn:hover { color: red; }
+</style>
+<script>
+function openModal() { 
+  document.getElementById("addStaffModal").style.display = "flex"; 
+  generatePassword(); // Auto-generate password when modal opens
+}
+function closeModal() { document.getElementById("addStaffModal").style.display = "none"; }
 
-          <div class="d-grid mt-3">
-            <button type="submit" class="btn btn-primary">Create Account</button>
-          </div>
-        </div>
+// Auto-generate password
+function generatePassword(length = 10) {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+  let password = "";
+  for (let i=0; i<length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  document.getElementById("password").value = password;
+}
+
+// Handle form submission
+function saveStaff() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const role = document.getElementById("role").value;
+  const department = document.getElementById("department").value;
+  const password = document.getElementById("password").value;
+
+  if(!name || !email || !role || !password) {
+    alert("Please fill all required fields.");
+    return;
+  }
+
+  // Add staff to table (only for display, in real app save to DB)
+  const tbody = document.querySelector("table tbody");
+  const row = tbody.insertRow();
+  row.innerHTML = `
+    <td>STF-${tbody.rows.length.toString().padStart(3,'0')}</td>
+    <td>${name}</td>
+    <td>${email}</td>
+    <td>${role}</td>
+    <td>${department}</td>
+    <td><span class="status-active">Active</span></td>
+    <td class="actions">
+      <button class="edit">Edit</button>
+      <button class="suspend">Suspend</button>
+      <button class="delete">Delete</button>
+    </td>
+  `;
+
+  alert(`Staff created! Password: ${password}`);
+  closeModal();
+  document.getElementById("addStaffForm").reset();
+  document.getElementById("password").value = "";
+}
+</script>
+</head>
+<body>
+
+<div class="card">
+  <h2>Staff Accounts (Deans & Teachers)</h2>
+  <button class="add-btn" onclick="openModal()"><i class="fas fa-user-plus"></i> Add Staff</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Staff ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Department</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>STF-001</td>
+        <td>Dr. Ana Reyes</td>
+        <td>ana.reyes@email.com</td>
+        <td>Dean</td>
+        <td>Business Administration</td>
+        <td><span class="status-active">Active</span></td>
+        <td class="actions">
+          <button class="edit">Edit</button>
+          <button class="suspend">Suspend</button>
+          <button class="delete">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="addStaffModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h3>Create Dean / Teacher Account</h3>
+
+    <form id="addStaffForm" onsubmit="event.preventDefault(); saveStaff();">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Enter full name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter email" required>
+
+      <label for="role">Role</label>
+      <select id="role" required>
+        <option value="Dean">Dean</option>
+        <option value="Teacher">Teacher</option>
+      </select>
+
+      <label for="department">Department</label>
+      <select id="department" required>
+        <option value="IT">Information Technology</option>
+        <option value="Education">Education</option>
+        <option value="Business">Business Administration</option>
+        <option value="Engineering">Engineering</option>
+      </select>
+
+      <label for="password">Password</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="password" placeholder="Generated password" readonly required>
+        <button type="button" onclick="generatePassword()">Generate</button>
       </div>
+
+      <button type="submit">Create Account</button>
     </form>
   </div>
-</x-auth-component>
+</div>
+
+</body>
+</html>
+</x-admin-component>
