@@ -34,10 +34,10 @@ class loginController extends Controller
                 return redirect()->route('Dean.deandashboard')->with('success', 'Logged In Successfully');
             }
             if ($user->user_role_id == 6) {
-                return redirect()->route('teacher.dashboard')->with('success', 'Logged In Successfully');
+                return redirect()->route('teacher.teacherdashboard')->with('success', 'Logged In Successfully');
             }
             if ($user->user_role_id == 7) {
-                return redirect()->route('student.dashboard')->with('success', 'Logged In Successfully');
+                return redirect()->route('student.studentdashboard')->with('success', 'Logged In Successfully');
             }
 
             // Unexpected role on web guard
@@ -62,7 +62,7 @@ class loginController extends Controller
                 return back()->withErrors(['login_error' => 'Unauthorized role for parent guard.'])->withInput();
             }
 
-            return redirect()->route('parent.dashboard')->with('success', 'Logged In Successfully');
+            return redirect()->route('parent.parentdashboard')->with('success', 'Logged In Successfully');
         }
 
         // Both failed

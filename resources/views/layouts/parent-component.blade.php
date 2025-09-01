@@ -17,7 +17,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
    <!-- [Favicon] icon -->
-    <link rel="icon" href="{{ asset('all/assets/images/favicon.svg')}}" type="image/x-icon"> <!-- [Google Font] Family -->
+    <link rel="icon" href="{{ asset('all/assets/images/remove.png')}}" type="image/x-icon"> <!-- [Google Font] Family -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
     <!-- [Tabler Icons] https://tablericons.com -->
     <link rel="stylesheet" href="{{ asset('all/assets/fonts/tabler-icons.min.css')}}" >
@@ -43,7 +43,7 @@
             <!-- Header -->
         <header class="pc-header">
             <div class="header-wrapper">
-                @include('dean.partials.header')
+                @include('parent.partials.header')
             </div>
         </header>
 
@@ -55,7 +55,7 @@
                         <img src="{{ asset('all/assets/images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="Logo">
                     </a>
                 </div>
-                @include('dean.partials.sidebar')
+                @include('parent.partials.sidebar')
             </div>
         </nav>
 
@@ -77,7 +77,7 @@
         <!-- Footer -->
         <footer class="pc-footer">
             <div class="footer-wrapper container-fluid">
-                @include('dean.partials.footer')
+                @include('parent.partials.footer')
             </div>
         </footer>
 

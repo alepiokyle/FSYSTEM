@@ -1,177 +1,146 @@
-<x-admin-component>
+<x-auth-component>
+    <div class="auth-form d-flex flex-column align-items-center justify-content-center min-vh-100"
+         style="background: url('{{ asset('all/assets/images/school.png') }}') no-repeat center center;
+                background-size: cover;
+                font-family: 'Poppins', sans-serif;
+                position: relative;">
 
-<style>
-  body { font-family: Arial, sans-serif; background: #f5f6fa; margin: 0; padding: 20px; }
+        {{-- Registration Card --}}
+        <div class="card shadow-lg border-0" style="width: 100%; max-width: 600px; border-radius: 15px; z-index: 2; background-color: rgba(255,255,255,0.95);">
+            <div class="card-body p-4">
 
-  .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; position: relative; }
+                {{-- Logo & Heading --}}
+                <div class="text-center mb-4">
+                    <a href="#"><img src="{{ asset('all/assets/images/logo1.png') }}" alt="Logo" style="width: 60px;"></a>
+                    <h3 class="mt-3 fw-bold">Student & Parent Registration</h3>
+                    <small class="text-muted">Fill out the form to register a new student and parent account.</small>
+                </div>
 
-  .card h2 { margin: 0 0 20px; font-size: 22px; color: #333; }
+                {{-- Error Messages --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger py-2">
+                        @foreach ($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
+                @endif
 
-  .add-btn {
-    position: absolute; top: 20px; right: 20px;
-    background: none; color: #333; border: 1px solid #ccc; border-radius: 6px;
-    padding: 8px 12px; display: flex; align-items: center; cursor: pointer; font-size: 14px;
-  }
-  .add-btn:hover { background: #f0f0f0; border-color: #999; }
-  .add-btn i { margin-right: 6px; font-size: 16px; }
+                {{-- Success Message --}}
+                @if (session('success'))
+                    <div class="alert alert-success py-2">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
-  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-  table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-  table th { background: #f0f0f0; color: #333; }
+                <form action="{{ route('register.store') }}" method="POST">
+                    @csrf
 
-  .status-active { color: green; font-weight: bold; }
-  .status-inactive { color: red; font-weight: bold; }
+                    {{-- Student Information --}}
+                    <h5 class="fw-bold text-info mb-3">Student Information</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Student ID</label>
+                            <input type="text" name="student_id" class="form-control" value="{{ old('student_id') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" name="date_of_birth" class="form-control" value="{{ old('date_of_birth') }}" required>
+                        </div>
+                    </div>
 
-  /* Actions container for buttons in a row */
-  .actions {
-    display: flex;
-    gap: 5px;
-  }
-  .actions button { padding: 5px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
-  .actions .edit { background: #2196F3; color: white; }
-  .actions .suspend { background: #ff9800; color: white; }
-  .actions .delete { background: #f44336; color: white; }
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ old('first_name') }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Middle Name</label>
+                            <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}" required>
+                        </div>
+                    </div>
 
-  /* Modal */
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-  .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 400px; position: relative; }
-  .modal-content h3 { margin: 0 0 15px; }
-  .modal-content label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; }
-  .modal-content input, .modal-content select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; }
-  .modal-content button { margin-top: 15px; background: #4CAF50; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; }
-  .modal-content button:hover { background: #45a049; }
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Suffix</label>
+                            <input type="text" name="suffix" class="form-control" value="{{ old('suffix') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Gender</label>
+                            <select name="gender" class="form-control" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male" {{ old('gender')=='Male'?'selected':'' }}>Male</option>
+                                <option value="Female" {{ old('gender')=='Female'?'selected':'' }}>Female</option>
+                            </select>
+                        </div>
+                    </div>
 
-  .close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 18px; font-weight: bold; color: #555; }
-  .close-btn:hover { color: red; }
-</style>
-<script>
-function openModal() { 
-  document.getElementById("addStaffModal").style.display = "flex"; 
-  generatePassword(); // Auto-generate password when modal opens
-}
-function closeModal() { document.getElementById("addStaffModal").style.display = "none"; }
+                    <hr>
 
-// Auto-generate password
-function generatePassword(length = 10) {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-  let password = "";
-  for (let i=0; i<length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  document.getElementById("password").value = password;
-}
+                    {{-- Parent / Guardian Information --}}
+                    <h5 class="fw-bold text-info mb-3">Parent / Guardian Information</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="parent_first_name" class="form-control" value="{{ old('parent_first_name') }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Middle Name</label>
+                            <input type="text" name="parent_middle_name" class="form-control" value="{{ old('parent_middle_name') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="parent_last_name" class="form-control" value="{{ old('parent_last_name') }}" required>
+                        </div>
+                    </div>
 
-// Handle form submission
-function saveStaff() {
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const role = document.getElementById("role").value;
-  const department = document.getElementById("department").value;
-  const password = document.getElementById("password").value;
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Gender</label>
+                            <select name="parent_gender" class="form-control">
+                                <option value="">Select Gender</option>
+                                <option value="Male" {{ old('parent_gender')=='Male'?'selected':'' }}>Male</option>
+                                <option value="Female" {{ old('parent_gender')=='Female'?'selected':'' }}>Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Relationship</label>
+                            <input type="text" name="relationship" class="form-control" value="{{ old('relationship') }}" required>
+                        </div>
+                    </div>
 
-  if(!name || !email || !role || !password) {
-    alert("Please fill all required fields.");
-    return;
-  }
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Contact Number</label>
+                            <input type="text" name="parent_contact" class="form-control" value="{{ old('parent_contact') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Address</label>
+                            <textarea name="address" class="form-control" rows="2" required>{{ old('address') }}</textarea>
+                        </div>
+                    </div>
 
-  // Add staff to table (only for display, in real app save to DB)
-  const tbody = document.querySelector("table tbody");
-  const row = tbody.insertRow();
-  row.innerHTML = `
-    <td>STF-${tbody.rows.length.toString().padStart(3,'0')}</td>
-    <td>${name}</td>
-    <td>${email}</td>
-    <td>${role}</td>
-    <td>${department}</td>
-    <td><span class="status-active">Active</span></td>
-    <td class="actions">
-      <button class="edit">Edit</button>
-      <button class="suspend">Suspend</button>
-      <button class="delete">Delete</button>
-    </td>
-  `;
+                    {{-- Action Buttons --}}
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-success btn-lg me-2">
+                            <i class="fas fa-user-plus me-1"></i> Register
+                        </button>
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-lg me-2">
+                            <i class="fas fa-sign-in-alt me-1"></i> Login Portal
+                        </a>
+                        <a href="{{ route('review') }}" class="btn btn-info btn-lg text-white">
+                            <i class="fas fa-eye me-1"></i> Review Registration
+                        </a>
+                    </div>
 
-  alert(`Staff created! Password: ${password}`);
-  closeModal();
-  document.getElementById("addStaffForm").reset();
-  document.getElementById("password").value = "";
-}
-</script>
-</head>
-<body>
+                </form>
+            </div>
+        </div>
+    </div>
 
-<div class="card">
-  <h2>Staff Accounts (Deans & Teachers)</h2>
-  <button class="add-btn" onclick="openModal()"><i class="fas fa-user-plus"></i> Add Staff</button>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Staff ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Department</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>STF-001</td>
-        <td>Dr. Ana Reyes</td>
-        <td>ana.reyes@email.com</td>
-        <td>Dean</td>
-        <td>Business Administration</td>
-        <td><span class="status-active">Active</span></td>
-        <td class="actions">
-          <button class="edit">Edit</button>
-          <button class="suspend">Suspend</button>
-          <button class="delete">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<!-- Modal -->
-<div class="modal" id="addStaffModal">
-  <div class="modal-content">
-    <span class="close-btn" onclick="closeModal()">&times;</span>
-    <h3>Create Dean / Teacher Account</h3>
-
-    <form id="addStaffForm" onsubmit="event.preventDefault(); saveStaff();">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" placeholder="Enter full name" required>
-
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Enter email" required>
-
-      <label for="role">Role</label>
-      <select id="role" required>
-        <option value="Dean">Dean</option>
-        <option value="Teacher">Teacher</option>
-      </select>
-
-      <label for="department">Department</label>
-      <select id="department" required>
-        <option value="IT">Information Technology</option>
-        <option value="Education">Education</option>
-        <option value="Business">Business Administration</option>
-        <option value="Engineering">Engineering</option>
-      </select>
-
-      <label for="password">Password</label>
-      <div style="display:flex; gap:8px;">
-        <input type="text" id="password" placeholder="Generated password" readonly required>
-        <button type="button" onclick="generatePassword()">Generate</button>
-      </div>
-
-      <button type="submit">Create Account</button>
-    </form>
-  </div>
-</div>
-
-</body>
-</html>
-</x-admin-component>
+    {{-- Font Awesome --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</x-auth-component>
