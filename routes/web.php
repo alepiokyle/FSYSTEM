@@ -67,25 +67,25 @@ Route::prefix('dean')->middleware('auth:web')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\dean\DashboardController::class, 'index'])->name('Dean.deandashboard');
 
 
-    
+
     Route::controller(App\Http\Controllers\dean\AssignController::class)->group(function () {
         Route::get('/AssignTeacher', 'index')->name('dean.AssignTeacher');
     });
 
 
-      Route::controller(App\Http\Controllers\dean\SubjectLoadingController::class)->group(function () {
+    Route::controller(App\Http\Controllers\dean\SubjectLoadingController::class)->group(function () {
         Route::get('/SubjectLoading', 'index')->name('Dean.SubjectLoading');
     });
 
-       Route::controller(App\Http\Controllers\dean\ApproveGradesController::class)->group(function () {
+    Route::controller(App\Http\Controllers\dean\ApproveGradesController::class)->group(function () {
         Route::get('/ApproveGrades', 'index')->name('Dean.ApproveGrades');
     });
 
-        Route::controller(App\Http\Controllers\dean\PostGradesController::class)->group(function () {
+    Route::controller(App\Http\Controllers\dean\PostGradesController::class)->group(function () {
         Route::get('/PostGrades', 'index')->name('Dean.PostGrades');
     });
 
-//Route::post('/admin/deans', [DeanController::class, 'store'])->name('deans.store');
+    //Route::post('/admin/deans', [DeanController::class, 'store'])->name('deans.store');
 });
 
 
