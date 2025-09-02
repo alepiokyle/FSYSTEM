@@ -51,7 +51,7 @@
         <nav class="pc-sidebar">
             <div class="navbar-wrapper">
                 <div class="m-header">
-                    <a href="{{ route('admin.dashboard') }}" class="b-brand text-primary">
+                    <a href="{{ route('parent.parentdashboard') }}" class="b-brand text-primary">
                         <img src="{{ asset('all/assets/images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="Logo">
                     </a>
                 </div>
@@ -91,24 +91,41 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     </body>
-
-    <script>
+<script>
     function logoutConfirm() {
-            Swal.fire({
-                title: "Are you sure you want to logout?",
-                text: "You will be logged out of your session!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Logout"
-            }).then((willLogout) => {
-                if (willLogout.isConfirmed) {
-                    // If confirmed, submit the logout form
-                    document.getElementById('logout-form').submit();
-                }
-            });
-        }
+        Swal.fire({
+            title: "<i class='fas fa-power-off text-red-500'></i> Logout",
+            html: "<p style='font-size:14px; color:#4b5563;'>Are you sure you want to end your session?</p>",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "<i class='fas fa-sign-out-alt'></i> Logout",
+            cancelButtonText: "<i class='fas fa-times'></i> Cancel",
+            confirmButtonColor: "#374151", // dark gray
+            cancelButtonColor: "#9ca3af",  // light gray
+            background: "#f3f4f6", // light gray (dashboard look)
+            color: "#111827", // dark text
+            customClass: {
+                popup: "rounded-xl shadow-2xl border border-gray-300",
+                title: "text-lg font-semibold text-gray-800",
+                confirmButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-gray-700",
+                cancelButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-gray-400"
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "<i class='fas fa-spinner fa-spin'></i> Logging out...",
+                    text: "Please wait while we end your session",
+                    showConfirmButton: false,
+                    background: "#f3f4f6",
+                    color: "#111827",
+                    timer: 1500,
+                    timerProgressBar: true,
+                }).then(() => {
+                    document.getElementById("logout-form").submit();
+                });
+            }
+        });
+    }
 </script>
 
 </html>
