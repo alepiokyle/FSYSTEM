@@ -134,6 +134,9 @@ return [
 
     'web_session' => 'web_session_cookie', // For users
     'parent_session' => 'parent_session_cookie', // For parents
+    'dean_session' => 'dean_session_cookie', // For deans
+    'admin_session' => 'admin_session_cookie', // For admins
+    'teacher_session' => 'teacher_session_cookie', // For teachers
 
 
     /*

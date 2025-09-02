@@ -44,6 +44,21 @@ return [
             'driver' => 'session',
             'provider' => 'parents',
         ],
+
+        'dean' => [
+            'driver' => 'session',
+            'provider' => 'deans',
+        ],
+
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+
+        'teacher' => [
+            'driver' => 'session',
+            'provider' => 'teachers',
+        ],
     ],
 
     /*
@@ -73,6 +88,22 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\ParentAccount::class,
         ],
+
+        'deans' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\DeanAccount::class,
+        ],
+
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\AdminAccount::class,
+        ],
+
+        'teachers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\TeacherAccount::class,
+        ],
+
 
         // 'users' => [
         //     'driver' => 'database',
