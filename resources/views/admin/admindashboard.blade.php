@@ -104,7 +104,7 @@
         <div class="glass-card text-center">
             <i class="fas fa-user-graduate card-icon icon-students"></i>
             <h6 class="mb-2">Total Students</h6>
-            <h4>1,250 <span class="badge bg-light-primary border border-primary"><i class="fas fa-arrow-up"></i> 15.3%</span></h4>
+            <h4>3 </h4>
             <p class="mb-0 text-muted">Active students in the system</p>
         </div>
     </div>
@@ -112,7 +112,7 @@
         <div class="glass-card text-center">
             <i class="fas fa-chalkboard-teacher card-icon icon-teachers"></i>
             <h6 class="mb-2">Total Teachers</h6>
-            <h4>85 <span class="badge bg-light-success border border-success"><i class="fas fa-arrow-up"></i> 8.5%</span></h4>
+            <h4>85</h4>
             <p class="mb-0 text-muted">Active teaching staff</p>
         </div>
     </div>
@@ -120,7 +120,7 @@
         <div class="glass-card text-center">
             <i class="fas fa-book card-icon icon-subjects"></i>
             <h6 class="mb-2">Total Subjects</h6>
-            <h4>120 <span class="badge bg-light-warning border border-warning"><i class="fas fa-book"></i></span></h4>
+            <h4>120 </h4>
             <p class="mb-0 text-muted">Subjects offered this semester</p>
         </div>
     </div>
@@ -128,7 +128,7 @@
         <div class="glass-card text-center">
             <i class="fas fa-users card-icon icon-users"></i>
             <h6 class="mb-2">System Users</h6>
-            <h4>1,455 <span class="badge bg-light-info border border-info"><i class="fas fa-users"></i></span></h4>
+            <h4>1,455</h4>
             <p class="mb-0 text-muted">Total system users</p>
         </div>
     </div>

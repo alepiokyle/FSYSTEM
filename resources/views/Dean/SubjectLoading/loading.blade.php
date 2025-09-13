@@ -1,182 +1,142 @@
 <x-dean-component>
-  <div class="subject-loading">
-    <!-- Page Title -->
-    <h2 class="page-title">📘 Subject Loading</h2>
+    <style>
+        /* ====== Background & Page ====== */
+        x-dean-component {
+            background: linear-gradient(to right, #f0f4f8, #ffffff);
+            min-height: 100vh;
+            padding: 20px 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: block;
+        }
 
-    <!-- Subject Loading Form -->
-    <div class="card">
-      <h3>Load Students to Subject</h3>
-      <form>
-        <div class="form-group">
-          <label for="department">Department:</label>
-          <select id="department" name="department">
-            <option value="">-- Select Department --</option>
-            <option value="BSIT">BSIT</option>
-            <option value="BSED">BSED</option>
-            <option value="BEED">BEED</option>
-          </select>
+        /* ====== Page Header ====== */
+        .page-header { margin-bottom: 30px; }
+        .page-header-title h5 { font-weight: 700; font-size: 1.8rem; color: #222; }
+        .breadcrumb { padding: 0; margin-top: 5px; background: transparent; }
+        .breadcrumb-item a { text-decoration: none; color: #555; }
+        .breadcrumb-item a:hover { text-decoration: underline; }
+
+        /* ====== Cards ====== */
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 25px;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
+        .card h4, .card h6 { font-weight: 600; margin-bottom: 15px; }
+
+        /* Table */
+        .table th {
+            background: #f8f9fa;
+        }
+    </style>
+
+    <!-- ====== Page Header ====== -->
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title"><h5>Dean Dashboard</h5></div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../dashboard/index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Subject Loading</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-
-        <div class="form-group">
-          <label for="yearLevel">Year Level & Section:</label>
-          <select id="yearLevel" name="yearLevel">
-            <option value="">-- Select Year & Section --</option>
-            <option value="1A">1st Year - Section A</option>
-            <option value="1B">1st Year - Section B</option>
-            <option value="2A">2nd Year - Section A</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="subject">Subject:</label>
-          <select id="subject" name="subject">
-            <option value="">-- Select Subject --</option>
-            <option value="IT101">IT101 - Intro to Computing</option>
-            <option value="IT102">IT102 - Programming Fundamentals</option>
-            <option value="ENG101">ENG101 - Communication Skills</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="students">Select Students:</label>
-          <select id="students" name="students" multiple>
-            <option value="1001">Juan Dela Cruz</option>
-            <option value="1002">Maria Santos</option>
-            <option value="1003">Pedro Reyes</option>
-            <option value="1004">Ana Dizon</option>
-          </select>
-          <small>Hold CTRL (Windows) or CMD (Mac) to select multiple students.</small>
-        </div>
-
-        <button type="submit" class="btn">➕ Load Students</button>
-      </form>
     </div>
 
-    <!-- Current Loaded Students Table -->
-    <div class="card">
-      <h3>📋 Currently Loaded Students</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Student ID</th>
-            <th>Name</th>
-            <th>Subject</th>
-            <th>Year & Section</th>
-            <th>Action</th>
-          </tr>
+ <!-- ====== Uploaded Subjects from Admin ====== -->
+<div class="card mt-4">
+    <h4>📘 Subjects Uploaded by Admin</h4>
+    <table class="table table-hover table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Units</th>
+                <th>Department</th>
+                <th>Semester</th>
+                <th>Date Uploaded</th>
+                <th>Status</th>
+            </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1001</td>
-            <td>Juan Dela Cruz</td>
-            <td>IT101 - Intro to Computing</td>
-            <td>1st Year - Section A</td>
-            <td><button class="btn-danger">❌ Remove</button></td>
-          </tr>
-          <tr>
-            <td>1002</td>
-            <td>Maria Santos</td>
-            <td>IT101 - Intro to Computing</td>
-            <td>1st Year - Section A</td>
-            <td><button class="btn-danger">❌ Remove</button></td>
-          </tr>
+            <!-- Example of a NEW subject -->
+            <tr>
+                <td>IT101</td>
+                <td>Intro to Computing</td>
+                <td>3</td>
+                <td>BSIT</td>
+                <td>1st Sem</td>
+                <td>2025-09-01</td>
+                <td><span class="badge bg-success">🆕 New</span></td>
+            </tr>
+
+            <!-- Example of an OLD subject -->
+            <tr>
+                <td>IT102</td>
+                <td>Programming Fundamentals</td>
+                <td>4</td>
+                <td>BSIT</td>
+                <td>1st Sem</td>
+                <td>2025-06-15</td>
+                <td><span class="badge bg-secondary">Old</span></td>
+            </tr>
+
+            <!-- Example of another NEW subject -->
+            <tr>
+                <td>ENG101</td>
+                <td>Communication Skills</td>
+                <td>3</td>
+                <td>BSED</td>
+                <td>1st Sem</td>
+                <td>2025-09-05</td>
+                <td><span class="badge bg-success">🆕 New</span></td>
+            </tr>
         </tbody>
-      </table>
+    </table>
+</div>
+
+    <!-- ====== Subject Loading Form ====== -->
+    <div class="card">
+        <h4>➕ Load Students to a Subject</h4>
+        <form>
+            <div class="mb-3">
+                <label for="subject" class="form-label">Select Subject:</label>
+                <select id="subject" class="form-select">
+                    <option value="">-- Choose Subject --</option>
+                    <option value="IT101">IT101 - Intro to Computing</option>
+                    <option value="IT102">IT102 - Programming Fundamentals</option>
+                    <option value="ENG101">ENG101 - Communication Skills</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="yearLevel" class="form-label">Year Level & Section:</label>
+                <select id="yearLevel" class="form-select">
+                    <option value="">-- Select Year & Section --</option>
+                    <option value="1A">1st Year - Section A</option>
+                    <option value="1B">1st Year - Section B</option>
+                    <option value="2A">2nd Year - Section A</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="students" class="form-label">Select Students:</label>
+                <select id="students" class="form-select" multiple>
+                    <option value="S001">S001 - John Doe</option>
+                    <option value="S002">S002 - Jane Smith</option>
+                    <option value="S003">S003 - Mark Lee</option>
+                </select>
+                <div class="form-text">Hold CTRL (Windows) or CMD (Mac) to select multiple students.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Load Students</button>
+        </form>
     </div>
-  </div>
-
-  <style>
-    .subject-loading {
-      padding: 20px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .page-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #2c3e50;
-    }
-
-    .card {
-      background: #fff;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    .card h3 {
-      margin-bottom: 15px;
-      font-size: 18px;
-      color: #34495e;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 5px;
-      color: #2c3e50;
-    }
-
-    select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-
-    small {
-      font-size: 12px;
-      color: #7f8c8d;
-    }
-
-    .btn {
-      background: #3498db;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .btn:hover {
-      background: #2980b9;
-    }
-
-    .btn-danger {
-      background: #e74c3c;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .btn-danger:hover {
-      background: #c0392b;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    table th, table td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    table th {
-      background: #f8f9fa;
-    }
-  </style>
 </x-dean-component>
