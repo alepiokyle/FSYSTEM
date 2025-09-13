@@ -1,10 +1,12 @@
-# Sidebar Icon Update Plan
+# TODO: Remove Edit User Profile in Admin
 
-## Steps to Complete:
-1. [ ] Update sidebar.blade.php to include logic for changing icons based on user roles
-2. [ ] Test the sidebar to ensure correct icons are displayed for different user roles
+## Step 1: Update the Admin Staff View
+- [x] Remove "Edit" buttons from dean and teacher rows in `resources/views/admin/AddStaff/addstaff.blade.php`
+- [x] Remove the `editStaff` JavaScript function
+- [x] Remove edit-related logic from modal (hidden staff_id input, update action, etc.)
 
-## Current Progress:
-- Analyzed the current sidebar structure
-- Identified User and UserRole models for role-based logic
-- Ready to implement role-based icon changes
+## Step 2: Update Routes
+- [x] Comment out PUT routes for dean and teacher updates in `routes/web.php`
+
+## Step 3: Update Controller
+- [x] Comment out `updateDean` and `updateTeacher` methods in `app/Http/Controllers/Admin/ViewAddStaffController.php`

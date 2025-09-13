@@ -87,7 +87,6 @@
       cursor: pointer;
       font-size: 13px;
     }
-    .actions .edit { background: #2196F3; color: white; }
     .actions .suspend { background: #ff9800; color: white; }
     .actions .delete { background: #f44336; color: white; }
 
@@ -159,97 +158,150 @@
     }
   </style>
   <script>
+    function resetModal() {
+      document.getElementById("name").value = '';
+      document.getElementById("email").value = '';
+      document.getElementById("role").value = 'Dean';
+      document.getElementById("department").value = '';
+      document.querySelector("#addStaffModal form").action = "{{ route('admin.addstaff.store') }}";
+      document.querySelector("#addStaffModal form").method = "POST";
+      document.querySelector(".btn-create").textContent = "Create";
+      document.querySelector("h3").textContent = "Create Dean / Teacher Account";
+      toggleDepartment();
+    }
+
     function openModal() {
+      resetModal();
       document.getElementById("addStaffModal").style.display = "flex";
     }
     function closeModal() {
       document.getElementById("addStaffModal").style.display = "none";
+      resetModal();
     }
 
     function toggleDepartment() {
       const role = document.getElementById("role").value;
       const deptRow = document.getElementById("departmentRow");
-      if(role === "Teacher") {
-        deptRow.style.display = "block";
-      } else {
+      const deptInput = document.getElementById("department");
+      if (role === "Teacher") {
         deptRow.style.display = "none";
+        deptInput.removeAttribute("required");
+      } else {
+        deptRow.style.display = "block";
+        deptInput.setAttribute("required", "required");
       }
     }
+
+
   </script>
 </head>
 <body>
 
   <div class="card">
     <h2>Staff Accounts (Deans & Teachers)</h2>
-    <button class="add-btn" onclick="openModal()">
-      <i class="fas fa-user-plus"></i> Add Staff
-    </button>
+    @if(session('success'))
+      <div style="background: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; border-radius: 6px;">
+        {{ session('success') }}
+      </div>
+    @endif
+        <button class="add-btn" onclick="openModal()">
+          <i class="fas fa-user-plus"></i> Add Staff
+        </button>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Staff ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Department</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>STF-001</td>
-          <td>Dr. Ana Reyes</td>
-          <td>ana.reyes@email.com</td>
-          <td>Dean</td>
-          <td>Business Administration</td>
-          <td><span class="status-active">Active</span></td>
-          <td class="actions">
-            <button class="edit">Edit</button>
-            <button class="suspend">Suspend</button>
-            <button class="delete">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Staff ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($deans as $dean)
+            <tr>
+              <td>D-{{ $dean->id }}</td>
+              <td>{{ $dean->name }}</td>
+              <td>{{ $dean->username }}</td>
+              <td>Dean</td>
+              <td>{{ $dean->profile->department ?? 'N/A' }}</td>
+              <td><span class="{{ $dean->is_active ? 'status-active' : 'status-inactive' }}">{{ $dean->is_active ? 'Active' : 'Inactive' }}</span></td>
+              <td class="actions">
+                <form method="POST" action="{{ route('admin.dean.suspend', $dean->id) }}" style="display:inline;">
+                  @csrf
+                  @method('PATCH')
+                  <button class="suspend">{{ $dean->is_active ? 'Suspend' : 'Activate' }}</button>
+                </form>
+                <form method="POST" action="{{ route('admin.dean.destroy', $dean->id) }}" style="display:inline;">
+                  @csrf
+                  @method('DELETE')
+                  <button class="delete">Delete</button>
+                </form>
+              </td>
+            </tr>
+            @endforeach
+            @foreach($teachers as $teacher)
+            <tr>
+              <td>T-{{ $teacher->id }}</td>
+              <td>{{ $teacher->name }}</td>
+              <td>{{ $teacher->username }}</td>
+              <td>Teacher</td>
+              <td>{{ $teacher->profile->department ?? 'N/A' }}</td>
+              <td><span class="{{ $teacher->is_active ? 'status-active' : 'status-inactive' }}">{{ $teacher->is_active ? 'Active' : 'Inactive' }}</span></td>
+              <td class="actions">
+                <form method="POST" action="{{ route('admin.teacher.suspend', $teacher->id) }}" style="display:inline;">
+                  @csrf
+                  @method('PATCH')
+                  <button class="suspend">{{ $teacher->is_active ? 'Suspend' : 'Activate' }}</button>
+                </form>
+                <form method="POST" action="{{ route('admin.teacher.destroy', $teacher->id) }}" style="display:inline;">
+                  @csrf
+                  @method('DELETE')
+                  <button class="delete">Delete</button>
+                </form>
+              </td>
+            </tr>
+            @endforeach
+          </tbody>
+        </table>
   </div>
 
   <!-- Modal -->
   <div class="modal" id="addStaffModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal()">&times;</span>
-      <h3>Create Dean / Teacher Account</h3>
+      <form method="POST" action="{{ route('admin.addstaff.store') }}">
+        @csrf
+        <h3>Create Dean / Teacher Account</h3>
 
-      <label for="name">Full Name</label>
-      <input type="text" id="name" placeholder="Enter full name">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Enter full name" required>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="Enter email">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter email" required>
 
-      <label for="role">Role</label>
-      <select id="role" onchange="toggleDepartment()">
-        <option value="Dean">Dean</option>
-        <option value="Teacher">Teacher</option>
-      </select>
-
-      <div id="departmentRow" style="display:none;">
-        <label for="department">Department</label>
-        <select id="department">
-          <option value="IT">Information Technology</option>
-          <option value="Education">Education</option>
-          <option value="Business">Business Administration</option>
-          <option value="Engineering">Engineering</option>
+        <label for="role">Role</label>
+        <select id="role" name="role" onchange="toggleDepartment()" required>
+          <option value="Dean">Dean</option>
+          <option value="Teacher">Teacher</option>
         </select>
-      </div>
 
-      <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter password">
+        <div id="departmentRow">
+          <label for="department">Department</label>
+          <input type="text" id="department" name="department" placeholder="Enter department">
+        </div>
 
-      <div class="form-actions">
-        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button type="button" class="btn-create">Create Account</button>
-      </div>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter password" required>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn-create">Create Account</button>
+        </div>
+      </form>
     </div>
   </div>
 

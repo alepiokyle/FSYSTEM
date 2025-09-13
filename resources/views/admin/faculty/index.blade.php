@@ -150,19 +150,12 @@ textarea::placeholder {
 
     
     <div class="glass-card">
-        <form method="POST" action="">
+        <form method="POST" action="{{ route('admin.upload-subject.store') }}">
             @csrf
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="department">Department</label>
-                    <select id="department" name="department" class="form-select" required>
-                        <option value="">-- Select Department --</option>
-                        <option value="IT">Information Technology</option>
-                        <option value="Business">Business</option>
-                        <option value="Education">Education</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="Nursing">Nursing</option>
-                    </select>
+                   <input type="text" name="department" class="form-control" id="department" placeholder="Enter department">
                 </div>
                 <div class="col-md-6">
                     <label for="subject_code">Subject Code</label>

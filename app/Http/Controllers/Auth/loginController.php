@@ -27,10 +27,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $user = Auth::guard('web')->user();
 
-            // optional: check is_active
-            if (property_exists($user, 'is_active') && (int) $user->is_active !== 1) {
+            // Check is_active
+            if (!isset($user->is_active) || (int) $user->is_active !== 1) {
                 Auth::guard('web')->logout();
-                return back()->withErrors(['login_error' => 'User account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // // Unexpected role on web guard
@@ -51,10 +53,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $parent = Auth::guard('parent')->user();
 
-            // optional: check is_active
-            if (property_exists($parent, 'is_active') && (int) $parent->is_active !== 1) {
+            // Check is_active
+            if (!isset($parent->is_active) || (int) $parent->is_active !== 1) {
                 Auth::guard('parent')->logout();
-                return back()->withErrors(['login_error' => 'Parent account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // optional: role check
@@ -71,10 +75,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $admin = Auth::guard('admin')->user();
 
-            // optional: check is_active
-            if (property_exists($admin, 'is_active') && (int)  $admin->is_active !== 1) {
+            // Check is_active
+            if (!isset($admin->is_active) || (int)  $admin->is_active !== 1) {
                 Auth::guard('admin')->logout();
-                return back()->withErrors(['login_error' => 'Admin account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // optional: role check
@@ -91,10 +97,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $dean = Auth::guard('dean')->user();
 
-            // optional: check is_active
-            if (property_exists($dean, 'is_active') && (int)  $dean->is_active !== 1) {
+            // Check is_active
+            if (!isset($dean->is_active) || (int)  $dean->is_active !== 1) {
                 Auth::guard('dean')->logout();
-                return back()->withErrors(['login_error' => 'dean account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // optional: role check
@@ -111,10 +119,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $teacher = Auth::guard('teacher')->user();
 
-            // optional: check is_active
-            if (property_exists($teacher, 'is_active') && (int)  $teacher->is_active !== 1) {
+            // Check is_active
+            if (!isset($teacher->is_active) || (int)  $teacher->is_active !== 1) {
                 Auth::guard('teacher')->logout();
-                return back()->withErrors(['login_error' => 'teacher account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // optional: role check

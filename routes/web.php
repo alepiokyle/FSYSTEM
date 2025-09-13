@@ -26,6 +26,9 @@ Route::get('/registration/review', [App\Http\Controllers\Auth\RegistrationContro
 Route::get('/login', [App\Http\Controllers\Auth\loginController::class, 'create'])->name('login');
 Route::post('/signin', [App\Http\Controllers\Auth\loginController::class, 'store'])->name('signin');
 Route::post('/logout', [App\Http\Controllers\Auth\logoutController::class, 'userDestroy'])->name('logout');
+Route::get('/suspended', function () {
+    return view('auth.suspended');
+})->name('suspended');
 
 // Admin
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
@@ -33,6 +36,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     Route::controller(App\Http\Controllers\Admin\addFacultyController::class)->group(function () {
         Route::get('/upload-subject', 'index')->name('admin.upload-subject');
+        Route::post('/upload-subject', 'store')->name('admin.upload-subject.store');
     });
 
 
@@ -55,6 +59,13 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     Route::controller(App\Http\Controllers\Admin\ViewAddStaffController::class)->group(function () {
         Route::get('/view-addstaff', 'index')->name('view.addstaff');
+        Route::post('/view-addstaff', 'store')->name('admin.addstaff.store');
+        // Route::put('/dean/{id}', 'updateDean')->name('admin.dean.update');
+        // Route::put('/teacher/{id}', 'updateTeacher')->name('admin.teacher.update');
+        Route::delete('/dean/{id}', 'destroyDean')->name('admin.dean.destroy');
+        Route::delete('/teacher/{id}', 'destroyTeacher')->name('admin.teacher.destroy');
+        Route::patch('/dean/{id}/suspend', 'suspendDean')->name('admin.dean.suspend');
+        Route::patch('/teacher/{id}/suspend', 'suspendTeacher')->name('admin.teacher.suspend');
     });
 
     Route::get('/uploadsubject', [App\Http\Controllers\Admin\UploadSubjectController::class, 'index'])->name('admin.uploadsubject');
