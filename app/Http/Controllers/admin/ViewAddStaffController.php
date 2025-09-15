@@ -9,6 +9,7 @@ use App\Models\DeanProfile;
 use App\Models\TeacherAccount;
 use App\Models\TeacherProfile;
 use App\Models\UserRole;
+use App\Models\Department;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -38,13 +39,15 @@ class ViewAddStaffController extends Controller
         $middleName = count($nameParts) > 2 ? $nameParts[1] : null;
         $lastName = count($nameParts) > 1 ? $nameParts[count($nameParts) - 1] : '';
 
+        $department = Department::firstOrCreate(['name' => $validated['department']]);
+
         if ($validated['role'] === 'Teacher') {
             // Create teacher profile
             $profile = TeacherProfile::create([
                 'first_name' => $firstName,
                 'middle_name' => $middleName,
                 'last_name' => $lastName,
-                'department' => $validated['department'],
+                'department_id' => $department->id,
             ]);
 
             // Create teacher account
@@ -62,7 +65,7 @@ class ViewAddStaffController extends Controller
                 'first_name' => $firstName,
                 'middle_name' => $middleName,
                 'last_name' => $lastName,
-                'department' => $validated['department'],
+                'department_id' => $department->id,
             ]);
 
             // Create dean account

@@ -12,6 +12,11 @@ class DeanProfile extends Model
         'first_name',
         'middle_name',
         'last_name',
-        'department',
+        'department_id',
     ];
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
 }

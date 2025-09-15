@@ -227,7 +227,7 @@
               <td>{{ $dean->name }}</td>
               <td>{{ $dean->username }}</td>
               <td>Dean</td>
-              <td>{{ $dean->profile->department ?? 'N/A' }}</td>
+              <td>{{ $dean->profile->department->name ?? 'N/A' }}</td>
               <td><span class="{{ $dean->is_active ? 'status-active' : 'status-inactive' }}">{{ $dean->is_active ? 'Active' : 'Inactive' }}</span></td>
               <td class="actions">
                 <form method="POST" action="{{ route('admin.dean.suspend', $dean->id) }}" style="display:inline;">
@@ -249,7 +249,7 @@
               <td>{{ $teacher->name }}</td>
               <td>{{ $teacher->username }}</td>
               <td>Teacher</td>
-              <td>{{ $teacher->profile->department ?? 'N/A' }}</td>
+              <td>{{ $teacher->profile->department->name ?? 'N/A' }}</td>
               <td><span class="{{ $teacher->is_active ? 'status-active' : 'status-inactive' }}">{{ $teacher->is_active ? 'Active' : 'Inactive' }}</span></td>
               <td class="actions">
                 <form method="POST" action="{{ route('admin.teacher.suspend', $teacher->id) }}" style="display:inline;">
