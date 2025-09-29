@@ -33,53 +33,70 @@ class ViewAddStaffController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        // Split full name into parts
-        $nameParts = explode(' ', $validated['name']);
-        $firstName = $nameParts[0] ?? '';
-        $middleName = count($nameParts) > 2 ? $nameParts[1] : null;
-        $lastName = count($nameParts) > 1 ? $nameParts[count($nameParts) - 1] : '';
+        try {
+            // Split full name into parts
+            $nameParts = explode(' ', $validated['name']);
+            $firstName = $nameParts[0] ?? '';
+            $middleName = count($nameParts) > 2 ? $nameParts[1] : null;
+            $lastName = count($nameParts) > 1 ? $nameParts[count($nameParts) - 1] : '';
 
-        $department = Department::firstOrCreate(['name' => $validated['department']]);
+            $department = null;
+            if (!empty($validated['department'])) {
+                $department = Department::firstOrCreate(['name' => $validated['department']]);
+            }
 
-        if ($validated['role'] === 'Teacher') {
-            // Create teacher profile
-            $profile = TeacherProfile::create([
-                'first_name' => $firstName,
-                'middle_name' => $middleName,
-                'last_name' => $lastName,
-                'department_id' => $department->id,
-            ]);
+            if ($validated['role'] === 'Teacher') {
+                $userRole = UserRole::where('role', 'Teacher')->first();
+                if (!$userRole) {
+                    return redirect()->back()->withErrors(['role' => 'Teacher role not found. Please seed the database.']);
+                }
 
-            // Create teacher account
-            TeacherAccount::create([
-                'teachers_profile_id' => $profile->id,
-                'name' => $validated['name'],
-                'username' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'user_role_id' => UserRole::where('role', 'Teacher')->first()->id,
-                'is_active' => true,
-            ]);
-        } else {
-            // Create dean profile
-            $profile = DeanProfile::create([
-                'first_name' => $firstName,
-                'middle_name' => $middleName,
-                'last_name' => $lastName,
-                'department_id' => $department->id,
-            ]);
+                // Create teacher profile
+                $profile = TeacherProfile::create([
+                    'first_name' => $firstName,
+                    'middle_name' => $middleName,
+                    'last_name' => $lastName,
+                    'department_id' => $department ? $department->id : null,
+                ]);
 
-            // Create dean account
-            DeanAccount::create([
-                'deans_profile_id' => $profile->id,
-                'name' => $validated['name'],
-                'username' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'user_role_id' => UserRole::where('role', 'Dean')->first()->id,
-                'is_active' => true,
-            ]);
+                // Create teacher account
+                TeacherAccount::create([
+                    'teachers_profile_id' => $profile->id,
+                    'name' => $validated['name'],
+                    'username' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    'user_role_id' => $userRole->id,
+                    'is_active' => true,
+                ]);
+            } else {
+                $userRole = UserRole::where('role', 'Dean')->first();
+                if (!$userRole) {
+                    return redirect()->back()->withErrors(['role' => 'Dean role not found. Please seed the database.']);
+                }
+
+                // Create dean profile
+                $profile = DeanProfile::create([
+                    'first_name' => $firstName,
+                    'middle_name' => $middleName,
+                    'last_name' => $lastName,
+                    'department_id' => $department->id,
+                ]);
+
+                // Create dean account
+                DeanAccount::create([
+                    'deans_profile_id' => $profile->id,
+                    'name' => $validated['name'],
+                    'username' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    'user_role_id' => $userRole->id,
+                    'is_active' => true,
+                ]);
+            }
+
+            return redirect()->route('view.addstaff')->with('success', 'Staff account created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Failed to create staff account: ' . $e->getMessage()]);
         }
-
-        return redirect()->route('view.addstaff')->with('success', 'Staff account created successfully.');
     }
 
     public function destroyDean($id)

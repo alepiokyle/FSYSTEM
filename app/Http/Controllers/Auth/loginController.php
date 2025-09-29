@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\TeacherAccount;
 
 class loginController extends Controller
 {
@@ -132,6 +133,9 @@ class loginController extends Controller
                 Auth::guard('teacher')->logout();
                 return back()->withErrors(['login_error' => 'Unauthorized role for teacher guard.'])->withInput();
             }
+
+            // Update last login timestamp
+            $teacher->update(['last_login_at' => now()]);
 
             return redirect()->route('teacher.teacherdashboard')->with('success', 'Logged In Successfully');
         }

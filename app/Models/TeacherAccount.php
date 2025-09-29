@@ -25,11 +25,19 @@ class TeacherAccount extends Authenticatable
         'password',
         'user_role_id',
         'is_active',
+        'last_login_at',
     ];
+
     // Hidden fields
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    // Cast fields
+    protected $casts = [
+        'last_login_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     // Role relationship

@@ -88,6 +88,9 @@
         <script src="{{ asset('all/assets/js/pcoded.js') }}"></script>
         <script src="{{ asset('all/assets/js/plugins/feather.min.js') }}"></script>
 
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
          <!-- SweetAlert2 CDN -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </body>
@@ -130,4 +133,3 @@
 </script>
 
 </html>
-

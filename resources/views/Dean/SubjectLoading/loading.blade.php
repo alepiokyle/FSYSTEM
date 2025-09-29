@@ -32,6 +32,53 @@
         .table th {
             background: #f8f9fa;
         }
+
+        /* Badge styles */
+        .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .py-4 {
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
+        }
+
+        /* Action buttons */
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+            margin: 0 0.125rem;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+            color: white;
+        }
     </style>
 
     <!-- ====== Page Header ====== -->
@@ -63,45 +110,48 @@
                 <th>Semester</th>
                 <th>Date Uploaded</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Example of a NEW subject -->
-            <tr>
-                <td>IT101</td>
-                <td>Intro to Computing</td>
-                <td>3</td>
-                <td>BSIT</td>
-                <td>1st Sem</td>
-                <td>2025-09-01</td>
-                <td><span class="badge bg-success">🆕 New</span></td>
-            </tr>
-
-            <!-- Example of an OLD subject -->
-            <tr>
-                <td>IT102</td>
-                <td>Programming Fundamentals</td>
-                <td>4</td>
-                <td>BSIT</td>
-                <td>1st Sem</td>
-                <td>2025-06-15</td>
-                <td><span class="badge bg-secondary">Old</span></td>
-            </tr>
-
-            <!-- Example of another NEW subject -->
-            <tr>
-                <td>ENG101</td>
-                <td>Communication Skills</td>
-                <td>3</td>
-                <td>BSED</td>
-                <td>1st Sem</td>
-                <td>2025-09-05</td>
-                <td><span class="badge bg-success">🆕 New</span></td>
-            </tr>
+            @forelse($subjects as $subject)
+                <tr>
+                    <td><strong>{{ $subject->subject_code }}</strong></td>
+                    <td>{{ $subject->subject_name }}</td>
+                    <td>
+                        <span class="badge bg-primary">{{ $subject->units }} unit{{ $subject->units > 1 ? 's' : '' }}</span>
+                    </td>
+                    <td>{{ $subject->department }}</td>
+                    <td>{{ $subject->semester }}</td>
+                    <td>{{ $subject->created_at->format('M d, Y') }}</td>
+                    <td>
+                        @if($subject->status == 'Active')
+                            <span class="badge bg-success">Active</span>
+                        @elseif($subject->status == 'Inactive')
+                            <span class="badge bg-secondary">Inactive</span>
+                        @else
+                            <span class="badge bg-warning">Pending</span>
+                        @endif
+                    </td>
+                    <td>
+                        <button class="btn btn-edit btn-action" title="Edit Subject">
+                            <i class="ti ti-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-delete btn-action" title="Delete Subject" onclick="deleteSubject({{ $subject->id }}, '{{ $subject->subject_code }} - {{ $subject->subject_name }}')">
+                            <i class="ti ti-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        <em>No subjects uploaded yet. Subjects will appear here once uploaded by admin.</em>
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
-</div>
-
+    </div>
     <!-- ====== Subject Loading Form ====== -->
     <div class="card">
         <h4>➕ Load Students to a Subject</h4>
@@ -139,4 +189,92 @@
             <button type="submit" class="btn btn-primary">Load Students</button>
         </form>
     </div>
+
+    <!-- CSRF Token for AJAX requests -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <script>
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        async function deleteSubject(subjectId, subjectName) {
+            const result = await Swal.fire({
+                title: "<i class='ti ti-alert-triangle text-warning'></i> Delete Subject",
+                html: `<p style='font-size:14px; color:#4b5563;'>Are you sure you want to delete the subject <strong>"${subjectName}"</strong>?</p><p style='font-size:12px; color:#6b7280; margin-top:10px;'>This action cannot be undone.</p>`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "<i class='ti ti-trash'></i> Yes, Delete",
+                cancelButtonText: "<i class='ti ti-x'></i> Cancel",
+                confirmButtonColor: "#dc3545",
+                cancelButtonColor: "#6c757d",
+                background: "#f8f9fa",
+                color: "#212529",
+                customClass: {
+                    popup: "rounded-xl shadow-2xl border border-gray-300",
+                    title: "text-lg font-semibold text-gray-800",
+                    confirmButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-red-600",
+                    cancelButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-gray-500"
+                }
+            });
+
+            if (result.isConfirmed) {
+                // Show loading state
+                Swal.fire({
+                    title: "<i class='ti ti-loader text-primary' style='animation: spin 1s linear infinite;'></i> Deleting...",
+                    text: "Please wait while we delete the subject",
+                    showConfirmButton: false,
+                    background: "#f8f9fa",
+                    color: "#212529",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
+
+                try {
+                    // Perform fetch delete request
+                    const response = await fetch(`/dean/SubjectLoading/${subjectId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        Swal.fire({
+                            title: "<i class='ti ti-check text-success'></i> Deleted!",
+                            text: data.message,
+                            icon: "success",
+                            confirmButtonText: "<i class='ti ti-check'></i> OK",
+                            confirmButtonColor: "#28a745",
+                            background: "#f8f9fa",
+                            color: "#212529",
+                            customClass: {
+                                popup: "rounded-xl shadow-2xl border border-gray-300",
+                                confirmButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-green-600"
+                            }
+                        }).then(() => {
+                            // Reload the page to show updated data
+                            location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to delete subject');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    Swal.fire({
+                        title: "<i class='ti ti-x text-danger'></i> Error!",
+                        text: error.message || "Failed to delete subject. Please try again.",
+                        icon: "error",
+                        confirmButtonText: "<i class='ti ti-check'></i> OK",
+                        confirmButtonColor: "#dc3545",
+                        background: "#f8f9fa",
+                        color: "#212529"
+                    });
+                }
+            }
+        }
+    </script>
 </x-dean-component>

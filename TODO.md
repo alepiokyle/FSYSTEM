@@ -1,12 +1,27 @@
-# TODO: Remove Edit User Profile in Admin
+# Admin Grade Section - Design & Centering Improvements
 
-## Step 1: Update the Admin Staff View
-- [x] Remove "Edit" buttons from dean and teacher rows in `resources/views/admin/AddStaff/addstaff.blade.php`
-- [x] Remove the `editStaff` JavaScript function
-- [x] Remove edit-related logic from modal (hidden staff_id input, update action, etc.)
+## Current Status: In Progress
 
-## Step 2: Update Routes
-- [x] Comment out PUT routes for dean and teacher updates in `routes/web.php`
+### Completed Tasks:
+- [ ] Improve design and center content in Grade.blade.php
 
-## Step 3: Update Controller
-- [x] Comment out `updateDean` and `updateTeacher` methods in `app/Http/Controllers/Admin/ViewAddStaffController.php`
+### Remaining Tasks:
+- [ ] Test responsive design
+- [ ] Verify content centering on different screen sizes
+- [ ] Check visual improvements
+
+## Changes Made:
+1. **Design Improvements:**
+   - Enhanced glass morphism effects
+   - Better color scheme and typography
+   - Improved spacing and visual hierarchy
+   - Added subtle hover effects
+
+2. **Content Centering:**
+   - Centered main content area
+   - Improved layout structure
+   - Better alignment of elements
+   - Responsive centering
+
+## Files Modified:
+- `resources/views/admin/Views/Grade.blade.php` - Main design and centering improvements

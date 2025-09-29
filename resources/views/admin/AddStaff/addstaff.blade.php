@@ -204,6 +204,15 @@
         {{ session('success') }}
       </div>
     @endif
+    @if($errors->any())
+      <div style="background: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 20px; border-radius: 6px;">
+        <ul>
+          @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
         <button class="add-btn" onclick="openModal()">
           <i class="fas fa-user-plus"></i> Add Staff
         </button>

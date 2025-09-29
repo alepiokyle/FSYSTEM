@@ -14,26 +14,15 @@
             <span class="pc-mtext">Upload Subjects</span>
           </a>
         </li>
-        <li class="pc-item">
-          <a href="{{ route('admin.uploadsubject')}}" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-eye"></i></span>
+
+           <li class="pc-item">
+           <a href="{{ route('admin.Grade')}}" class="pc-link">
+            <span class="pc-micon"><i class="ti ti-user-check"></i></span>
             <span class="pc-mtext">View Student Grades</span>
           </a>
         </li>
-        <li class="pc-item">
-           <a href="{{ route('view.dean')}}" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-user-check"></i></span>
-            <span class="pc-mtext">Dean Account</span>
-          </a>
-        </li>
 
-     
-        <li class="pc-item">
-          <a href="{{ route('view.teacher')}}" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-user"></i></span>
-            <span class="pc-mtext">Teacher Account</span>
-          </a>
-        </li>
+      
         <li class="pc-item">
        <a href="{{ route('view.student')}}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-users"></i></span>
