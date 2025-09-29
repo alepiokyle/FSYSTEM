@@ -179,9 +179,11 @@
             <div class="mb-3">
                 <label for="students" class="form-label">Select Students:</label>
                 <select id="students" class="form-select" multiple>
-                    <option value="S001">S001 - John Doe</option>
-                    <option value="S002">S002 - Jane Smith</option>
-                    <option value="S003">S003 - Mark Lee</option>
+                    @foreach($students as $student)
+                        @if($student->profile)
+                            <option value="{{ $student->profile->student_id }}">{{ $student->profile->student_id }} - {{ $student->profile->first_name }} {{ $student->profile->last_name }}</option>
+                        @endif
+                    @endforeach
                 </select>
                 <div class="form-text">Hold CTRL (Windows) or CMD (Mac) to select multiple students.</div>
             </div>

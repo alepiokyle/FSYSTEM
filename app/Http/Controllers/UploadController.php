@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Subject;
+use App\Models\Department;
 
 class UploadController extends Controller
 {
@@ -16,7 +17,8 @@ class UploadController extends Controller
         \Log::info('UploadController@index called - returning latest 10 subjects');
 
         $subjects = Subject::latest()->take(10)->get(); // Get latest 10 subjects
-        return view('admin.uploadSubject.subject', compact('subjects'));
+        $departments = Department::all(); // Get all departments
+        return view('admin.uploadSubject.subject', compact('subjects', 'departments'));
     }
 
     /**

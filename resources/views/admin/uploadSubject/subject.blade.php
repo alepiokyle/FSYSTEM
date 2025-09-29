@@ -321,12 +321,9 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
                 <label for="department">Department</label>
                 <select id="department" name="department" class="form-select" required>
                     <option value="">-- Select Department --</option>
-                    <option value="IT">Information Technology</option>
-                    <option value="Business">Business Administration</option>
-                    <option value="Education">Education</option>
-                    <option value="Engineering">Engineering</option>
-                    <option value="Arts">Arts and Sciences</option>
-                    <option value="Nursing">Nursing</option>
+                    @foreach($departments as $department)
+                        <option value="{{ $department->name }}">{{ $department->name }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-md-6">

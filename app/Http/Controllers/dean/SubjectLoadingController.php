@@ -4,16 +4,29 @@ namespace App\Http\Controllers\dean;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Subject;
+use App\Models\User;
 
 class SubjectLoadingController extends Controller
 {
     public function index()
     {
-        // Fetch all subjects from database, ordered by creation date (newest first)
-        $subjects = Subject::orderBy('created_at', 'desc')->get();
+        // Get the authenticated dean
+        $dean = Auth::guard('dean')->user();
 
-        return view('Dean.SubjectLoading.loading', compact('subjects'));
+        // Get the dean's department name
+        $departmentName = $dean->profile->department->name;
+
+        // Fetch subjects filtered by the dean's department, ordered by creation date (newest first)
+        $subjects = Subject::where('department', $departmentName)
+                          ->orderBy('created_at', 'desc')
+                          ->get();
+
+        // Fetch all students
+        $students = User::where('user_role_id', 7)->with('profile')->get();
+
+        return view('Dean.SubjectLoading.loading', compact('subjects', 'students'));
     }
 
     /**
