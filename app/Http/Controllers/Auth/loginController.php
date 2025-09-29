@@ -16,6 +16,17 @@ class loginController extends Controller
 
     public function store(Request $request)
     {
+        // Logout any existing authenticated guards to prevent multiple accounts logged in
+        if (Auth::guard('web')->check() || Auth::guard('parent')->check() || Auth::guard('admin')->check() || Auth::guard('dean')->check() || Auth::guard('teacher')->check()) {
+            Auth::guard('web')->logout();
+            Auth::guard('parent')->logout();
+            Auth::guard('admin')->logout();
+            Auth::guard('dean')->logout();
+            Auth::guard('teacher')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
