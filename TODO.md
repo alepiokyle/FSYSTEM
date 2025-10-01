@@ -1,1 +1,2 @@
 - [x] Modify loginController create method to check authentication and redirect logged-in users
+- [x] Update root route to use loginController create method for consistency

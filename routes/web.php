@@ -12,9 +12,7 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\dean\DeanController;
 use App\Models\User;
 
-Route::get('/', function () {
-    return view('userAuth.login');
-});
+Route::get('/', [App\Http\Controllers\Auth\loginController::class, 'create']);
 
 Route::get('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'index'])->name('register');
 Route::post('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'store'])->name('register.store');
