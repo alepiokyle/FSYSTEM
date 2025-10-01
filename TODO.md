@@ -1,1 +1,1 @@
-- [x] Modify loginController.php to logout existing authenticated guards before new login attempts
+- [x] Modify loginController create method to check authentication and redirect logged-in users

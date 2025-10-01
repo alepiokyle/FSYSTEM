@@ -1,25 +1,12 @@
 <x-admin-component>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Add Staff</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f6fa;
-      margin: 0;
-      padding: 20px;
-    }
-
     .card {
       background: #fff;
       border-radius: 12px;
       padding: 20px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       max-width: 1000px;
-      margin: auto;
+      margin: 20px auto;
       position: relative;
     }
 
@@ -117,7 +104,7 @@
       font-weight: bold;
       font-size: 14px;
     }
-    .modal-content input, 
+    .modal-content input,
     .modal-content select {
       width: 100%;
       padding: 8px;
@@ -157,46 +144,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
-  <script>
-    function resetModal() {
-      document.getElementById("name").value = '';
-      document.getElementById("email").value = '';
-      document.getElementById("role").value = 'Dean';
-      document.getElementById("department").value = '';
-      document.querySelector("#addStaffModal form").action = "{{ route('admin.addstaff.store') }}";
-      document.querySelector("#addStaffModal form").method = "POST";
-      document.querySelector(".btn-create").textContent = "Create";
-      document.querySelector("h3").textContent = "Create Dean / Teacher Account";
-      toggleDepartment();
-    }
-
-    function openModal() {
-      resetModal();
-      document.getElementById("addStaffModal").style.display = "flex";
-    }
-    function closeModal() {
-      document.getElementById("addStaffModal").style.display = "none";
-      resetModal();
-    }
-
-    function toggleDepartment() {
-      const role = document.getElementById("role").value;
-      const deptRow = document.getElementById("departmentRow");
-      const deptInput = document.getElementById("department");
-      if (role === "Teacher") {
-        deptRow.style.display = "none";
-        deptInput.removeAttribute("required");
-      } else {
-        deptRow.style.display = "block";
-        deptInput.setAttribute("required", "required");
-      }
-    }
-
-
-  </script>
-</head>
-<body>
-
   <div class="card">
     <h2>Staff Accounts (Deans & Teachers)</h2>
     @if(session('success'))
@@ -213,69 +160,69 @@
         </ul>
       </div>
     @endif
-        <button class="add-btn" onclick="openModal()">
-          <i class="fas fa-user-plus"></i> Add Staff
-        </button>
+    <button class="add-btn" onclick="openModal()">
+      <i class="fas fa-user-plus"></i> Add Staff
+    </button>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Staff ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Department</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach($deans as $dean)
-            <tr>
-              <td>D-{{ $dean->id }}</td>
-              <td>{{ $dean->name }}</td>
-              <td>{{ $dean->username }}</td>
-              <td>Dean</td>
-              <td>{{ $dean->profile->department->name ?? 'N/A' }}</td>
-              <td><span class="{{ $dean->is_active ? 'status-active' : 'status-inactive' }}">{{ $dean->is_active ? 'Active' : 'Inactive' }}</span></td>
-              <td class="actions">
-                <form method="POST" action="{{ route('admin.dean.suspend', $dean->id) }}" style="display:inline;">
-                  @csrf
-                  @method('PATCH')
-                  <button class="suspend">{{ $dean->is_active ? 'Suspend' : 'Activate' }}</button>
-                </form>
-                <form method="POST" action="{{ route('admin.dean.destroy', $dean->id) }}" style="display:inline;">
-                  @csrf
-                  @method('DELETE')
-                  <button class="delete">Delete</button>
-                </form>
-              </td>
-            </tr>
-            @endforeach
-            @foreach($teachers as $teacher)
-            <tr>
-              <td>T-{{ $teacher->id }}</td>
-              <td>{{ $teacher->name }}</td>
-              <td>{{ $teacher->username }}</td>
-              <td>Teacher</td>
-              <td>{{ $teacher->profile->department->name ?? 'N/A' }}</td>
-              <td><span class="{{ $teacher->is_active ? 'status-active' : 'status-inactive' }}">{{ $teacher->is_active ? 'Active' : 'Inactive' }}</span></td>
-              <td class="actions">
-                <form method="POST" action="{{ route('admin.teacher.suspend', $teacher->id) }}" style="display:inline;">
-                  @csrf
-                  @method('PATCH')
-                  <button class="suspend">{{ $teacher->is_active ? 'Suspend' : 'Activate' }}</button>
-                </form>
-                <form method="POST" action="{{ route('admin.teacher.destroy', $teacher->id) }}" style="display:inline;">
-                  @csrf
-                  @method('DELETE')
-                  <button class="delete">Delete</button>
-                </form>
-              </td>
-            </tr>
-            @endforeach
-          </tbody>
-        </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Staff ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($deans as $dean)
+        <tr>
+          <td>D-{{ $dean->id }}</td>
+          <td>{{ $dean->name }}</td>
+          <td>{{ $dean->username }}</td>
+          <td>Dean</td>
+          <td>{{ $dean->profile->department->name ?? 'N/A' }}</td>
+          <td><span class="{{ $dean->is_active ? 'status-active' : 'status-inactive' }}">{{ $dean->is_active ? 'Active' : 'Inactive' }}</span></td>
+          <td class="actions">
+            <form method="POST" action="{{ route('admin.dean.suspend', $dean->id) }}" style="display:inline;">
+              @csrf
+              @method('PATCH')
+              <button class="suspend">{{ $dean->is_active ? 'Suspend' : 'Activate' }}</button>
+            </form>
+            <form method="POST" action="{{ route('admin.dean.destroy', $dean->id) }}" style="display:inline;">
+              @csrf
+              @method('DELETE')
+              <button class="delete">Delete</button>
+            </form>
+          </td>
+        </tr>
+        @endforeach
+        @foreach($teachers as $teacher)
+        <tr>
+          <td>T-{{ $teacher->id }}</td>
+          <td>{{ $teacher->name }}</td>
+          <td>{{ $teacher->username }}</td>
+          <td>Teacher</td>
+          <td>{{ $teacher->profile->department->name ?? 'N/A' }}</td>
+          <td><span class="{{ $teacher->is_active ? 'status-active' : 'status-inactive' }}">{{ $teacher->is_active ? 'Active' : 'Inactive' }}</span></td>
+          <td class="actions">
+            <form method="POST" action="{{ route('admin.teacher.suspend', $teacher->id) }}" style="display:inline;">
+              @csrf
+              @method('PATCH')
+              <button class="suspend">{{ $teacher->is_active ? 'Suspend' : 'Activate' }}</button>
+            </form>
+            <form method="POST" action="{{ route('admin.teacher.destroy', $teacher->id) }}" style="display:inline;">
+              @csrf
+              @method('DELETE')
+              <button class="delete">Delete</button>
+            </form>
+          </td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
   </div>
 
   <!-- Modal -->
@@ -314,6 +261,39 @@
     </div>
   </div>
 
-</body>
-</html>
+  <script>
+    function resetModal() {
+      document.getElementById("name").value = '';
+      document.getElementById("email").value = '';
+      document.getElementById("role").value = 'Dean';
+      document.getElementById("department").value = '';
+      document.querySelector("#addStaffModal form").action = "{{ route('admin.addstaff.store') }}";
+      document.querySelector("#addStaffModal form").method = "POST";
+      document.querySelector(".btn-create").textContent = "Create";
+      document.querySelector("h3").textContent = "Create Dean / Teacher Account";
+      toggleDepartment();
+    }
+
+    function openModal() {
+      resetModal();
+      document.getElementById("addStaffModal").style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById("addStaffModal").style.display = "none";
+      resetModal();
+    }
+
+    function toggleDepartment() {
+      const role = document.getElementById("role").value;
+      const deptRow = document.getElementById("departmentRow");
+      const deptInput = document.getElementById("department");
+      if (role === "Teacher") {
+        deptRow.style.display = "none";
+        deptInput.removeAttribute("required");
+      } else {
+        deptRow.style.display = "block";
+        deptInput.setAttribute("required", "required");
+      }
+    }
+  </script>
 </x-admin-component>

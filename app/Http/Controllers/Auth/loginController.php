@@ -11,6 +11,23 @@ class loginController extends Controller
 {
     public function create()
     {
+        // Check if any guard is authenticated and redirect to appropriate dashboard
+        if (Auth::guard('web')->check()) {
+            return redirect()->route('student.studentdashboard');
+        }
+        if (Auth::guard('parent')->check()) {
+            return redirect()->route('parent.parentdashboard');
+        }
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+        if (Auth::guard('dean')->check()) {
+            return redirect()->route('Dean.deandashboard');
+        }
+        if (Auth::guard('teacher')->check()) {
+            return redirect()->route('teacher.teacherdashboard');
+        }
+
         return view('userAuth.login');
     }
 

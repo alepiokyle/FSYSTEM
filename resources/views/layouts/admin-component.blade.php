@@ -66,6 +66,9 @@
                 <a href="{{ route('admin.dashboard') }}" class="b-brand text-primary">
                     <img src="{{ asset('all/assets/images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="Logo">
                 </a>
+                <button class="sidebar-toggle-btn" aria-label="Toggle sidebar">
+                    <i class="ti ti-chevron-left"></i>
+                </button>
             </div>
             @include('admin.partials.sidebar')
         </div>
