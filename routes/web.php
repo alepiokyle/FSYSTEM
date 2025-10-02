@@ -53,10 +53,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     Route::controller(App\Http\Controllers\Admin\viewstudentController::class)->group(function () {
         Route::get('/view-student', 'index')->name('view.student');
+        Route::delete('/student/{id}', 'destroy')->name('admin.student.destroy');
     });
 
     Route::controller(App\Http\Controllers\Admin\ParentAccountController::class)->group(function () {
         Route::get('/view-parent', 'index')->name('view.parent');
+        Route::delete('/parent/{id}', 'destroy')->name('admin.parent.destroy');
     });
 
     Route::controller(App\Http\Controllers\Admin\ViewAddStaffController::class)->group(function () {

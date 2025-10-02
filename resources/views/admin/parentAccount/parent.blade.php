@@ -38,6 +38,11 @@ body {
     border: 1px solid #ccc;
 }
 
+.search-bar button {
+    flex: 0.3;
+    border-radius: 8px;
+}
+
 /* Table */
 .glass-table {
     width: 100%;
@@ -67,10 +72,6 @@ body {
     text-align: left;
     vertical-align: middle;
 }
-
-/* Status */
-.status-active { color: #2ecc71; font-weight: bold; }
-.status-suspended { color: #e74c3c; font-weight: bold; }
 
 /* Action buttons */
 .action-group {
@@ -105,11 +106,6 @@ body {
     <!-- Search + Filter -->
     <form class="search-bar">
         <input type="text" placeholder="Search by parent name, email or student...">
-        <select>
-            <option value="">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Suspended">Suspended</option>
-        </select>
         <button type="button" class="action-btn edit-btn">Filter</button>
     </form>
 
@@ -119,44 +115,46 @@ body {
             <tr>
                 <th>Parent ID</th>
                 <th>Name</th>
-                <th>Email</th>
+                <th>Username</th>
                 <th>Linked Student</th>
-                <th>Status</th>
                 <th style="width: 200px;">Action</th>
             </tr>
         </thead>
         <tbody>
+            @forelse($parents as $parent)
             <tr>
-                <td>P-001</td>
-                <td>Roberto Cruz</td>
-                <td>roberto@email.com</td>
-                <td>Juan Dela Cruz (2023-001)</td>
-                <td><span class="status-active">Active</span></td>
+                <td>{{ $parent->id }}</td>
+                <td>{{ $parent->name }}</td>
+                <td>{{ $parent->username }}</td>
+                <td>
+                    @if($parent->profile && $parent->profile->students->count() > 0)
+                        @foreach($parent->profile->students as $studentProfile)
+                            {{ $studentProfile->user->name }} ({{ $studentProfile->user->username }})
+                            @if(!$loop->last), @endif
+                        @endforeach
+                    @else
+                        No linked student
+                    @endif
+                </td>
                 <td>
                     <div class="action-group">
                         <button class="action-btn edit-btn">Edit</button>
-                        <button class="action-btn suspend-btn">Suspend</button>
-                        <button class="action-btn delete-btn">Delete</button>
+                     
+                        <form method="POST" action="{{ route('admin.parent.destroy', $parent->id) }}" onsubmit="return confirm('Are you sure you want to delete this parent?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="action-btn delete-btn">Delete</button>
+                        </form>
                     </div>
                 </td>
             </tr>
+            @empty
             <tr>
-                <td>P-002</td>
-                <td>Ana Santos</td>
-                <td>ana@email.com</td>
-                <td>Maria Santos (2023-002)</td>
-                <td><span class="status-suspended">Suspended</span></td>
-                <td>
-                    <div class="action-group">
-                        <button class="action-btn edit-btn">Edit</button>
-                        <button class="action-btn suspend-btn">Activate</button>
-                        <button class="action-btn delete-btn">Delete</button>
-                    </div>
-                </td>
+                <td colspan="5">No parent accounts found.</td>
             </tr>
+            @endforelse
         </tbody>
     </table>
 </div>
-
 
 </x-admin-component>

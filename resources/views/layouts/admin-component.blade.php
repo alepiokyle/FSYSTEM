@@ -66,9 +66,7 @@
                 <a href="{{ route('admin.dashboard') }}" class="b-brand text-primary">
                     <img src="{{ asset('all/assets/images/logo-dark.svg') }}" class="img-fluid logo-lg" alt="Logo">
                 </a>
-                <button class="sidebar-toggle-btn" aria-label="Toggle sidebar">
-                    <i class="ti ti-chevron-left"></i>
-                </button>
+              
             </div>
             @include('admin.partials.sidebar')
         </div>
@@ -89,12 +87,7 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="pc-footer">
-        <div class="footer-wrapper container-fluid">
-            @include('admin.partials.footer')
-        </div>
-    </footer>
+   
 
     <!-- Scripts -->
     <!-- Core JS Files -->

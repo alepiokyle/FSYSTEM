@@ -18,4 +18,10 @@ class ParentProfile extends Model
         'relationship',
         'address',
     ];
+
+    // Relationship to students
+    public function students()
+    {
+        return $this->hasMany(UsersProfile::class, 'parents_profile_id', 'id');
+    }
 }

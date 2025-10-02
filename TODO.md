@@ -1,2 +1,2 @@
-- [x] Modify loginController create method to check authentication and redirect logged-in users
-- [x] Update root route to use loginController create method for consistency
+- [x] Fix null property access in resources/views/admin/partials/header.blade.php by adding safe null checks for auth()->user()->name and auth()->user()->role->role
+- [ ] Test the header view to ensure no errors occur when user is not authenticated or user role is null
