@@ -10,5 +10,7 @@ class ViewTeacherController extends Controller
     public function index()
     {
         return view('admin.teacherAccount.teacher');
+
+        
     }
 }

@@ -1,182 +1,282 @@
 <x-dean-component>
-  <div class="subject-loading">
-    <!-- Page Title -->
-    <h2 class="page-title">📘 Subject Loading</h2>
+    <style>
+        /* ====== Background & Page ====== */
+        x-dean-component {
+            background: linear-gradient(to right, #f0f4f8, #ffffff);
+            min-height: 100vh;
+            padding: 20px 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: block;
+        }
 
-    <!-- Subject Loading Form -->
-    <div class="card">
-      <h3>Load Students to Subject</h3>
-      <form>
-        <div class="form-group">
-          <label for="department">Department:</label>
-          <select id="department" name="department">
-            <option value="">-- Select Department --</option>
-            <option value="BSIT">BSIT</option>
-            <option value="BSED">BSED</option>
-            <option value="BEED">BEED</option>
-          </select>
+        /* ====== Page Header ====== */
+        .page-header { margin-bottom: 30px; }
+        .page-header-title h5 { font-weight: 700; font-size: 1.8rem; color: #222; }
+        .breadcrumb { padding: 0; margin-top: 5px; background: transparent; }
+        .breadcrumb-item a { text-decoration: none; color: #555; }
+        .breadcrumb-item a:hover { text-decoration: underline; }
+
+        /* ====== Cards ====== */
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 25px;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
+        .card h4, .card h6 { font-weight: 600; margin-bottom: 15px; }
+
+        /* Table */
+        .table th {
+            background: #f8f9fa;
+        }
+
+        /* Badge styles */
+        .badge {
+            font-size: 0.75em;
+            padding: 0.35em 0.65em;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .py-4 {
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
+        }
+
+        /* Action buttons */
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+            margin: 0 0.125rem;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+            color: white;
+        }
+    </style>
+
+    <!-- ====== Page Header ====== -->
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title"><h5>Dean Dashboard</h5></div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../dashboard/index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Subject Loading</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-
-        <div class="form-group">
-          <label for="yearLevel">Year Level & Section:</label>
-          <select id="yearLevel" name="yearLevel">
-            <option value="">-- Select Year & Section --</option>
-            <option value="1A">1st Year - Section A</option>
-            <option value="1B">1st Year - Section B</option>
-            <option value="2A">2nd Year - Section A</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="subject">Subject:</label>
-          <select id="subject" name="subject">
-            <option value="">-- Select Subject --</option>
-            <option value="IT101">IT101 - Intro to Computing</option>
-            <option value="IT102">IT102 - Programming Fundamentals</option>
-            <option value="ENG101">ENG101 - Communication Skills</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="students">Select Students:</label>
-          <select id="students" name="students" multiple>
-            <option value="1001">Juan Dela Cruz</option>
-            <option value="1002">Maria Santos</option>
-            <option value="1003">Pedro Reyes</option>
-            <option value="1004">Ana Dizon</option>
-          </select>
-          <small>Hold CTRL (Windows) or CMD (Mac) to select multiple students.</small>
-        </div>
-
-        <button type="submit" class="btn">➕ Load Students</button>
-      </form>
     </div>
 
-    <!-- Current Loaded Students Table -->
-    <div class="card">
-      <h3>📋 Currently Loaded Students</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Student ID</th>
-            <th>Name</th>
-            <th>Subject</th>
-            <th>Year & Section</th>
-            <th>Action</th>
-          </tr>
+ <!-- ====== Uploaded Subjects from Admin ====== -->
+<div class="card mt-4">
+    <h4>📘 Subjects Uploaded by Admin</h4>
+    <table class="table table-hover table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Units</th>
+                <th>Department</th>
+                <th>Semester</th>
+                <th>Date Uploaded</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1001</td>
-            <td>Juan Dela Cruz</td>
-            <td>IT101 - Intro to Computing</td>
-            <td>1st Year - Section A</td>
-            <td><button class="btn-danger">❌ Remove</button></td>
-          </tr>
-          <tr>
-            <td>1002</td>
-            <td>Maria Santos</td>
-            <td>IT101 - Intro to Computing</td>
-            <td>1st Year - Section A</td>
-            <td><button class="btn-danger">❌ Remove</button></td>
-          </tr>
+            @forelse($subjects as $subject)
+                <tr>
+                    <td><strong>{{ $subject->subject_code }}</strong></td>
+                    <td>{{ $subject->subject_name }}</td>
+                    <td>
+                        <span class="badge bg-primary">{{ $subject->units }} unit{{ $subject->units > 1 ? 's' : '' }}</span>
+                    </td>
+                    <td>{{ $subject->department }}</td>
+                    <td>{{ $subject->semester }}</td>
+                    <td>{{ $subject->created_at->format('M d, Y') }}</td>
+                    <td>
+                        @if($subject->status == 'Active')
+                            <span class="badge bg-success">Active</span>
+                        @elseif($subject->status == 'Inactive')
+                            <span class="badge bg-secondary">Inactive</span>
+                        @else
+                            <span class="badge bg-warning">Pending</span>
+                        @endif
+                    </td>
+                    <td>
+                        <button class="btn btn-edit btn-action" title="Edit Subject">
+                            <i class="ti ti-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-delete btn-action" title="Delete Subject" onclick="deleteSubject({{ $subject->id }}, '{{ $subject->subject_code }} - {{ $subject->subject_name }}')">
+                            <i class="ti ti-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        <em>No subjects uploaded yet. Subjects will appear here once uploaded by admin.</em>
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
-      </table>
+    </table>
     </div>
-  </div>
+    <!-- ====== Subject Loading Form ====== -->
+    <div class="card">
+        <h4>➕ Load Students to a Subject</h4>
+        <form>
+            <div class="mb-3">
+                <label for="subject" class="form-label">Select Subject:</label>
+                <select id="subject" class="form-select">
+                    <option value="">-- Choose Subject --</option>
+                    <option value="IT101">IT101 - Intro to Computing</option>
+                    <option value="IT102">IT102 - Programming Fundamentals</option>
+                    <option value="ENG101">ENG101 - Communication Skills</option>
+                </select>
+            </div>
 
-  <style>
-    .subject-loading {
-      padding: 20px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+            <div class="mb-3">
+                <label for="yearLevel" class="form-label">Year Level & Section:</label>
+                <select id="yearLevel" class="form-select">
+                    <option value="">-- Select Year & Section --</option>
+                    <option value="1A">1st Year - Section A</option>
+                    <option value="1B">1st Year - Section B</option>
+                    <option value="2A">2nd Year - Section A</option>
+                </select>
+            </div>
 
-    .page-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #2c3e50;
-    }
+            <div class="mb-3">
+                <label for="students" class="form-label">Select Students:</label>
+                <select id="students" class="form-select" multiple>
+                    @foreach($students as $student)
+                        @if($student->profile)
+                            <option value="{{ $student->profile->student_id }}">{{ $student->profile->student_id }} - {{ $student->profile->first_name }} {{ $student->profile->last_name }}</option>
+                        @endif
+                    @endforeach
+                </select>
+                <div class="form-text">Hold CTRL (Windows) or CMD (Mac) to select multiple students.</div>
+            </div>
 
-    .card {
-      background: #fff;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-    }
+            <button type="submit" class="btn btn-primary">Load Students</button>
+        </form>
+    </div>
 
-    .card h3 {
-      margin-bottom: 15px;
-      font-size: 18px;
-      color: #34495e;
-    }
+    <!-- CSRF Token for AJAX requests -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    .form-group {
-      margin-bottom: 15px;
-    }
+    <script>
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 5px;
-      color: #2c3e50;
-    }
+        async function deleteSubject(subjectId, subjectName) {
+            const result = await Swal.fire({
+                title: "<i class='ti ti-alert-triangle text-warning'></i> Delete Subject",
+                html: `<p style='font-size:14px; color:#4b5563;'>Are you sure you want to delete the subject <strong>"${subjectName}"</strong>?</p><p style='font-size:12px; color:#6b7280; margin-top:10px;'>This action cannot be undone.</p>`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "<i class='ti ti-trash'></i> Yes, Delete",
+                cancelButtonText: "<i class='ti ti-x'></i> Cancel",
+                confirmButtonColor: "#dc3545",
+                cancelButtonColor: "#6c757d",
+                background: "#f8f9fa",
+                color: "#212529",
+                customClass: {
+                    popup: "rounded-xl shadow-2xl border border-gray-300",
+                    title: "text-lg font-semibold text-gray-800",
+                    confirmButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-red-600",
+                    cancelButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-gray-500"
+                }
+            });
 
-    select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 14px;
-    }
+            if (result.isConfirmed) {
+                // Show loading state
+                Swal.fire({
+                    title: "<i class='ti ti-loader text-primary' style='animation: spin 1s linear infinite;'></i> Deleting...",
+                    text: "Please wait while we delete the subject",
+                    showConfirmButton: false,
+                    background: "#f8f9fa",
+                    color: "#212529",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                });
 
-    small {
-      font-size: 12px;
-      color: #7f8c8d;
-    }
+                try {
+                    // Perform fetch delete request
+                    const response = await fetch(`/dean/SubjectLoading/${subjectId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
 
-    .btn {
-      background: #3498db;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
+                    const data = await response.json();
 
-    .btn:hover {
-      background: #2980b9;
-    }
-
-    .btn-danger {
-      background: #e74c3c;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .btn-danger:hover {
-      background: #c0392b;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    table th, table td {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    table th {
-      background: #f8f9fa;
-    }
-  </style>
+                    if (response.ok && data.success) {
+                        Swal.fire({
+                            title: "<i class='ti ti-check text-success'></i> Deleted!",
+                            text: data.message,
+                            icon: "success",
+                            confirmButtonText: "<i class='ti ti-check'></i> OK",
+                            confirmButtonColor: "#28a745",
+                            background: "#f8f9fa",
+                            color: "#212529",
+                            customClass: {
+                                popup: "rounded-xl shadow-2xl border border-gray-300",
+                                confirmButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-green-600"
+                            }
+                        }).then(() => {
+                            // Reload the page to show updated data
+                            location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to delete subject');
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    Swal.fire({
+                        title: "<i class='ti ti-x text-danger'></i> Error!",
+                        text: error.message || "Failed to delete subject. Please try again.",
+                        icon: "error",
+                        confirmButtonText: "<i class='ti ti-check'></i> OK",
+                        confirmButtonColor: "#dc3545",
+                        background: "#f8f9fa",
+                        color: "#212529"
+                    });
+                }
+            }
+        }
+    </script>
 </x-dean-component>

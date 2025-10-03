@@ -38,6 +38,11 @@ body {
     border: 1px solid #ccc;
 }
 
+.search-bar button {
+    flex: 0.3;
+    border-radius: 8px;
+}
+
 /* Table */
 .glass-table {
     width: 100%;
@@ -45,37 +50,57 @@ body {
     color: #333;
     border-radius: 10px;
     overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.1);
 }
 
 .glass-table thead {
     background: rgba(0, 0, 0, 0.05);
     font-weight: bold;
+    border-bottom: 2px solid rgba(0,0,0,0.15);
 }
 
 .glass-table tbody tr {
     background: rgba(255,255,255,0.6);
     transition: 0.2s;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.glass-table tbody tr:nth-child(even) {
+    background: rgba(245,245,245,0.6); /* alternate row */
 }
 
 .glass-table tbody tr:hover {
-    background: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.95);
 }
 
 .glass-table th,
 .glass-table td {
-    padding: 12px;
+    padding: 14px;
     text-align: left;
     vertical-align: middle;
 }
 
 /* Status */
-.status-active { color: #2ecc71; font-weight: bold; }
-.status-suspended { color: #e74c3c; font-weight: bold; }
+.status-active { 
+    color: #2ecc71; 
+    font-weight: bold; 
+    padding: 4px 8px;
+    background: rgba(46, 204, 113, 0.1);
+    border-radius: 6px;
+}
+.status-suspended { 
+    color: #e74c3c; 
+    font-weight: bold; 
+    padding: 4px 8px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 6px;
+}
 
 /* Action buttons */
 .action-group {
     display: flex;
     gap: 6px;
+    justify-content: center; /* center buttons */
 }
 
 .action-btn {
@@ -87,6 +112,7 @@ body {
     color: white;
     font-size: 0.8rem;
     transition: 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .edit-btn { background: #3498db; }
@@ -104,7 +130,7 @@ body {
 
     <!-- Search + Filter -->
     <form class="search-bar">
-        <input type="text" placeholder="Search by name, email or ID...">
+        <input type="text" placeholder="Search by name or ID...">
         <select>
             <option value="">All Courses</option>
             <option value="BSIT">BS Information Technology</option>
@@ -122,58 +148,35 @@ body {
             <tr>
                 <th>Student ID</th>
                 <th>Name</th>
-                <th>Email</th>
-                <th>Course / Year</th>
                 <th>Status</th>
-                <th style="width: 200px;">Action</th>
+                <th style="width: 200px; text-align: center;">Action</th>
             </tr>
         </thead>
         <tbody>
+            @foreach($students as $student)
             <tr>
-                <td>2023-001</td>
-                <td>Juan Dela Cruz</td>
-                <td>juan@email.com</td>
-                <td>BSIT - 2A</td>
-                <td><span class="status-active">Active</span></td>
+                <td>{{ $student->profile->student_id ?? 'N/A' }}</td>
+                <td>{{ $student->name }}</td>
+                <td>
+                    <span class="{{ $student->is_active ? 'status-active' : 'status-suspended' }}">
+                        {{ $student->is_active ? 'Active' : 'Suspended' }}
+                    </span>
+                </td>
                 <td>
                     <div class="action-group">
                         <button class="action-btn edit-btn">Edit</button>
-                        <button class="action-btn suspend-btn">Suspend</button>
-                        <button class="action-btn delete-btn">Delete</button>
+                        <button class="action-btn suspend-btn">{{ $student->is_active ? 'Suspend' : 'Activate' }}</button>
+                        <form method="POST" action="{{ route('admin.student.destroy', $student->id) }}" onsubmit="return confirm('Are you sure you want to delete this student?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="action-btn delete-btn">Delete</button>
+                        </form>
                     </div>
                 </td>
             </tr>
-            <tr>
-                <td>2023-002</td>
-                <td>Maria Santos</td>
-                <td>maria@email.com</td>
-                <td>BSED - 1B</td>
-                <td><span class="status-suspended">Suspended</span></td>
-                <td>
-                    <div class="action-group">
-                        <button class="action-btn edit-btn">Edit</button>
-                        <button class="action-btn suspend-btn">Activate</button>
-                        <button class="action-btn delete-btn">Delete</button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>2023-003</td>
-                <td>Carlos Reyes</td>
-                <td>carlos@email.com</td>
-                <td>BSBA - 3C</td>
-                <td><span class="status-active">Active</span></td>
-                <td>
-                    <div class="action-group">
-                        <button class="action-btn edit-btn">Edit</button>
-                        <button class="action-btn suspend-btn">Suspend</button>
-                        <button class="action-btn delete-btn">Delete</button>
-                    </div>
-                </td>
-            </tr>
+            @endforeach
         </tbody>
     </table>
 </div>
-
 
 </x-admin-component>

@@ -5,16 +5,45 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\TeacherAccount;
 
 class loginController extends Controller
 {
     public function create()
     {
+        // Check if any guard is authenticated and redirect to appropriate dashboard
+        if (Auth::guard('web')->check()) {
+            return redirect()->route('student.studentdashboard');
+        }
+        if (Auth::guard('parent')->check()) {
+            return redirect()->route('parent.parentdashboard');
+        }
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+        if (Auth::guard('dean')->check()) {
+            return redirect()->route('Dean.deandashboard');
+        }
+        if (Auth::guard('teacher')->check()) {
+            return redirect()->route('teacher.teacherdashboard');
+        }
+
         return view('userAuth.login');
     }
 
     public function store(Request $request)
     {
+        // Logout any existing authenticated guards to prevent multiple accounts logged in
+        if (Auth::guard('web')->check() || Auth::guard('parent')->check() || Auth::guard('admin')->check() || Auth::guard('dean')->check() || Auth::guard('teacher')->check()) {
+            Auth::guard('web')->logout();
+            Auth::guard('parent')->logout();
+            Auth::guard('admin')->logout();
+            Auth::guard('dean')->logout();
+            Auth::guard('teacher')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
@@ -27,10 +56,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $user = Auth::guard('web')->user();
 
-            // optional: check is_active
-            if (property_exists($user, 'is_active') && (int) $user->is_active !== 1) {
+            // Check is_active
+            if (!isset($user->is_active) || (int) $user->is_active !== 1) {
                 Auth::guard('web')->logout();
-                return back()->withErrors(['login_error' => 'User account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // // Unexpected role on web guard
@@ -39,8 +70,8 @@ class loginController extends Controller
 
             // optional: role check
             if ((int) $user->user_role_id !== 7) {
-                Auth::guard('parent')->logout();
-                return back()->withErrors(['login_error' => 'Unauthorized role for parent guard.'])->withInput();
+                Auth::guard('web')->logout();
+                return back()->withErrors(['login_error' => 'Unauthorized role for web guard.'])->withInput();
             }
 
             return redirect()->route('student.studentdashboard')->with('success', 'Logged In Successfully');
@@ -51,10 +82,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $parent = Auth::guard('parent')->user();
 
-            // optional: check is_active
-            if (property_exists($parent, 'is_active') && (int) $parent->is_active !== 1) {
+            // Check is_active
+            if (!isset($parent->is_active) || (int) $parent->is_active !== 1) {
                 Auth::guard('parent')->logout();
-                return back()->withErrors(['login_error' => 'Parent account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // optional: role check
@@ -71,10 +104,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $admin = Auth::guard('admin')->user();
 
-            // optional: check is_active
-            if (property_exists($admin, 'is_active') && (int)  $admin->is_active !== 1) {
+            // Check is_active
+            if (!isset($admin->is_active) || (int)  $admin->is_active !== 1) {
                 Auth::guard('admin')->logout();
-                return back()->withErrors(['login_error' => 'Admin account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // optional: role check
@@ -91,10 +126,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $dean = Auth::guard('dean')->user();
 
-            // optional: check is_active
-            if (property_exists($dean, 'is_active') && (int)  $dean->is_active !== 1) {
+            // Check is_active
+            if (!isset($dean->is_active) || (int)  $dean->is_active !== 1) {
                 Auth::guard('dean')->logout();
-                return back()->withErrors(['login_error' => 'dean account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // optional: role check
@@ -111,10 +148,12 @@ class loginController extends Controller
             $request->session()->regenerate();
             $teacher = Auth::guard('teacher')->user();
 
-            // optional: check is_active
-            if (property_exists($teacher, 'is_active') && (int)  $teacher->is_active !== 1) {
+            // Check is_active
+            if (!isset($teacher->is_active) || (int)  $teacher->is_active !== 1) {
                 Auth::guard('teacher')->logout();
-                return back()->withErrors(['login_error' => 'teacher account is deactivated.'])->withInput();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                return redirect()->route('suspended');
             }
 
             // optional: role check
@@ -122,6 +161,9 @@ class loginController extends Controller
                 Auth::guard('teacher')->logout();
                 return back()->withErrors(['login_error' => 'Unauthorized role for teacher guard.'])->withInput();
             }
+
+            // Update last login timestamp
+            $teacher->update(['last_login_at' => now()]);
 
             return redirect()->route('teacher.teacherdashboard')->with('success', 'Logged In Successfully');
         }

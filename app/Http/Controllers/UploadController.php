@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Subject;
+use App\Models\Department;
 
 class UploadController extends Controller
 {
@@ -12,7 +13,12 @@ class UploadController extends Controller
      */
     public function index()
     {
-        return view('admin.uploadSubject.subject');
+        // Debug: Log that this controller method is being called
+        \Log::info('UploadController@index called - returning latest 10 subjects');
+
+        $subjects = Subject::latest()->take(10)->get(); // Get latest 10 subjects
+        $departments = Department::all(); // Get all departments
+        return view('admin.uploadSubject.subject', compact('subjects', 'departments'));
     }
 
     /**
@@ -22,13 +28,18 @@ class UploadController extends Controller
     {
         // Handle subject upload logic
         $validated = $request->validate([
+            'department' => 'required|string|max:255',
             'subject_code' => 'required|string|max:10',
             'subject_name' => 'required|string|max:255',
+            'units' => 'required|integer|min:1|max:6',
+            'semester' => 'required|string|max:255',
+            'school_year' => 'required|string|max:20',
             'description' => 'nullable|string',
+            'status' => 'required|string|max:255',
         ]);
 
         $subject = Subject::create($validated);
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Subject uploaded successfully',

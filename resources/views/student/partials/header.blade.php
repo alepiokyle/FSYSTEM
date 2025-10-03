@@ -128,7 +128,7 @@
         aria-expanded="false"
       >
         <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar">
-        <span>Stebin Ben</span>
+        <span>{{ optional(auth()->user())->name ?? 'Guest' }}</span>
       </a>
       <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
         <div class="dropdown-header">
@@ -137,8 +137,8 @@
               <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
             </div>
             <div class="flex-grow-1 ms-3">
-              <h6 class="mb-1">Stebin Ben</h6>
-              <span>UI/UX Designer</span>
+              <h6 class="mb-1">{{ optional(auth()->user())->name ?? 'Guest' }}</h6>
+              <span>{{ auth()->user()->role ? auth()->user()->role->role : 'No Role' }}</span>
             </div>
             <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
           </div>

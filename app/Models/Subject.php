@@ -19,5 +19,7 @@ class Subject extends Model
         'year_level',
         'semester',
         'school_year',
+        'description',
+        'status',
     ];
 }

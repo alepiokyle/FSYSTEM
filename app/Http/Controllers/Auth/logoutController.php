@@ -12,7 +12,13 @@ class logoutController extends Controller
 {
     public function userDestroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        // Log out from all guards
+        $guards = ['web', 'parent', 'admin', 'dean', 'teacher'];
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                Auth::guard($guard)->logout();
+            }
+        }
 
         $request->session()->invalidate();
 

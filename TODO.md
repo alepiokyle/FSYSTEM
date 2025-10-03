@@ -1,10 +1,4 @@
-# Sidebar Icon Update Plan
-
-## Steps to Complete:
-1. [ ] Update sidebar.blade.php to include logic for changing icons based on user roles
-2. [ ] Test the sidebar to ensure correct icons are displayed for different user roles
-
-## Current Progress:
-- Analyzed the current sidebar structure
-- Identified User and UserRole models for role-based logic
-- Ready to implement role-based icon changes
+- [x] Fix the role access in teacher header partial to prevent "Attempt to read property 'role' on null" error
+- [x] Fix the same issue in admin header partial for consistency
+- [x] Fix the same issue in dean, student, and parent header partials
+- [ ] Test teacher login and dashboard to ensure error is resolved

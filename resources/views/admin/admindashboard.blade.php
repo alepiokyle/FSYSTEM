@@ -104,23 +104,23 @@
         <div class="glass-card text-center">
             <i class="fas fa-user-graduate card-icon icon-students"></i>
             <h6 class="mb-2">Total Students</h6>
-            <h4>1,250 <span class="badge bg-light-primary border border-primary"><i class="fas fa-arrow-up"></i> 15.3%</span></h4>
+            <h4>{{ $totalStudents }}</h4>
             <p class="mb-0 text-muted">Active students in the system</p>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="glass-card text-center">
             <i class="fas fa-chalkboard-teacher card-icon icon-teachers"></i>
-            <h6 class="mb-2">Total Teachers</h6>
-            <h4>85 <span class="badge bg-light-success border border-success"><i class="fas fa-arrow-up"></i> 8.5%</span></h4>
-            <p class="mb-0 text-muted">Active teaching staff</p>
+            <h6 class="mb-2">Active Teachers</h6>
+            <h4>{{ $activeTeachers }}</h4>
+            <p class="mb-0 text-muted">Logged in last 30 days</p>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
         <div class="glass-card text-center">
             <i class="fas fa-book card-icon icon-subjects"></i>
             <h6 class="mb-2">Total Subjects</h6>
-            <h4>120 <span class="badge bg-light-warning border border-warning"><i class="fas fa-book"></i></span></h4>
+            <h4>{{ $totalSubjects }}</h4>
             <p class="mb-0 text-muted">Subjects offered this semester</p>
         </div>
     </div>
@@ -128,7 +128,7 @@
         <div class="glass-card text-center">
             <i class="fas fa-users card-icon icon-users"></i>
             <h6 class="mb-2">System Users</h6>
-            <h4>1,455 <span class="badge bg-light-info border border-info"><i class="fas fa-users"></i></span></h4>
+            <h4>{{ $totalUsers }}</h4>
             <p class="mb-0 text-muted">Total system users</p>
         </div>
     </div>
@@ -139,7 +139,7 @@
 <script>
     // Grab values from the cards
     const totalStudents = parseInt(document.querySelector('.icon-students').parentElement.querySelector('h4').textContent);
-    const totalTeachers = parseInt(document.querySelector('.icon-teachers').parentElement.querySelector('h4').textContent);
+    const activeTeachers = parseInt(document.querySelector('.icon-teachers').parentElement.querySelector('h4').textContent);
     const totalSubjects = parseInt(document.querySelector('.icon-subjects').parentElement.querySelector('h4').textContent);
     const totalUsers = parseInt(document.querySelector('.icon-users').parentElement.querySelector('h4').textContent);
 
@@ -151,7 +151,7 @@
             labels: ['Students', 'Teachers', 'Subjects', 'Users'],
             datasets: [{
                 label: 'System Overview',
-                data: [totalStudents, totalTeachers, totalSubjects, totalUsers],
+                data: [totalStudents, activeTeachers, totalSubjects, totalUsers],
                 borderColor: '#4cafef',
                 backgroundColor: 'rgba(76, 175, 239, 0.1)',
                 fill: true,
