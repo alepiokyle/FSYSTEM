@@ -136,11 +136,21 @@ class loginController extends Controller
         if (Auth::guard('parent')->check()) {
             Auth::guard('parent')->logout();
         }
+
         if (Auth::guard('web')->check()) {
             Auth::guard('web')->logout();
         }
+
         if (Auth::guard('admin')->check()) {
             Auth::guard('admin')->logout();
+        }
+
+        if (Auth::guard('dean')->check()) {
+            Auth::guard('dean')->logout();
+        }
+
+        if (Auth::guard('teacher')->check()) {
+            Auth::guard('teacher')->logout();
         }
 
         $request->session()->invalidate();
