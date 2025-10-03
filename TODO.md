@@ -1,2 +1,4 @@
-- [x] Fix null property access in resources/views/admin/partials/header.blade.php by adding safe null checks for auth()->user()->name and auth()->user()->role->role
-- [ ] Test the header view to ensure no errors occur when user is not authenticated or user role is null
+- [x] Fix the role access in teacher header partial to prevent "Attempt to read property 'role' on null" error
+- [x] Fix the same issue in admin header partial for consistency
+- [x] Fix the same issue in dean, student, and parent header partials
+- [ ] Test teacher login and dashboard to ensure error is resolved

@@ -401,7 +401,7 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
 
 <!-- Recent Subjects Table -->
 <div class="glass-card">
-    <h3>📋 Recently Uploaded Subjects</h3>
+    <h3>📋 Recently Uploaded Subjects <button id="toggleSubjects" class="btn btn-link p-0 ms-2" style="font-size: 18px; color: #333;">▼</button></h3>
     <div class="table-responsive">
         <table class="glass-table">
             <thead>
@@ -520,12 +520,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (newTableBody) {
                 document.getElementById('subjectsTableBody').innerHTML = newTableBody.innerHTML;
+                // Preserve hidden state
+                if (isTableHidden) {
+                    document.getElementById('subjectsTableBody').style.display = 'none';
+                }
             }
         })
         .catch(error => {
             console.error('Error refreshing table:', error);
         });
     }
+
+    // Toggle subjects table visibility
+    const toggleBtn = document.getElementById('toggleSubjects');
+    const tableBody = document.getElementById('subjectsTableBody');
+    let isTableHidden = false;
+
+    toggleBtn.addEventListener('click', function() {
+        isTableHidden = !isTableHidden;
+        if (isTableHidden) {
+            tableBody.style.display = 'none';
+            toggleBtn.textContent = '▲';
+        } else {
+            tableBody.style.display = '';
+            toggleBtn.textContent = '▼';
+        }
+    });
 
     // Form submission handler
     form.addEventListener('submit', function(e) {
