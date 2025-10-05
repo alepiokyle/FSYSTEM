@@ -319,12 +319,8 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="department">Department</label>
-                <select id="department" name="department" class="form-select" required>
-                    <option value="">-- Select Department --</option>
-                    @foreach($departments as $department)
-                        <option value="{{ $department->name }}">{{ $department->name }}</option>
-                    @endforeach
-                </select>
+                <input type="text" id="department" name="department" class="form-control"
+                       placeholder="e.g., Computer Science" required>
             </div>
             <div class="col-md-6">
                 <label for="subject_code">Subject Code</label>
@@ -337,6 +333,24 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
             <label for="subject_name">Subject Name</label>
             <input type="text" id="subject_name" name="subject_name" class="form-control"
                    placeholder="e.g., Introduction to Programming" required maxlength="255">
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="year_level">Year Level</label>
+                <select id="year_level" name="year_level" class="form-select">
+                    <option value="">-- Select Year Level --</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="section">Section</label>
+                <input type="text" id="section" name="section" class="form-control"
+                       placeholder="e.g., A, B, C" maxlength="255" required>
+            </div>
         </div>
 
         <div class="row mb-3">
@@ -411,6 +425,8 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
                     <th>Department</th>
                     <th>Units</th>
                     <th>Semester</th>
+                    <th>Year Level</th>
+                    <th>Section</th>
                     <th>Year</th>
                     <th>Status</th>
                     <th>Date</th>

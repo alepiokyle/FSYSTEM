@@ -155,33 +155,33 @@
     <!-- ====== Subject Loading Form ====== -->
     <div class="card">
         <h4>➕ Load Students to a Subject</h4>
-        <form>
+        <form id="loadStudentsForm">
             <div class="mb-3">
                 <label for="subject" class="form-label">Select Subject:</label>
-                <select id="subject" class="form-select">
+                <select id="subject" class="form-select" name="subject_id" required>
                     <option value="">-- Choose Subject --</option>
-                    <option value="IT101">IT101 - Intro to Computing</option>
-                    <option value="IT102">IT102 - Programming Fundamentals</option>
-                    <option value="ENG101">ENG101 - Communication Skills</option>
+                    @foreach($subjects as $subject)
+                        <option value="{{ $subject->id }}" data-subject-code="{{ $subject->subject_code }}" data-units="{{ $subject->units }}">{{ $subject->subject_code }} - {{ $subject->subject_name }}</option>
+                    @endforeach
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="yearLevel" class="form-label">Year Level & Section:</label>
-                <select id="yearLevel" class="form-select">
+                <select id="yearLevel" class="form-select" name="year_section" required>
                     <option value="">-- Select Year & Section --</option>
-                    <option value="1A">1st Year - Section A</option>
-                    <option value="1B">1st Year - Section B</option>
-                    <option value="2A">2nd Year - Section A</option>
+                    @foreach($yearSections as $yearSection)
+                        <option value="{{ $yearSection }}">{{ $yearSection }}</option>
+                    @endforeach
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="students" class="form-label">Select Students:</label>
-                <select id="students" class="form-select" multiple>
+                <select id="students" class="form-select" name="student_ids[]" multiple required>
                     @foreach($students as $student)
                         @if($student->profile)
-                            <option value="{{ $student->profile->student_id }}">{{ $student->profile->student_id }} - {{ $student->profile->first_name }} {{ $student->profile->last_name }}</option>
+                            <option value="{{ $student->id }}">{{ $student->profile->student_id }} - {{ $student->profile->first_name }} {{ $student->profile->last_name }} ({{ $student->profile->course }}, {{ $student->profile->year_level }})</option>
                         @endif
                     @endforeach
                 </select>
@@ -278,5 +278,63 @@
                 }
             }
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const subjectSelect = document.getElementById('subject');
+            const loadStudentsForm = document.getElementById('loadStudentsForm');
+
+            // When subject is selected, save subject code and units to localStorage
+            subjectSelect.addEventListener('change', function () {
+                const selectedOption = subjectSelect.options[subjectSelect.selectedIndex];
+                if (selectedOption.value) {
+                    const subjectCode = selectedOption.getAttribute('data-subject-code');
+                    const units = selectedOption.getAttribute('data-units');
+                    localStorage.setItem('selectedSubjectCode', subjectCode);
+                    localStorage.setItem('selectedUnits', units);
+                } else {
+                    localStorage.removeItem('selectedSubjectCode');
+                    localStorage.removeItem('selectedUnits');
+                }
+            });
+
+            // Handle form submission with AJAX
+            loadStudentsForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(loadStudentsForm);
+                const subjectId = formData.get('subject_id');
+                const studentIds = formData.getAll('student_ids[]');
+
+                if (!subjectId || studentIds.length === 0) {
+                    alert('Please select a subject and at least one student.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch("{{ route('Dean.SubjectLoading.store') }}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json',
+                        },
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        alert(data.message);
+                        // Optionally reset form or do other UI updates
+                    } else {
+                        alert(data.message || 'Failed to load students.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading students.');
+                }
+            });
+        });
     </script>
 </x-dean-component>

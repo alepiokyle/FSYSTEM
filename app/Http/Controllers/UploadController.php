@@ -32,6 +32,8 @@ class UploadController extends Controller
             'subject_code' => 'required|string|max:10',
             'subject_name' => 'required|string|max:255',
             'units' => 'required|integer|min:1|max:6',
+            'year_level' => 'nullable|string|max:255',
+            'section' => 'nullable|string|max:255',
             'semester' => 'required|string|max:255',
             'school_year' => 'required|string|max:20',
             'description' => 'nullable|string',

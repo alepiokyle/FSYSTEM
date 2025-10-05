@@ -12,7 +12,7 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\dean\DeanController;
 use App\Models\User;
 
-Route::get('/', [App\Http\Controllers\Auth\loginController::class, 'create']);
+Route::get('/', [App\Http\Controllers\Auth\loginController::class, 'create'])->name('home');
 
 Route::get('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'index'])->name('register');
 Route::post('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'store'])->name('register.store');
@@ -79,11 +79,15 @@ Route::prefix('dean')->middleware('auth:dean')->group(function () {
 
     Route::controller(App\Http\Controllers\dean\AssignController::class)->group(function () {
         Route::get('/AssignTeacher', 'index')->name('dean.AssignTeacher');
+        Route::post('/AssignTeacher', 'store')->name('dean.AssignTeacher.store');
+        Route::delete('/AssignTeacher/{id}', 'destroy')->name('dean.AssignTeacher.destroy');
     });
 
     Route::controller(App\Http\Controllers\dean\SubjectLoadingController::class)->group(function () {
         Route::get('/SubjectLoading', 'index')->name('Dean.SubjectLoading');
+        Route::post('/SubjectLoading', 'store')->name('Dean.SubjectLoading.store');
         Route::delete('/SubjectLoading/{id}', 'destroy')->name('Dean.SubjectLoading.destroy');
+        Route::get('/get-subjects/{department}', 'getSubjectsByDepartment')->name('dean.getSubjectsByDepartment');
     });
 
     Route::controller(App\Http\Controllers\dean\ApproveGradesController::class)->group(function () {
@@ -98,22 +102,23 @@ Route::prefix('dean')->middleware('auth:dean')->group(function () {
 // Teacher
 Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\teacher\TeacherDashboardController::class, 'index'])->name('teacher.teacherdashboard');
-});
 
-Route::controller(App\Http\Controllers\teacher\ViewController::class)->group(function () {
-    Route::get('/ViewAssign', 'index')->name('teacher.ViewAssign');
-});
+    Route::controller(App\Http\Controllers\teacher\ViewController::class)->group(function () {
+        Route::get('/ViewAssign', 'index')->name('teacher.ViewAssign');
+        Route::delete('/ViewAssign/{id}', 'unassign')->name('teacher.ViewAssign.unassign');
+    });
 
-Route::controller(App\Http\Controllers\teacher\AttendanceController::class)->group(function () {
-    Route::get('/Manage', 'index')->name('teacher.Manage');
-});
+    Route::controller(App\Http\Controllers\teacher\AttendanceController::class)->group(function () {
+        Route::get('/Manage', 'index')->name('teacher.Manage');
+    });
 
-Route::controller(App\Http\Controllers\teacher\AssessmentController::class)->group(function () {
-    Route::get('/Manages', 'index')->name('teacher.Manages');
-});
+    Route::controller(App\Http\Controllers\teacher\AssessmentController::class)->group(function () {
+        Route::get('/Manages', 'index')->name('teacher.Manages');
+    });
 
-Route::controller(App\Http\Controllers\teacher\GradesController::class)->group(function () {
-    Route::get('/Submit', 'index')->name('teacher.Grades');
+    Route::controller(App\Http\Controllers\teacher\GradesController::class)->group(function () {
+        Route::get('/Submit', 'index')->name('teacher.Grades');
+    });
 });
 
 // Student

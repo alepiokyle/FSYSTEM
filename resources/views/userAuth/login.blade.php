@@ -11,7 +11,7 @@
 
                 {{-- Logo & Heading --}}
                 <div class="text-center mb-4">
-                    <a href="#"><img src="{{ asset('all/assets/images/logo1.png')}}" alt="Logo" style="width: 60px;"></a>
+                    <a href="#"><img src="{{ asset('all/assets/images/logo1.png')}}" alt="Logo" class="d-block mx-auto" style="width: 60px;"></a>
                     <h3 class="mt-3"><b>Login</b></h3>
                     <small class="text-muted">Welcome back! Please login to your account.</small>
                 </div>

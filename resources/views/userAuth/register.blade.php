@@ -78,6 +78,17 @@
                         </div>
                     </div>
 
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Course</label>
+                            <input type="text" name="course" class="form-control" placeholder="Enter Course" value="{{ old('course') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Year Level</label>
+                            <input type="text" name="year_level" class="form-control" placeholder="Enter Year Level" value="{{ old('year_level') }}">
+                        </div>
+                    </div>
+
                     <hr>
 
                     {{-- Parent / Guardian Information --}}

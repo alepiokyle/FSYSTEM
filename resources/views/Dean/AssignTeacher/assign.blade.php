@@ -105,35 +105,52 @@
     <!-- ====== Assign Teacher Form Card ====== -->
     <div class="card">
         <h2>New Assignment</h2>
-        <form class="row" style="display: flex; flex-wrap: wrap; gap: 20px;">
-            <div class="form-group" style="flex:1;">
-                <label for="department">Department</label>
-                <select id="department">
-                    <option>-- Select Department --</option>
-                    <option>BSIT</option>
-                    <option>BSED</option>
-                    <option>BEED</option>
-                </select>
+        <form id="assignForm">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Department</label>
+                    <p style="margin: 0; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; background: #f8f9fa;">{{ $departmentName }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label for="year_level">Year Level</label>
+                    <select id="year_level" name="year_level" class="form-control">
+                        <option value="">-- Select Year Level --</option>
+                        @foreach($yearLevels as $yl)
+                            <option value="{{ $yl }}">{{ $yl }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-
-            <div class="form-group" style="flex:1;">
-                <label for="subject">Subject</label>
-                <select id="subject">
-                    <option>-- Select Subject --</option>
-                    <option>IT101 - Database Management</option>
-                    <option>ENG102 - English Communication</option>
-                    <option>MATH103 - College Algebra</option>
-                </select>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="section">Section</label>
+                    <select id="section" name="section" class="form-control">
+                        <option value="">-- Select Section --</option>
+                        @foreach($sections as $sec)
+                            <option value="{{ $sec }}">{{ $sec }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="subject">Subject</label>
+                    <select id="subject" name="subject_id" class="form-control">
+                        <option value="">-- Select Subject --</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject->id }}" data-year="{{ $subject->year_level }}" data-section="{{ $subject->section }}">{{ $subject->subject_code }} - {{ $subject->subject_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-
-            <div class="form-group" style="flex:1;">
-                <label for="teacher">Teacher</label>
-                <select id="teacher">
-                    <option>-- Select Teacher --</option>
-                    <option>Mr. Santos</option>
-                    <option>Ms. Cruz</option>
-                    <option>Mr. Dela Cruz</option>
-                </select>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label for="teacher">Teacher</label>
+                    <select id="teacher" name="teacher_id" class="form-control">
+                        <option value="">-- Select Teacher --</option>
+                        @foreach($teachers as $teacher)
+                            <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </form>
         <div style="margin-top:20px; text-align:right;">
@@ -148,46 +165,146 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Subject Code</th>
-                        <th>Subject Name</th>
                         <th>Department</th>
-                        <th>Assigned Teacher</th>
+                        <th>Subject</th>
+                        <th>Assign teacher</th>
                         <th style="text-align:center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @foreach($subjects as $subject)
                     <tr>
-                        <td>IT101</td>
-                        <td>Database Management</td>
-                        <td>BSIT</td>
-                        <td>Mr. Santos</td>
+                        <td>{{ $subject->department }}</td>
+                        <td>{{ $subject->subject_code }} - {{ $subject->subject_name }}</td>
+                        <td>{{ $subject->teacher ? $subject->teacher->name : 'Not Assigned' }}</td>
                         <td class="action-links" style="text-align:center;">
                             <a href="#" class="edit">✏ Reassign</a>
-                            <a href="#" class="remove">🗑 Remove</a>
+                            <a href="#" class="remove" data-id="{{ $subject->id }}">🗑 Remove</a>
                         </td>
                     </tr>
-                    <tr>
-                        <td>ENG102</td>
-                        <td>English Communication</td>
-                        <td>BSED</td>
-                        <td>Ms. Cruz</td>
-                        <td class="action-links" style="text-align:center;">
-                            <a href="#" class="edit">✏ Reassign</a>
-                            <a href="#" class="remove">🗑 Remove</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>MATH103</td>
-                        <td>College Algebra</td>
-                        <td>BSIT</td>
-                        <td>Mr. Dela Cruz</td>
-                        <td class="action-links" style="text-align:center;">
-                            <a href="#" class="edit">✏ Reassign</a>
-                            <a href="#" class="remove">🗑 Remove</a>
-                        </td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script>
+        // Filter subjects based on year level and section
+        function filterSubjects() {
+            const selectedYL = document.getElementById('year_level').value;
+            const selectedSec = document.getElementById('section').value;
+            const subjectSelect = document.getElementById('subject');
+            const options = subjectSelect.querySelectorAll('option');
+
+            options.forEach(option => {
+                if (option.value === '') return; // Skip the placeholder
+                const year = option.getAttribute('data-year');
+                const section = option.getAttribute('data-section');
+                if ((selectedYL === '' || year === selectedYL) && (selectedSec === '' || section === selectedSec)) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+
+            // Reset subject selection if not matching
+            const currentSubject = subjectSelect.value;
+            if (currentSubject) {
+                const currentOption = subjectSelect.querySelector(`option[value="${currentSubject}"]`);
+                if (currentOption && currentOption.style.display === 'none') {
+                    subjectSelect.value = '';
+                }
+            }
+        }
+
+        // Add event listeners for filtering
+        document.getElementById('year_level').addEventListener('change', filterSubjects);
+        document.getElementById('section').addEventListener('change', filterSubjects);
+
+        // Handle assign button click
+        document.querySelector('.btn-assign').addEventListener('click', function() {
+            const form = document.getElementById('assignForm');
+            const formData = new FormData(form);
+
+            if (!formData.get('subject_id') || !formData.get('teacher_id')) {
+                alert('Please select both subject and teacher.');
+                return;
+            }
+
+            fetch('{{ route("dean.AssignTeacher.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // Update the table dynamically
+                    const subjectSelect = document.getElementById('subject');
+                    const teacherSelect = document.getElementById('teacher');
+                    const selectedSubjectText = subjectSelect.options[subjectSelect.selectedIndex].text;
+                    const selectedTeacherText = teacherSelect.options[teacherSelect.selectedIndex].text;
+                    // Find the row and update the teacher column
+                    const rows = document.querySelectorAll('tbody tr');
+                    for (let row of rows) {
+                        if (row.cells[1].textContent === selectedSubjectText) {
+                            row.cells[2].textContent = selectedTeacherText;
+                            break;
+                        }
+                    }
+                    // Clear the selects
+                    document.getElementById('year_level').value = '';
+                    document.getElementById('section').value = '';
+                    subjectSelect.value = '';
+                    teacherSelect.value = '';
+                    filterSubjects(); // Reset filter
+                } else {
+                    alert('Failed to assign teacher: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error assigning teacher.');
+                console.error('Error:', error);
+            });
+        });
+
+        // Handle remove button click
+        document.querySelectorAll('.remove').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const subjectId = this.getAttribute('data-id');
+                if (!subjectId) return;
+
+                if (confirm('Are you sure you want to remove this assignment?')) {
+                    fetch(`/dean/AssignTeacher/${subjectId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            // Remove the row from the table
+                            const row = event.target.closest('tr');
+                            if (row) row.remove();
+                        } else {
+                            alert('Failed to remove assignment: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error removing assignment.');
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        });
+    </script>
 </x-dean-component>

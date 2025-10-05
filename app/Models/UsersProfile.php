@@ -18,6 +18,8 @@ class UsersProfile extends Model
         'suffix',
         'date_of_birth',
         'gender',
+        'course',
+        'year_level',
         'parents_profile_id', // kung gusto mo i-link sa parent
     ];
 

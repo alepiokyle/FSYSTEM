@@ -5,6 +5,7 @@ namespace App\Http\Controllers\dean;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
 use App\Models\Subject;
 use App\Models\User;
 
@@ -23,10 +24,23 @@ class SubjectLoadingController extends Controller
                           ->orderBy('created_at', 'desc')
                           ->get();
 
+        // Fetch unique year level and section combinations from subjects
+        $yearSections = Subject::where('department', $departmentName)
+                              ->whereNotNull('year_level')
+                              ->whereNotNull('section')
+                              ->select('year_level', 'section')
+                              ->distinct()
+                              ->get()
+                              ->map(function($item) {
+                                  return $item->year_level . ' - ' . $item->section;
+                              })
+                              ->unique()
+                              ->values();
+
         // Fetch all students
         $students = User::where('user_role_id', 7)->with('profile')->get();
 
-        return view('Dean.SubjectLoading.loading', compact('subjects', 'students'));
+        return view('Dean.SubjectLoading.loading', compact('subjects', 'students', 'yearSections'));
     }
 
     /**
@@ -55,5 +69,52 @@ class SubjectLoadingController extends Controller
                 'message' => 'Failed to delete subject. Please try again.'
             ], 500);
         }
+    }
+
+    /**
+     * Get subjects by department for AJAX
+     */
+    public function getSubjectsByDepartment($department)
+    {
+        $subjects = Subject::where('department', $department)->get(['id', 'subject_code', 'subject_name']);
+
+        return response()->json($subjects);
+    }
+
+    /**
+     * Load students to a subject
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'subject_id' => 'required|exists:subjects,id',
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:users,id',
+        ]);
+
+        $subject = Subject::findOrFail($request->subject_id);
+
+        // Attach students to the subject, but skip if already attached
+        $attachedCount = 0;
+        foreach ($request->student_ids as $studentId) {
+            try {
+                $subject->students()->attach($studentId);
+                $attachedCount++;
+            } catch (QueryException $e) {
+                // Skip if duplicate (already enrolled)
+                if ($e->getCode() !== '23000') {
+                    throw $e; // Re-throw if it's not a duplicate error
+                }
+            }
+        }
+
+        $message = $attachedCount > 0
+            ? "Successfully loaded {$attachedCount} student(s) to the subject."
+            : "All selected students are already enrolled in this subject.";
+
+        return response()->json([
+            'success' => true,
+            'message' => $message
+        ]);
     }
 }

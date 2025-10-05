@@ -50,64 +50,74 @@
 
           <!-- Table Body -->
           <tbody class="text-gray-800">
-            <!-- Row 1 -->
+            @forelse($assignedSubjects as $subject)
             <tr class="hover:bg-gray-50">
-              <td class="px-4 py-2 border">CS101</td>
-              <td class="px-4 py-2 border">Intro to Computer Science</td>
-              <td class="px-4 py-2 border">A1</td>
-              <td class="px-4 py-2 border">Mon-Wed 9:00 - 10:30</td>
-              <td class="px-4 py-2 border">Room 201</td>
-              <td class="px-4 py-2 border text-center">45</td>
+              <td class="px-4 py-2 border">{{ $subject->subject_code }}</td>
+              <td class="px-4 py-2 border">{{ $subject->subject_name }}</td>
+              <td class="px-4 py-2 border">{{ $subject->section }}</td>
+              <td class="px-4 py-2 border">-</td>
+              <td class="px-4 py-2 border">-</td>
+              <td class="px-4 py-2 border text-center">-</td>
               <td class="px-4 py-2 border">
                 <div class="flex flex-wrap gap-2 justify-center">
                   <a href="#" class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg shadow hover:bg-green-700">
                     View Students
                   </a>
-                  <a href="#" class="px-3 py-1 bg-yellow-500 text-white text-sm rounded-lg shadow hover:bg-yellow-600">
-                    Attendance
-                  </a>
-                  <a href="#" class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg shadow hover:bg-blue-700">
-                    Assessment
+                  <a href="#" class="remove-btn px-3 py-1 bg-red-600 text-white text-sm rounded-lg shadow hover:bg-red-700" data-id="{{ $subject->id }}">
+                    Remove
                   </a>
                 </div>
               </td>
             </tr>
-
-            <!-- Row 2 -->
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-2 border">MATH202</td>
-              <td class="px-4 py-2 border">Advanced Mathematics</td>
-              <td class="px-4 py-2 border">B2</td>
-              <td class="px-4 py-2 border">Tue-Thu 10:30 - 12:00</td>
-              <td class="px-4 py-2 border">Room 105</td>
-              <td class="px-4 py-2 border text-center">38</td>
-              <td class="px-4 py-2 border">
-                <div class="flex flex-wrap gap-2 justify-center">
-                  <a href="#" class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg shadow hover:bg-green-700">
-                    View Students
-                  </a>
-                  <a href="#" class="px-3 py-1 bg-yellow-500 text-white text-sm rounded-lg shadow hover:bg-yellow-600">
-                    Attendance
-                  </a>
-                  <a href="#" class="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg shadow hover:bg-blue-700">
-                    Assessment
-                  </a>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Empty State Example -->
+            @empty
             <tr>
               <td colspan="7" class="text-center py-4 text-gray-500">
-                <!-- No subjects assigned yet. -->
+                No subjects assigned yet.
               </td>
             </tr>
+            @endforelse
           </tbody>
         </table>
       </div>
     </main>
   </div>
 
+    <script>
+        // Handle remove button click
+        document.querySelectorAll('.remove-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const subjectId = this.getAttribute('data-id');
+                if (!subjectId) return;
+
+                if (confirm('Are you sure you want to unassign this subject?')) {
+                    fetch(`/teacher/ViewAssign/${subjectId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            // Remove the row from the table
+                            const row = event.target.closest('tr');
+                            if (row) row.remove();
+                        } else {
+                            alert('Failed to unassign subject: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error unassigning subject.');
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 </x-teacher-component>

@@ -18,26 +18,32 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Example Row -->
-                        <tr>
-                            <td>IT101</td>
-                            <td>Introduction to Computing</td>
-                            <td>3</td>
-                            <td>Mon/Wed 10:00–11:00 AM</td>
-                            <td>Mr. Dela Cruz</td>
-                            <td><span class="badge bg-success">Active</span></td>
-                            <td>
-                                <!-- View Info Button -->
-                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#subjectInfoModal">
-                                    View Info
-                                </button>
-                                <!-- Teacher Button -->
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#teacherInfoModal">
-                                    Teacher
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- Add more rows as needed -->
+                        @forelse($enrolledSubjects as $subject)
+                            <tr>
+                                <td>{{ $subject->subject_code }}</td>
+                                <td>{{ $subject->subject_name }}</td>
+                                <td>{{ $subject->units }}</td>
+                                <td>{{ $subject->schedule ?? 'TBD' }}</td>
+                                <td>{{ $subject->teacher ? $subject->teacher->name : 'TBD' }}</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>
+                                    <!-- View Info Button -->
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#subjectInfoModal{{ $subject->id }}">
+                                        View Info
+                                    </button>
+                                    <!-- Teacher Button -->
+                                    <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#teacherInfoModal{{ $subject->id }}">
+                                        Teacher
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <em>No enrolled subjects yet.</em>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

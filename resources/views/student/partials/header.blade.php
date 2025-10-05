@@ -138,7 +138,7 @@
             </div>
             <div class="flex-grow-1 ms-3">
               <h6 class="mb-1">{{ optional(auth()->user())->name ?? 'Guest' }}</h6>
-              <span>{{ auth()->user()->role ? auth()->user()->role->role : 'No Role' }}</span>
+<span>{{ optional(auth()->user())->role?->role ?? 'No Role' }}</span>
             </div>
             <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
           </div>

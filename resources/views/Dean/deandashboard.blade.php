@@ -67,16 +67,16 @@
     <div class="row">
         <div class="col-md-6 col-xl-3">
             <div class="card">
-                <h6>Total Subjects</h6>
-                <h4>12 <span class="badge bg-light-primary"><i class="ti ti-trending-up" style="margin-right:4px;"></i>5%</span></h4>
-                <p>New subjects added this semester</p>
+                <h6>Subjects Uploaded by Admin</h6>
+                <h4>{{ $totalSubjects }} <span class="badge bg-light-primary"><i class="ti ti-trending-up" style="margin-right:4px;"></i>5%</span></h4>
+                <p>Subjects uploaded in your department</p>
             </div>
         </div>
         <div class="col-md-6 col-xl-3">
             <div class="card">
                 <h6>Teachers Assigned</h6>
-                <h4>25 <span class="badge bg-light-success"><i class="ti ti-trending-up" style="margin-right:4px;"></i>10%</span></h4>
-                <p>Teachers assigned to subjects this semester</p>
+                <h4>{{ $teachersAssigned }} <span class="badge bg-light-success"><i class="ti ti-trending-up" style="margin-right:4px;"></i>10%</span></h4>
+                <p>Current assignments in your department</p>
             </div>
         </div>
         <div class="col-md-6 col-xl-3">

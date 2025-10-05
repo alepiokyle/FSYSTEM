@@ -17,9 +17,27 @@ class Subject extends Model
         'subject_code',
         'units',
         'year_level',
+        'section',
         'semester',
         'school_year',
         'description',
         'status',
+        'teacher_id',
     ];
+
+    /**
+     * Get the teacher assigned to this subject.
+     */
+    public function teacher()
+    {
+        return $this->belongsTo(TeacherAccount::class, 'teacher_id');
+    }
+
+    /**
+     * Get the students enrolled in this subject.
+     */
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'student_subject', 'subject_id', 'student_id');
+    }
 }

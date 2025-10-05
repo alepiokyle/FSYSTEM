@@ -138,6 +138,8 @@ class RegistrationController extends Controller
             'suffix'             => $request->suffix,
             'date_of_birth'      => $request->date_of_birth,
             'gender'             => $request->gender, // student gender
+            'course'             => $request->course,
+            'year_level'         => $request->year_level,
         ]);
 
         /* ===========================
