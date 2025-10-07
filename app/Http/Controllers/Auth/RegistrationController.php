@@ -39,7 +39,7 @@ class RegistrationController extends Controller
     {
         // Validate
         $request->validate([
-            'student_id'         => 'required|unique:users_profile,student_id',
+            'student_id'         => 'required|exists:imported_student_ids,student_id|unique:users_profile,student_id',
             'first_name'         => 'required',
             'last_name'          => 'required',
             'gender'             => 'required',

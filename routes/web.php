@@ -53,7 +53,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     Route::controller(App\Http\Controllers\Admin\viewstudentController::class)->group(function () {
         Route::get('/view-student', 'index')->name('view.student');
+        Route::get('/import-student', 'importPage')->name('admin.student.import.page');
+        Route::post('/import-student', 'import')->name('admin.student.import');
         Route::delete('/student/{id}', 'destroy')->name('admin.student.destroy');
+        Route::get('/download-sample-student', function () {
+            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\SampleStudentExport, 'Student_Summary.xlsx');
+        })->name('admin.student.download.sample');
     });
 
     Route::controller(App\Http\Controllers\Admin\ParentAccountController::class)->group(function () {
