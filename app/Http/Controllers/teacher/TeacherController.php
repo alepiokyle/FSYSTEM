@@ -8,9 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Subject;
 use App\Models\Grade;
 
-class AssessmentController extends Controller
+class TeacherController extends Controller
 {
-
     public function index()
     {
         $teacherId = Auth::guard('teacher')->id();
@@ -89,8 +88,8 @@ class AssessmentController extends Controller
                     ->where('teacher_id', $teacherId)
                     ->first();
 
-                // Prevent editing if status is not draft or saved
-                if ($existingGrade && !in_array($existingGrade->status, ['draft', 'saved'])) {
+                // Prevent editing if status is not draft
+                if ($existingGrade && $existingGrade->status !== 'draft') {
                     continue;
                 }
 
@@ -105,7 +104,7 @@ class AssessmentController extends Controller
                         'midterm' => isset($gradeData['midterm']) && $gradeData['midterm'] !== '' ? (float) $gradeData['midterm'] : null,
                         'semi_final' => isset($gradeData['semi_final']) && $gradeData['semi_final'] !== '' ? (float) $gradeData['semi_final'] : null,
                         'final' => isset($gradeData['final']) && $gradeData['final'] !== '' ? (float) $gradeData['final'] : null,
-                        'status' => 'saved',
+                        'status' => 'draft',
                         'semester' => $subject->semester,
                         'school_year' => $subject->school_year,
                     ]
@@ -149,30 +148,25 @@ class AssessmentController extends Controller
         // Get total enrolled students
         $totalStudents = $subject->students()->count();
 
-        // Count draft and saved grades
-        $draftGrades = Grade::where('subject_id', $subjectId)
+        // Count draft grades
+        $draftGradesCount = Grade::where('subject_id', $subjectId)
             ->where('teacher_id', $teacherId)
             ->where('status', 'draft')
             ->count();
 
-        $savedGradesCount = Grade::where('subject_id', $subjectId)
-            ->where('teacher_id', $teacherId)
-            ->where('status', 'saved')
-            ->count();
-
-        // Check if all students have saved grades (no drafts and saved count equals total students)
-        if ($draftGrades > 0 || $savedGradesCount < $totalStudents) {
+        // Check if all students have draft grades
+        if ($draftGradesCount < $totalStudents) {
             return response()->json(['error' => 'Please save grades for all students before submitting.'], 400);
         }
 
-        // Submit all saved grades
-        $savedGrades = Grade::where('subject_id', $subjectId)
+        // Submit all draft grades
+        $draftGrades = Grade::where('subject_id', $subjectId)
             ->where('teacher_id', $teacherId)
-            ->where('status', 'saved')
+            ->where('status', 'draft')
             ->get();
 
-        foreach ($savedGrades as $grade) {
-            $grade->status = 'pending';
+        foreach ($draftGrades as $grade) {
+            $grade->status = 'submitted';
             $grade->save();
         }
 

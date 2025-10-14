@@ -18,8 +18,10 @@ class UsersProfile extends Model
         'suffix',
         'date_of_birth',
         'gender',
+        'profile_picture',
         'course',
         'year_level',
+        'department_id',
         'parents_profile_id', // kung gusto mo i-link sa parent
     ];
 
@@ -33,5 +35,11 @@ class UsersProfile extends Model
     public function parent()
     {
         return $this->belongsTo(ParentProfile::class, 'parents_profile_id', 'id');
+    }
+
+    // 🔹 Profile belongs to a Department
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }

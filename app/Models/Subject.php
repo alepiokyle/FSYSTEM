@@ -12,7 +12,7 @@ class Subject extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'department',
+        'department_id',
         'subject_name',
         'subject_code',
         'units',
@@ -39,5 +39,13 @@ class Subject extends Model
     public function students()
     {
         return $this->belongsToMany(User::class, 'student_subject', 'subject_id', 'student_id');
+    }
+
+    /**
+     * Get the department of this subject.
+     */
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }

@@ -91,12 +91,12 @@
     <div class="row">
         <div class="card">
             <h6>Subjects Assigned</h6>
-            <h4>3 <span class="badge bg-light-primary">📚</span></h4>
+            <h4>{{ $subjectsCount }} <span class="badge bg-light-primary">📚</span></h4>
             <p>Total subjects assigned this semester</p>
         </div>
         <div class="card">
             <h6>Students</h6>
-            <h4>75 <span class="badge bg-light-success">👨‍🎓</span></h4>
+            <h4>{{ $studentsCount }} <span class="badge bg-light-success">👨‍🎓</span></h4>
             <p>Total students under your subjects</p>
         </div>
         <div class="card">

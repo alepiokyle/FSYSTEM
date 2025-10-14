@@ -2,26 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Grade extends Model
+class Attendance extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'student_id',
+        'date',
+        'status',
         'subject_id',
         'teacher_id',
-        'prelim',
-        'midterm',
-        'semi_final',
-        'final',
-        'term_grade',
-        'remarks',
-        'status',
-        'semester',
-        'school_year',
     ];
 
     public function student()
@@ -31,16 +21,11 @@ class Grade extends Model
 
     public function subject()
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 
     public function teacher()
     {
         return $this->belongsTo(TeacherAccount::class, 'teacher_id');
-    }
-
-    public function scopeDraft($query)
-    {
-        return $query->where('status', 'draft');
     }
 }

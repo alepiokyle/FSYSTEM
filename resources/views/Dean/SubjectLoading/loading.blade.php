@@ -121,7 +121,7 @@
                     <td>
                         <span class="badge bg-primary">{{ $subject->units }} unit{{ $subject->units > 1 ? 's' : '' }}</span>
                     </td>
-                    <td>{{ $subject->department }}</td>
+                    <td>{{ $subject->department->name }}</td>
                     <td>{{ $subject->semester }}</td>
                     <td>{{ $subject->created_at->format('M d, Y') }}</td>
                     <td>
@@ -167,13 +167,8 @@
             </div>
 
             <div class="mb-3">
-                <label for="yearLevel" class="form-label">Year Level & Section:</label>
-                <select id="yearLevel" class="form-select" name="year_section" required>
-                    <option value="">-- Select Year & Section --</option>
-                    @foreach($yearSections as $yearSection)
-                        <option value="{{ $yearSection }}">{{ $yearSection }}</option>
-                    @endforeach
-                </select>
+                <label for="yearLevel" class="form-label">Year Level:</label>
+                <input type="text" id="yearLevel" class="form-control" name="year_level" placeholder="e.g., 1st Year" required>
             </div>
 
             <div class="mb-3">

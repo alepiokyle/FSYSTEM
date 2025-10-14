@@ -1,18 +1,78 @@
 <x-student-component>
+    <style>
+        x-student-component {
+            background: linear-gradient(to right, #f0f4f8, #ffffff);
+            min-height: 100vh;
+            padding: 40px 60px;
+            display: block;
+            font-family: 'Poppins', sans-serif;
+        }
+        .page-header {
+            font-weight: 700;
+            color: #1e3a8a;
+            border-bottom: 3px solid #2563eb;
+            display: inline-block;
+            padding-bottom: 8px;
+        }
+        .card {
+            border: none;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+        .rounded-circle {
+            border: 4px solid #2563eb;
+            object-fit: cover;
+        }
+        .btn-outline-primary, .btn-success {
+            border-radius: 30px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .btn-outline-primary:hover {
+            background-color: #2563eb;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #16a34a;
+            color: white;
+        }
+        #saveProfileBtn {
+            margin-top: 8px;
+        }
+    </style>
+
     <div class="container mt-4">
-        <h3 class="page-header mb-4">👤 Student Profile</h3>
+        <h3 class="page-header mb-4">🎓 Student Profile</h3>
 
         <div class="row g-4">
             <!-- Profile Summary -->
             <div class="col-md-4">
-                <div class="card shadow-sm text-center">
+                <div class="card shadow-sm text-center p-3">
                     <div class="card-body">
-                        <img src="{{ asset('all/assets/images/student.png') }}" 
-                             class="rounded-circle mb-3" width="120" height="120" alt="Student Avatar">
-                        <h5 class="card-title">Juan Dela Cruz</h5>
-                        <p class="text-muted mb-1">Student ID: 2025-12345</p>
-                        <p class="text-muted">BS Information Technology – 2nd Year</p>
-                        <button class="btn btn-sm btn-outline-primary mt-2">Change Profile Picture</button>
+                        <img id="studentImage"
+                             src="{{ $profile->profile_picture ? asset('storage/profile_pictures/' . $profile->profile_picture) : asset('uploads/student_profiles/student.png') }}"
+                             class="rounded-circle mb-3 shadow-sm"
+                             width="130" height="130" alt="Student Avatar">
+
+                        <h5 class="card-title fw-bold text-primary">{{ $profile->name }}</h5>
+                        <p class="text-muted mb-1">Student ID: {{ $profile->student_id }}</p>
+                        <p class="text-muted mb-3">{{ $profile->course }} – {{ $profile->year_level }}</p>
+
+                        <!-- Upload Form -->
+                        <form id="profileForm" enctype="multipart/form-data" method="POST">
+                            @csrf
+                            <input type="file" id="uploadProfile" name="profile_picture" accept="image/*" style="display: none;">
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="changeProfileBtn">
+                                <i class="fas fa-camera me-1"></i> Change Profile Picture
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success mt-2" id="saveProfileBtn" style="display: none;">
+                                <i class="fas fa-save me-1"></i> Save
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -20,106 +80,66 @@
             <!-- Profile Details -->
             <div class="col-md-8">
                 <div class="card shadow-sm mb-3">
-                    <div class="card-header bg-primary text-white">
-                        Personal Information
-                    </div>
+                    <div class="card-header bg-primary text-white">Personal Information</div>
                     <div class="card-body">
-                        <p><strong>Full Name:</strong> Juan Dela Cruz</p>
-                        <p><strong>Birthdate:</strong> January 15, 2005</p>
-                        <p><strong>Gender:</strong> Male</p>
-                        <p><strong>Address:</strong> Sindangan, Zamboanga del Norte</p>
-                        <p><strong>Contact No.:</strong> 0912-345-6789</p>
-                        <p><strong>Email:</strong> juandelacruz@example.com</p>
-                    </div>
-                </div>
-
-                <div class="card shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        Academic Information
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Course:</strong> BS Information Technology</p>
-                        <p><strong>Year Level:</strong> 2nd Year</p>
-                        <p><strong>Section:</strong> A2</p>
-                        <p><strong>Adviser:</strong> Mr. Dela Cruz</p>
-                        <p><strong>Dean:</strong> Dr. Santos</p>
-                    </div>
-                </div>
-
-                <!-- Account Settings -->
-                <div class="card shadow-sm mt-3">
-                    <div class="card-header bg-dark text-white">
-                        Account Settings
-                    </div>
-                    <div class="card-body">
-                        <!-- Trigger Modals -->
-                        <button class="btn btn-outline-warning me-2" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
-                            Change Password
-                        </button>
-                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editContactModal">
-                            Edit Contact Details
-                        </button>
+                        <p><strong>Full Name:</strong> {{ $profile->name }}</p>
+                        <p><strong>Email:</strong> {{ $profile->email }}</p>
+                        <p><strong>Course:</strong> {{ $profile->course }}</p>
+                        <p><strong>Year Level:</strong> {{ $profile->year_level }}</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Change Password Modal -->
-    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title">Change Password</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label>Current Password</label>
-                            <input type="password" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label>New Password</label>
-                            <input type="password" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label>Confirm New Password</label>
-                            <input type="password" class="form-control">
-                        </div>
-                        <button type="button" class="btn btn-warning w-100">Save Changes</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-    <!-- Edit Contact Details Modal -->
-    <div class="modal fade" id="editContactModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-secondary text-white">
-                    <h5 class="modal-title">Edit Contact Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label>Contact No.</label>
-                            <input type="text" class="form-control" value="0912-345-6789">
-                        </div>
-                        <div class="mb-3">
-                            <label>Email</label>
-                            <input type="email" class="form-control" value="juandelacruz@example.com">
-                        </div>
-                        <div class="mb-3">
-                            <label>Address</label>
-                            <input type="text" class="form-control" value="Sindangan, Zamboanga del Norte">
-                        </div>
-                        <button type="button" class="btn btn-secondary w-100">Save Changes</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script>
+        const changeBtn = document.getElementById('changeProfileBtn');
+        const saveBtn = document.getElementById('saveProfileBtn');
+        const fileInput = document.getElementById('uploadProfile');
+        const studentImage = document.getElementById('studentImage');
+
+        changeBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    studentImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                saveBtn.style.display = 'inline-block';
+            }
+        });
+
+        saveBtn.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('profile_picture', fileInput.files[0]);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            try {
+                const response = await fetch('{{ route('student.updateProfile') }}', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    studentImage.src = result.image_url;
+                    // Update header profile images
+                    document.querySelectorAll('.user-avtar').forEach(img => img.src = result.image_url);
+                    alert(result.message);
+                    saveBtn.style.display = 'none';
+                } else {
+                    alert('Upload failed. Please try again.');
+                }
+            } catch (error) {
+                alert('Something went wrong. Try again.');
+            }
+        });
+
+
+    </script>
 </x-student-component>

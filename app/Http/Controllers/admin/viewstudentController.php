@@ -24,7 +24,7 @@ class viewstudentController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls',
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         $import = new StudentImport;

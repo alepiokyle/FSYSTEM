@@ -69,7 +69,7 @@ body {
 </style>
 
 <div class="glass-card">
-    <h3>Import Students from Excel</h3>
+    <h3>Import Students from Excel or CSV</h3>
 
     @if(session('success'))
         <div style="color: green; margin-bottom: 15px;">{{ session('success') }}</div>
@@ -87,14 +87,14 @@ body {
 
     <form action="{{ route('admin.student.import') }}" method="POST" enctype="multipart/form-data" class="import-form">
         @csrf
-        <label for="file">Select Excel File:</label>
-        <input type="file" name="file" id="file" accept=".xlsx,.xls" required>
+        <label for="file">Select Excel or CSV File:</label>
+        <input type="file" name="file" id="file" accept=".xlsx,.xls,.csv" required>
 
         <button type="submit">Import Students</button>
     </form>
 
     <div class="sample-info">
-        <h4>Excel Format Requirements:</h4>
+        <h4>File Format Requirements:</h4>
         <p><strong>IMPORTANT:</strong> The import automatically detects column headers. Include headers in the first row for best results, or download the sample file as a template.</p>
         <p><strong>Required columns (case-insensitive headers):</strong></p>
         <ul>
@@ -103,6 +103,7 @@ body {
         <p><strong>Download the sample file and copy your data into it to ensure correct import:</strong></p>
         <p><a href="{{ route('admin.student.download.sample') }}" download style="background: #27ae60; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">📥 Download Sample Excel File</a></p>
         <p><em>The import will skip rows with empty required fields and show errors for invalid data.</em></p>
+        <p><strong>Note:</strong> If you encounter issues with Excel files, try converting to CSV format.</p>
     </div>
 </div>
 

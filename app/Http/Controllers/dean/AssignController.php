@@ -7,28 +7,46 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\TeacherAccount;
 use App\Models\Subject;
+use App\Models\SchoolYear;
 
 class AssignController extends Controller
 {
     public function index()
     {
-        // Fetch active teachers with their profiles
-        $teachers = TeacherAccount::with('profile')->where('is_active', true)->get();
+        $isTeacher = Auth::guard('teacher')->check();
+        $isDean = Auth::guard('dean')->check();
 
-        // Get the authenticated dean
-        $dean = Auth::guard('dean')->user();
+        if ($isDean) {
+            // Get the authenticated dean
+            $user = Auth::guard('dean')->user();
+            $departmentName = $user->profile->department->name;
+            $departmentId = $user->profile->department_id;
+        } elseif ($isTeacher) {
+            // Get the authenticated teacher
+            $user = Auth::guard('teacher')->user();
+            $departmentName = $user->profile->department->name;
+            $departmentId = $user->profile->department_id;
+        } else {
+            abort(403);
+        }
 
-        // Get the dean's department name
-        $departmentName = $dean->profile->department->name;
+        // Fetch active teachers created by admin
+        $teachers = TeacherAccount::with('profile', 'creator')->where('is_active', true)->whereNotNull('created_by')->get();
 
-        // Fetch subjects filtered by the dean's department
-        $subjects = Subject::with('teacher')->where('department', $departmentName)->get();
+        // Fetch subjects filtered by the department
+        $subjects = Subject::with('teacher')->whereHas('department', function($q) use ($departmentName) {
+            $q->where('name', $departmentName);
+        })->get();
 
         // Get unique year levels and sections for the department
-        $yearLevels = Subject::where('department', $departmentName)->distinct()->pluck('year_level')->filter()->sort();
-        $sections = Subject::where('department', $departmentName)->distinct()->pluck('section')->filter()->sort();
+        $yearLevels = Subject::whereHas('department', function($q) use ($departmentName) {
+            $q->where('name', $departmentName);
+        })->distinct()->pluck('year_level')->filter()->sort();
+        $sections = Subject::whereHas('department', function($q) use ($departmentName) {
+            $q->where('name', $departmentName);
+        })->distinct()->pluck('section')->filter()->sort();
 
-        return view('dean.AssignTeacher.assign', compact('teachers', 'subjects', 'departmentName', 'yearLevels', 'sections'));
+        return view('dean.AssignTeacher.assign', array_merge(compact('teachers', 'subjects', 'departmentName', 'yearLevels', 'sections', 'isTeacher', 'isDean', 'user'), ['currentUserId' => $user->id]));
     }
 
     /**
@@ -77,5 +95,31 @@ class AssignController extends Controller
                 'message' => 'Failed to delete subject. Please try again.'
             ], 500);
         }
+    }
+
+    /**
+     * Check the number of subjects assigned to a teacher in the current school year
+     */
+    public function checkAssignments($teacher_id)
+    {
+        $currentSchoolYear = SchoolYear::latest()->first()->schoolyear ?? '2024-2025';
+
+        $count = Subject::where('teacher_id', $teacher_id)
+            ->where('school_year', $currentSchoolYear)
+            ->count();
+
+        return response()->json(['count' => $count]);
+    }
+
+    /**
+     * Get the creator admin name for a teacher
+     */
+    public function getCreator($teacher_id)
+    {
+        $teacher = TeacherAccount::with('creator')->findOrFail($teacher_id);
+
+        $creatorName = $teacher->creator ? $teacher->creator->name : 'Unknown';
+
+        return response()->json(['creator_name' => $creatorName]);
     }
 }

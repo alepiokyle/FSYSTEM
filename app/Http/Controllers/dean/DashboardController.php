@@ -18,10 +18,14 @@ class DashboardController extends Controller
         $departmentName = $dean->profile->department->name;
 
         // Count total subjects uploaded in the department
-        $totalSubjects = Subject::where('department', $departmentName)->count();
+        $totalSubjects = Subject::whereHas('department', function($q) use ($departmentName) {
+            $q->where('name', $departmentName);
+        })->count();
 
         // Count teachers assigned (subjects with teacher_id not null)
-        $teachersAssigned = Subject::where('department', $departmentName)->whereNotNull('teacher_id')->count();
+        $teachersAssigned = Subject::whereHas('department', function($q) use ($departmentName) {
+            $q->where('name', $departmentName);
+        })->whereNotNull('teacher_id')->count();
 
         return view('Dean.deandashboard', compact('totalSubjects', 'teachersAssigned'));
     }

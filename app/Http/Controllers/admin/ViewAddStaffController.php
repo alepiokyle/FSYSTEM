@@ -11,6 +11,7 @@ use App\Models\TeacherProfile;
 use App\Models\UserRole;
 use App\Models\Department;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class ViewAddStaffController extends Controller
@@ -67,6 +68,7 @@ class ViewAddStaffController extends Controller
                     'password' => Hash::make($validated['password']),
                     'user_role_id' => $userRole->id,
                     'is_active' => true,
+                    'created_by' => Auth::guard('admin')->id(),
                 ]);
             } else {
                 $userRole = UserRole::where('role', 'Dean')->first();

@@ -127,7 +127,7 @@ body {
 
 <div class="glass-card">
     <h3>Student List / Directory</h3>
-    <a href="{{ route('admin.student.import.page') }}" class="action-btn edit-btn">Import Students from Excel</a>
+    <a href="{{ route('admin.student.import.page') }}" class="action-btn edit-btn">Import Students from Excel/CSV</a>
 
     <!-- Search + Filter -->
     <form class="search-bar">

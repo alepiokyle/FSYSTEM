@@ -4,277 +4,420 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Manage Assessments - Teacher Dashboard</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f9fa;
       margin: 0;
       padding: 0;
     }
-    .container {
-      padding: 20px;
+
+    header {
+      background: #ffffff;
+      padding: 15px 20px;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 15px;
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
       color: #333;
     }
+
+    .content {
+      padding: 20px;
+    }
+
     .card {
       background: #fff;
-      border-radius: 12px;
+      border-radius: 8px;
       padding: 20px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       margin-bottom: 20px;
     }
+
     label {
       font-weight: 500;
       display: block;
       margin-bottom: 6px;
       color: #444;
     }
+
     select {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
       font-size: 14px;
+      margin-bottom: 10px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      margin-top: 10px;
+      font-size: 14px;
     }
-    table th, table td {
-      padding: 12px;
+
+    th, td {
+      padding: 10px;
       border: 1px solid #ddd;
       text-align: center;
-      font-size: 14px;
     }
-    table th {
-      background: #f0f2f5;
+
+    th {
+      background: #f1f3f5;
       font-weight: 600;
     }
-    .btn {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      margin-right: 8px;
-    }
-    .btn-edit { background: #ff9800; color: #fff; }
-    .btn-submit { background: #4CAF50; color: #fff; }
-    .btn-export { background: #007bff; color: #fff; }
-    .btn:hover { opacity: 0.9; }
 
-    /* Modal */
+    input.grade-input {
+      width: 70px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 6px;
+    }
+
+    .btn-save {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .btn-edit {
+      background: #f39c12;
+      color: white;
+    }
+
+    .btn-submit {
+      background: #007bff;
+      color: white;
+    }
+
+    .btn-export {
+      background: #6c757d;
+      color: white;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #b33;
+      margin-top: 10px;
+    }
+
+    .actions {
+      margin-top: 10px;
+    }
+
+    /* ===== Modal Styles ===== */
     .modal {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      width: 700px; /* wider */
-      max-width: 95%;
-      position: relative;
-      animation: fadeIn 0.3s ease;
-    }
-    .modal-content h3 {
-      margin-bottom: 15px;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
     }
 
-    /* Two-column form layout */
-    .modal-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px 20px;
+    .modal-content {
+      background-color: #fff;
+      margin: 8% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      position: relative;
     }
-    .modal-form label {
-      font-weight: bold;
-      font-size: 14px;
+
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 22px;
+      cursor: pointer;
     }
-    .modal-form input {
+
+    .close:hover {
+      color: #000;
+    }
+
+    .modal-content input {
       width: 100%;
       padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ddd;
+      margin: 8px 0;
+      border: 1px solid #ccc;
       border-radius: 6px;
-      font-size: 14px;
     }
-    .form-actions {
-      grid-column: span 2;
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-    .btn-cancel {
-      background: #ccc; 
-      color: #333; 
-      padding: 8px 12px; 
-      border-radius: 6px; 
-      cursor: pointer;
-    }
-    .btn-save {
-      background: #4CAF50; 
-      color: white; 
-      padding: 8px 12px; 
-      border-radius: 6px; 
-      cursor: pointer;
-    }
-    .close-btn {
-      position: absolute;
-      top: 10px; right: 15px;
-      cursor: pointer;
-      font-size: 18px;
-      font-weight: bold;
-      color: #555;
-    }
-    .close-btn:hover { color: red; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .modal-content button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #2f3e46;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .modal-content button:hover {
+      background: #1f2b32;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <header>
     <h1>Manage Assessments</h1>
+  </header>
 
+  <div class="content">
     <!-- Subject Selector -->
     <div class="card">
       <label for="subject">Select Subject</label>
       <select id="subject">
         <option value="">-- Choose Subject --</option>
-        <option>Math 101</option>
-        <option>English 102</option>
-        <option>Science 103</option>
+        @foreach($subjects as $subject)
+          <option value="{{ $subject->id }}">{{ $subject->subject_name }} ({{ $subject->subject_code }})</option>
+        @endforeach
       </select>
     </div>
 
     <!-- Assessments Table -->
     <div class="card">
-      <h3>Student Grades</h3>
+      <h3 style="margin-bottom: 10px;">Student Grades</h3>
       <table>
         <thead>
           <tr>
             <th>Student ID</th>
             <th>Name</th>
-            <th>Quizzes</th>
-            <th>Exams</th>
             <th>Prelim</th>
             <th>Midterm</th>
             <th>Semi-Final</th>
             <th>Final</th>
+            <th>Term Grade</th>
+            <th>Remarks</th>
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>2025-001</td>
-            <td>Juan Dela Cruz</td>
-            <td>85</td>
-            <td>90</td>
-            <td>88</td>
-            <td>87</td>
-            <td>89</td>
-            <td>90</td>
-            <td>
-              <button class="btn btn-edit" onclick="openEditModal('Juan Dela Cruz',85,90,88,87,89,90)">Edit</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody id="studentsTableBody"></tbody>
       </table>
     </div>
 
     <!-- Action Buttons -->
-    <div>
-      <button class="btn btn-submit">Submit to Dean</button>
+    <div class="actions">
+      <button class="btn btn-submit" id="submitBtn" onclick="showSubmitModal()">Submit to Dean</button>
       <button class="btn btn-export">Export to Excel</button>
     </div>
 
-    <p style="color: red; margin-top: 10px; font-size: 14px;">
+    <p class="note">
       ⚠️ Once submitted, you can no longer edit the grades. Dean will review and approve/post.
     </p>
   </div>
 
-  <!-- Modal -->
-  <div class="modal" id="editGradesModal">
+  <!-- ===== Edit Modal ===== -->
+  <div id="editModal" class="modal">
     <div class="modal-content">
-      <span class="close-btn" onclick="closeEditModal()">&times;</span>
+      <span class="close" onclick="closeModal()">&times;</span>
       <h3>Edit Grades</h3>
+      <form id="editForm">
+        <input type="hidden" id="editStudentId">
+        <label>Prelim:</label>
+        <input type="number" id="editPrelim" min="0" max="100">
+        <label>Midterm:</label>
+        <input type="number" id="editMidterm" min="0" max="100">
+        <label>Semi-Final:</label>
+        <input type="number" id="editSemiFinal" min="0" max="100">
+        <label>Final:</label>
+        <input type="number" id="editFinal" min="0" max="100">
+        <button type="submit">Update Grades</button>
+      </form>
+    </div>
+  </div>
 
-      <div class="modal-form">
-        <div>
-          <label>Student Name</label>
-          <input type="text" id="studentName" readonly />
-        </div>
-        <div>
-          <label>Quizzes</label>
-          <input type="number" id="editQuizzes" />
-        </div>
-        <div>
-          <label>Exams</label>
-          <input type="number" id="editExams" />
-        </div>
-        <div>
-          <label>Prelim</label>
-          <input type="number" id="editPrelim" />
-        </div>
-        <div>
-          <label>Midterm</label>
-          <input type="number" id="editMidterm" />
-        </div>
-        <div>
-          <label>Semi-Final</label>
-          <input type="number" id="editSemiFinal" />
-        </div>
-        <div>
-          <label>Final</label>
-          <input type="number" id="editFinal" />
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-          <button type="button" class="btn-save" onclick="saveChanges()">Save Changes</button>
-        </div>
-      </div>
+  <!-- ===== Submit Confirmation Modal ===== -->
+  <div id="submitModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeSubmitModal()">&times;</span>
+      <h3>Confirm Submission</h3>
+      <p>Are you sure you want to submit the grades to the Dean? Once submitted, you cannot edit them anymore.</p>
+      <button class="btn btn-submit" onclick="confirmSubmit()">Yes, Submit</button>
+      <button class="btn btn-export" onclick="closeSubmitModal()">Cancel</button>
     </div>
   </div>
 
   <script>
-    // Open Modal
-    function openEditModal(name, quizzes, exams, prelim, midterm, semiFinal, final) {
-      document.getElementById("studentName").value = name;
-      document.getElementById("editQuizzes").value = quizzes;
-      document.getElementById("editExams").value = exams;
-      document.getElementById("editPrelim").value = prelim;
-      document.getElementById("editMidterm").value = midterm;
-      document.getElementById("editSemiFinal").value = semiFinal;
-      document.getElementById("editFinal").value = final;
+    // Load students dynamically
+    document.getElementById('subject').addEventListener('change', function() {
+      const subjectId = this.value;
+      const tbody = document.getElementById('studentsTableBody');
+      tbody.innerHTML = '';
 
-      document.getElementById("editGradesModal").style.display = "flex";
+      if (!subjectId) return;
+
+      fetch(`/teacher/Manages/${subjectId}/students`)
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(student => {
+            const row = document.createElement('tr');
+            const isEditable = student.status === 'draft' || student.status === 'saved';
+            row.innerHTML = `
+              <td>${student.id}</td>
+              <td>${student.name}</td>
+              <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="prelim" value="${student.prelim ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
+              <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="midterm" value="${student.midterm ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
+              <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="semi_final" value="${student.semi_final ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
+              <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="final" value="${student.final ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
+              <td>${student.term_grade ?? '-'}</td>
+              <td>${student.remarks ?? '-'}</td>
+              <td>
+                <button class="btn btn-save" onclick="saveStudentGrades(${student.id})" ${isEditable ? '' : 'disabled'}>Save</button>
+                <button class="btn btn-edit" onclick="openEditModal(${student.id})" ${isEditable ? '' : 'disabled'}>Edit</button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        })
+        .catch(err => alert('Error loading students.'));
+    });
+
+    // Save student grades
+    function saveStudentGrades(studentId) {
+      const subjectId = document.getElementById('subject').value;
+      const inputs = document.querySelectorAll(`.grade-input[data-student-id="${studentId}"]`);
+      const grades = {};
+
+      inputs.forEach(input => grades[input.dataset.field] = input.value || 0);
+
+      fetch(`/teacher/Manages/${subjectId}/save-grades`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ grades: { [studentId]: grades } })
+      })
+      .then(res => res.json())
+      .then(data => alert(data.success ? 'Grades saved successfully!' : (data.error || 'Error saving grades.')))
+      .catch(() => alert('Error saving grades.'));
+    }
+
+    // Open Edit Modal
+    function openEditModal(studentId) {
+      const modal = document.getElementById('editModal');
+      document.getElementById('editStudentId').value = studentId;
+
+      // Fill modal with current values
+      const prelimInput = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="prelim"]`);
+      if (prelimInput) document.getElementById('editPrelim').value = prelimInput.value;
+
+      const midtermInput = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="midterm"]`);
+      if (midtermInput) document.getElementById('editMidterm').value = midtermInput.value;
+
+      const semiFinalInput = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="semi_final"]`);
+      if (semiFinalInput) document.getElementById('editSemiFinal').value = semiFinalInput.value;
+
+      const finalInput = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="final"]`);
+      if (finalInput) document.getElementById('editFinal').value = finalInput.value;
+
+      modal.style.display = 'block';
     }
 
     // Close Modal
-    function closeEditModal() {
-      document.getElementById("editGradesModal").style.display = "none";
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
     }
 
-    // Save Changes (demo only)
-    function saveChanges() {
-      alert("Grades updated successfully (demo only, not saved to database).");
-      closeEditModal();
+    // Submit Edit Form
+    document.getElementById('editForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const studentId = document.getElementById('editStudentId').value;
+
+      const prelimModal = document.getElementById('editPrelim');
+      const prelimTable = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="prelim"]`);
+      if (prelimModal && prelimTable) prelimTable.value = prelimModal.value;
+
+      const midtermModal = document.getElementById('editMidterm');
+      const midtermTable = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="midterm"]`);
+      if (midtermModal && midtermTable) midtermTable.value = midtermModal.value;
+
+      const semiFinalModal = document.getElementById('editSemiFinal');
+      const semiFinalTable = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="semi_final"]`);
+      if (semiFinalModal && semiFinalTable) semiFinalTable.value = semiFinalModal.value;
+
+      const finalModal = document.getElementById('editFinal');
+      const finalTable = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="final"]`);
+      if (finalModal && finalTable) finalTable.value = finalModal.value;
+
+      alert('Grade update submitted for approval!');
+      closeModal();
+    });
+
+    window.onclick = function(event) {
+      const editModal = document.getElementById('editModal');
+      const submitModal = document.getElementById('submitModal');
+      if (event.target === editModal) editModal.style.display = 'none';
+      if (event.target === submitModal) submitModal.style.display = 'none';
+    }
+
+    // Show Submit Modal
+    function showSubmitModal() {
+      const subjectId = document.getElementById('subject').value;
+      if (!subjectId) {
+        alert('Please select a subject.');
+        return;
+      }
+      document.getElementById('submitModal').style.display = 'block';
+    }
+
+    // Close Submit Modal
+    function closeSubmitModal() {
+      document.getElementById('submitModal').style.display = 'none';
+    }
+
+    // Confirm Submit
+    function confirmSubmit() {
+      closeSubmitModal();
+      submitToDean();
+    }
+
+    // Submit to Dean
+    function submitToDean() {
+      const subjectId = document.getElementById('subject').value;
+
+      // Submit the grades
+      fetch(`/teacher/Manages/${subjectId}/submit-grades`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert(data.message);
+          // Reload students to reflect status change
+          document.getElementById('subject').dispatchEvent(new Event('change'));
+        } else {
+          alert(data.error || 'Error submitting grades.');
+        }
+      })
+      .catch(() => alert('Error submitting grades.'));
     }
   </script>
 </body>

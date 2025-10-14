@@ -19,28 +19,28 @@ class SubjectLoadingController extends Controller
         // Get the dean's department name
         $departmentName = $dean->profile->department->name;
 
-        // Fetch subjects filtered by the dean's department, ordered by creation date (newest first)
-        $subjects = Subject::where('department', $departmentName)
+        // Fetch subjects filtered by the dean's department, ordered by creation date (newest first), then group by code and name to show unique
+        $subjects = Subject::whereHas('department', function($q) use ($departmentName) {
+                            $q->where('name', $departmentName);
+                        })
                           ->orderBy('created_at', 'desc')
-                          ->get();
+                          ->get()
+                          ->groupBy(function ($subject) {
+                              return $subject->subject_code . '|' . $subject->subject_name;
+                          })
+                          ->map(function ($group) {
+                              return $group->first(); // Take the latest created
+                          });
 
-        // Fetch unique year level and section combinations from subjects
-        $yearSections = Subject::where('department', $departmentName)
-                              ->whereNotNull('year_level')
-                              ->whereNotNull('section')
-                              ->select('year_level', 'section')
-                              ->distinct()
-                              ->get()
-                              ->map(function($item) {
-                                  return $item->year_level . ' - ' . $item->section;
-                              })
-                              ->unique()
-                              ->values();
+        // Fetch students in the dean's department
+        $students = User::where('user_role_id', 7)
+                        ->whereHas('profile.department', function($query) use ($departmentName) {
+                            $query->where('name', $departmentName);
+                        })
+                        ->with('profile')
+                        ->get();
 
-        // Fetch all students
-        $students = User::where('user_role_id', 7)->with('profile')->get();
-
-        return view('Dean.SubjectLoading.loading', compact('subjects', 'students', 'yearSections'));
+        return view('Dean.SubjectLoading.loading', compact('subjects', 'students'));
     }
 
     /**
@@ -76,7 +76,9 @@ class SubjectLoadingController extends Controller
      */
     public function getSubjectsByDepartment($department)
     {
-        $subjects = Subject::where('department', $department)->get(['id', 'subject_code', 'subject_name']);
+        $subjects = Subject::whereHas('department', function($q) use ($department) {
+            $q->where('name', $department);
+        })->get(['id', 'subject_code', 'subject_name']);
 
         return response()->json($subjects);
     }

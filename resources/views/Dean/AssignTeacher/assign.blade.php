@@ -123,26 +123,15 @@
             </div>
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="section">Section</label>
-                    <select id="section" name="section" class="form-control">
-                        <option value="">-- Select Section --</option>
-                        @foreach($sections as $sec)
-                            <option value="{{ $sec }}">{{ $sec }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-6">
                     <label for="subject">Subject</label>
                     <select id="subject" name="subject_id" class="form-control">
                         <option value="">-- Select Subject --</option>
                         @foreach($subjects as $subject)
-                            <option value="{{ $subject->id }}" data-year="{{ $subject->year_level }}" data-section="{{ $subject->section }}">{{ $subject->subject_code }} - {{ $subject->subject_name }}</option>
+                            <option value="{{ $subject->id }}" data-year="{{ $subject->year_level }}">{{ $subject->subject_code }} - {{ $subject->subject_name }}</option>
                         @endforeach
                     </select>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <label for="teacher">Teacher</label>
                     <select id="teacher" name="teacher_id" class="form-control">
                         <option value="">-- Select Teacher --</option>
@@ -150,11 +139,13 @@
                             <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
                         @endforeach
                     </select>
+                    <div id="teacherMessage" style="margin-top: 10px; font-weight: bold;"></div>
+                    <div id="creatorMessage" style="margin-top: 5px; font-style: italic; color: #666;"></div>
                 </div>
             </div>
         </form>
         <div style="margin-top:20px; text-align:right;">
-            <button type="button" class="btn-assign">Assign Teacher</button>
+            <button type="button" class="btn-assign" id="assignBtn">Assign Teacher</button>
         </div>
     </div>
 
@@ -173,8 +164,8 @@
                 </thead>
                 <tbody>
                     @foreach($subjects as $subject)
-                    <tr>
-                        <td>{{ $subject->department }}</td>
+                    <tr data-subject-id="{{ $subject->id }}">
+                        <td>{{ $subject->department->name }}</td>
                         <td>{{ $subject->subject_code }} - {{ $subject->subject_name }}</td>
                         <td>{{ $subject->teacher ? $subject->teacher->name : 'Not Assigned' }}</td>
                         <td class="action-links" style="text-align:center;">
@@ -189,18 +180,16 @@
     </div>
 
     <script>
-        // Filter subjects based on year level and section
+        // Filter subjects based on year level
         function filterSubjects() {
             const selectedYL = document.getElementById('year_level').value;
-            const selectedSec = document.getElementById('section').value;
             const subjectSelect = document.getElementById('subject');
             const options = subjectSelect.querySelectorAll('option');
 
             options.forEach(option => {
                 if (option.value === '') return; // Skip the placeholder
                 const year = option.getAttribute('data-year');
-                const section = option.getAttribute('data-section');
-                if ((selectedYL === '' || year === selectedYL) && (selectedSec === '' || section === selectedSec)) {
+                if (selectedYL === '' || year === selectedYL) {
                     option.style.display = '';
                 } else {
                     option.style.display = 'none';
@@ -219,7 +208,58 @@
 
         // Add event listeners for filtering
         document.getElementById('year_level').addEventListener('change', filterSubjects);
-        document.getElementById('section').addEventListener('change', filterSubjects);
+
+        // Handle teacher selection change
+        document.getElementById('teacher').addEventListener('change', function() {
+            const teacherId = this.value;
+            const messageDiv = document.getElementById('teacherMessage');
+            const creatorDiv = document.getElementById('creatorMessage');
+            const btn = document.getElementById('assignBtn');
+
+            if (!teacherId) {
+                messageDiv.textContent = '';
+                creatorDiv.textContent = '';
+                btn.disabled = false;
+                return;
+            }
+
+            // Fetch assignment count
+            fetch(`{{ route('dean.AssignTeacher.check', ':teacherId') }}`.replace(':teacherId', teacherId))
+                .then(response => response.json())
+                .then(data => {
+                    const count = data.count;
+                    if (count === 0) {
+                        messageDiv.innerHTML = '🟢 Available (0 subjects assigned)';
+                        messageDiv.style.color = 'green';
+                        btn.disabled = false;
+                    } else if (count < 5) {
+                        messageDiv.innerHTML = `⚠️ Already assigned to ${count} subjects`;
+                        messageDiv.style.color = 'orange';
+                        btn.disabled = false;
+                    } else {
+                        messageDiv.innerHTML = `🚫 Fully assigned (Limit reached, e.g., 5)`;
+                        messageDiv.style.color = 'red';
+                        btn.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messageDiv.textContent = 'Error checking assignments.';
+                    messageDiv.style.color = 'red';
+                    btn.disabled = false;
+                });
+
+            // Fetch creator name
+            fetch(`{{ route('dean.AssignTeacher.creator', ':teacherId') }}`.replace(':teacherId', teacherId))
+                .then(response => response.json())
+                .then(data => {
+                    creatorDiv.textContent = 'Created by: ' + data.creator_name;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    creatorDiv.textContent = 'Error fetching creator.';
+                });
+        });
 
         // Handle assign button click
         document.querySelector('.btn-assign').addEventListener('click', function() {
@@ -258,9 +298,10 @@
                     }
                     // Clear the selects
                     document.getElementById('year_level').value = '';
-                    document.getElementById('section').value = '';
                     subjectSelect.value = '';
                     teacherSelect.value = '';
+                    document.getElementById('teacherMessage').textContent = '';
+                    document.getElementById('assignBtn').disabled = false;
                     filterSubjects(); // Reset filter
                 } else {
                     alert('Failed to assign teacher: ' + data.message);
@@ -306,5 +347,7 @@
                 }
             });
         });
+
+
     </script>
 </x-dean-component>
