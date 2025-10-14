@@ -29,20 +29,24 @@ class SectionController extends Controller
 
         if ($request->hasFile('profile_picture')) {
             // Delete old profile picture if exists
-            if ($profile->profile_picture && Storage::exists('public/profile_pictures/' . $profile->profile_picture)) {
-                Storage::delete('public/profile_pictures/' . $profile->profile_picture);
+            if ($profile->profile_picture && Storage::disk('public')->exists('profile_pictures/' . $profile->profile_picture)) {
+                Storage::disk('public')->delete('profile_pictures/' . $profile->profile_picture);
             }
 
-            // Store new image
+            // Create user-specific folder path
+            $userFolder = $user->id;
             $fileName = time() . '_' . $user->id . '.' . $request->file('profile_picture')->getClientOriginalExtension();
-            $path = $request->file('profile_picture')->storeAs('public/profile_pictures', $fileName);
+            $relativePath = $userFolder . '/' . $fileName;
 
-            // Update profile
-            $profile->update(['profile_picture' => $fileName]);
+            // Store new image in user folder
+            $path = $request->file('profile_picture')->storeAs('profile_pictures/' . $userFolder, $fileName, 'public');
+
+            // Update profile with relative path
+            $profile->update(['profile_picture' => $relativePath]);
 
             return response()->json([
                 'success' => true,
-                'image_url' => asset('storage/profile_pictures/' . $fileName),
+                'image_url' => asset('storage/profile_pictures/' . $relativePath),
                 'message' => 'Profile picture updated successfully!'
             ]);
         }

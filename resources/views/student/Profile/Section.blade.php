@@ -56,7 +56,8 @@
                         <img id="studentImage"
                              src="{{ $profile->profile_picture ? asset('storage/profile_pictures/' . $profile->profile_picture) : asset('uploads/student_profiles/student.png') }}"
                              class="rounded-circle mb-3 shadow-sm"
-                             width="130" height="130" alt="Student Avatar">
+                             width="130" height="130" alt="Student Avatar"
+                             onerror="this.src='{{ asset('uploads/student_profiles/student.png') }}'">
 
                         <h5 class="card-title fw-bold text-primary">{{ $profile->name }}</h5>
                         <p class="text-muted mb-1">Student ID: {{ $profile->student_id }}</p>

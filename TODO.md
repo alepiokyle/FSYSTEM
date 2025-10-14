@@ -1,18 +1,11 @@
-# TODO: Implement Profile Picture Upload for Student Section
+# Profile Image Upload Fix for Students
 
-## Steps to Complete
-
-1. **Create Migration**: Add `profile_picture` column to `users_profile` table.
-2. **Run Migration**: Execute the migration to update the database.
-3. **Update UsersProfile Model**: Add `profile_picture` to fillable array.
-4. **Update SectionController**: Add `uploadProfilePicture` method to handle file upload.
-5. **Add Route**: Add POST route for `/student/upload-profile-picture`.
-6. **Update View**: Modify `Section.blade.php` to display uploaded picture and handle upload via JavaScript.
-
-## Progress
-- [x] Step 1: Create Migration
-- [x] Step 2: Run Migration
-- [x] Step 3: Update Model
-- [x] Step 4: Update Controller
-- [x] Step 5: Add Route
-- [x] Step 6: Update View
+## Tasks
+- [x] Modify SectionController.php to store images in subfolders by user ID (e.g., public/profile_pictures/{$user->id}/filename)
+- [x] Update profile_picture column storage to include user ID folder in path (e.g., '182/filename.jpg')
+- [x] Update delete logic in SectionController to handle new path structure
+- [x] Update Section.blade.php view to use new path in img src
+- [x] Update header.blade.php view to use new path in img src
+- [x] Ensure storage link is active (php artisan storage:link)
+- [ ] Test upload and display functionality
+- [ ] Handle existing files if necessary (optional, focus on new uploads)
