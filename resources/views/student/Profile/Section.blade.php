@@ -83,10 +83,14 @@
                 <div class="card shadow-sm mb-3">
                     <div class="card-header bg-primary text-white">Personal Information</div>
                     <div class="card-body">
-                        <p><strong>Full Name:</strong> {{ $profile->name }}</p>
-                        <p><strong>Email:</strong> {{ $profile->email }}</p>
+                        <p><strong>Full Name:</strong> {{ $profile->first_name }} {{ $profile->middle_name }} {{ $profile->last_name }} {{ $profile->suffix }}</p>
+                        {{-- <p><strong>Email:</strong> {{ $profile->user->email }}</p> --}}
+                        <p><strong>Student ID:</strong> {{ $profile->student_id }}</p>
+                        <p><strong>Date of Birth:</strong> {{ $profile->date_of_birth ? \Carbon\Carbon::parse($profile->date_of_birth)->format('M d, Y') : 'N/A' }}</p>
+                        <p><strong>Gender:</strong> {{ $profile->gender }}</p>
                         <p><strong>Course:</strong> {{ $profile->course }}</p>
                         <p><strong>Year Level:</strong> {{ $profile->year_level }}</p>
+                        <p><strong>Department:</strong> {{ $profile->department->name ?? 'N/A' }}</p>
                     </div>
                 </div>
             </div>

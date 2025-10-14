@@ -13,7 +13,7 @@ class SectionController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $profile = UsersProfile::where('users_id', $user->id)->first();
+        $profile = UsersProfile::with(['user', 'department'])->where('users_id', $user->id)->first();
 
         return view('student.Profile.Section', compact('profile'));
     }
