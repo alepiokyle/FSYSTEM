@@ -1,12 +1,24 @@
 <x-auth-component>
-    <div class="auth-form d-flex flex-column align-items-center justify-content-center min-vh-100"
-         style="background: url('{{ asset('all/assets/images/school.png') }}') no-repeat center center;
-                background-size: cover;
+    {{-- Full-screen Background Overlay --}}
+    <div class="auth-background" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1;">
+        <div style="background: url('{{ asset('all/assets/images/school.png') }}') no-repeat center center;
+                    background-size: cover;
+                    filter: blur(8px);
+                    width: 100%;
+                    height: 100%;
+                    transform: scale(1.1); /* Prevent blur edges */"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.3);"></div>
+    </div>
+
+    {{-- Centered Auth Form --}}
+    <div class="auth-form d-flex flex-column align-items-center justify-content-center"
+         style="min-height: 100vh;
                 font-family: 'Poppins', sans-serif;
-                position: relative;">
+                position: relative;
+                z-index: 2;">
 
         {{-- Login Card --}}
-        <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 15px; z-index: 2; background-color: rgba(255,255,255,0.95);">
+        <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 15px; background-color: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
             <div class="card-body p-4">
 
                 {{-- Logo & Heading --}}
@@ -75,9 +87,8 @@
                         <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 10px;">Login</button>
                     </div>
 
-                 
 
-               
+
                 </form>
             </div>
         </div>
@@ -92,7 +103,4 @@
 
 
 
-    <div class="col-md-4">
-                    <label for="units">Units</label>
-                    <input type="number" id="units" name="units" class="form-control" placeholder="Auto-filled or enter manually" min="1" required>
-                </div>
+ 

@@ -84,6 +84,145 @@
         .action-links a.edit { color: #0d6efd; }
         .action-links a.remove { color: #dc3545; }
         .action-links a:hover { text-decoration: underline; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 767px) {
+            x-dean-component {
+                padding: 16px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .page-header-title h5 {
+                font-size: 1.5rem;
+            }
+
+            .breadcrumb {
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 16px;
+                border-radius: 8px;
+            }
+
+            .card h2 {
+                font-size: 1.1rem;
+                margin-bottom: 16px;
+            }
+
+            .row.mb-3 {
+                margin-bottom: 16px !important;
+            }
+
+            .col-md-6 {
+                margin-bottom: 16px;
+            }
+
+            .col-md-6:last-child {
+                margin-bottom: 0;
+            }
+
+            label {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            select,
+            p[style*="border"] {
+                font-size: 16px; /* Prevent zoom on iOS */
+                padding: 12px 10px;
+            }
+
+            .btn-assign {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            th:nth-child(4),
+            td:nth-child(4) {
+                width: 100px;
+                min-width: 100px;
+            }
+
+            .action-links {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .action-links a {
+                margin: 0;
+                padding: 4px 8px;
+                border-radius: 4px;
+                background: #f8f9fa;
+                display: block;
+                text-align: center;
+                font-size: 12px;
+            }
+
+            /* Stack table on very small screens */
+            @media (max-width: 480px) {
+                table {
+                    display: block;
+                    border: none;
+                }
+
+                thead {
+                    display: none;
+                }
+
+                tbody,
+                tr,
+                td {
+                    display: block;
+                    width: 100%;
+                }
+
+                tr {
+                    border: 1px solid #e9ecef;
+                    border-radius: 8px;
+                    margin-bottom: 12px;
+                    padding: 12px;
+                    background: #fff;
+                }
+
+                td {
+                    border: none;
+                    padding: 4px 0;
+                    text-align: left;
+                }
+
+                td:before {
+                    content: attr(data-label) ": ";
+                    font-weight: bold;
+                    display: inline-block;
+                    min-width: 80px;
+                    color: #666;
+                }
+
+                .action-links {
+                    margin-top: 8px;
+                    padding-top: 8px;
+                    border-top: 1px solid #eee;
+                }
+            }
+        }
     </style>
 
     <!-- ====== Page Header ====== -->
@@ -165,10 +304,10 @@
                 <tbody>
                     @foreach($subjects as $subject)
                     <tr data-subject-id="{{ $subject->id }}">
-                        <td>{{ $subject->department->name }}</td>
-                        <td>{{ $subject->subject_code }} - {{ $subject->subject_name }}</td>
-                        <td>{{ $subject->teacher ? $subject->teacher->name : 'Not Assigned' }}</td>
-                        <td class="action-links" style="text-align:center;">
+                        <td data-label="Department">{{ $subject->department->name }}</td>
+                        <td data-label="Subject">{{ $subject->subject_code }} - {{ $subject->subject_name }}</td>
+                        <td data-label="Assign teacher">{{ $subject->teacher ? $subject->teacher->name : 'Not Assigned' }}</td>
+                        <td data-label="Action" class="action-links" style="text-align:center;">
                             <a href="#" class="edit">✏ Reassign</a>
                             <a href="#" class="remove" data-id="{{ $subject->id }}">🗑 Remove</a>
                         </td>

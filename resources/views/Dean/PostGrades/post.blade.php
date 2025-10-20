@@ -80,6 +80,88 @@
             border-color: #004085;
             color: white;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 767px) {
+            x-dean-component {
+                padding: 16px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .page-header-title h5 {
+                font-size: 1.5rem;
+            }
+
+            .breadcrumb {
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 16px;
+                border-radius: 8px;
+            }
+
+            .card h4 {
+                font-size: 1.1rem;
+                margin-bottom: 12px;
+            }
+
+            .row .col-md-3,
+            .row .col-md-4 {
+                margin-bottom: 16px;
+            }
+
+            .row .col-md-3:last-child,
+            .row .col-md-4:last-child {
+                margin-bottom: 0;
+            }
+
+            label {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            select,
+            .form-select {
+                font-size: 16px; /* Prevent zoom on iOS */
+                padding: 12px 10px;
+            }
+
+            .btn-filter {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+            .table th,
+            .table td {
+                padding: 8px 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .btn-action {
+                padding: 6px 8px;
+                font-size: 12px;
+                margin: 2px;
+            }
+
+            /* Horizontal scroll on mobile */
+            @media (max-width: 767px) {
+                .table-responsive {
+                    overflow-x: auto;
+                }
+            }
+        }
     </style>
 
     <!-- ====== Page Header ====== -->
@@ -157,22 +239,24 @@
     <!-- ====== Approved Grades Table ====== -->
     <div class="card">
         <h4>Approved Grades Ready to Post</h4>
-        <table id="approvedTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Prelim</th>
-                    <th>Midterm</th>
-                    <th>Semi-Final</th>
-                    <th>Final</th>
-                    <th>Term Grade</th>
-                    <th>Remarks</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="approvedTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Prelim</th>
+                        <th>Midterm</th>
+                        <th>Semi-Final</th>
+                        <th>Final</th>
+                        <th>Term Grade</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -194,15 +278,15 @@
                     data.forEach(grade => {
                         approvedBody.innerHTML += `
                             <tr>
-                                <td>${grade.student_id}</td>
-                                <td><strong>${grade.student_name}</strong></td>
-                                <td>${grade.prelim}</td>
-                                <td>${grade.midterm}</td>
-                                <td>${grade.semi_final}</td>
-                                <td>${grade.final}</td>
-                                <td>${grade.term_grade}</td>
-                                <td>${grade.remarks}</td>
-                                <td>
+                                <td data-label="Student ID">${grade.student_id}</td>
+                                <td data-label="Name"><strong>${grade.student_name}</strong></td>
+                                <td data-label="Prelim">${grade.prelim}</td>
+                                <td data-label="Midterm">${grade.midterm}</td>
+                                <td data-label="Semi-Final">${grade.semi_final}</td>
+                                <td data-label="Final">${grade.final}</td>
+                                <td data-label="Term Grade">${grade.term_grade}</td>
+                                <td data-label="Remarks">${grade.remarks}</td>
+                                <td data-label="Action">
                                     <button class="btn btn-post btn-action" onclick="postGrade(${grade.id})">Post</button>
                                 </td>
                             </tr>`;

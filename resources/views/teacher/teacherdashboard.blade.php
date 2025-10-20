@@ -73,8 +73,113 @@
         .btn-danger { background-color: #dc3545; }
         .btn-danger:hover { background-color: #b02a37; transform: translateY(-2px); }
 
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
-            .row, .quick-actions { flex-direction: column; }
+            x-teacher-component {
+                padding: 16px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .page-header-title h5 {
+                font-size: 1.5rem;
+            }
+
+            .breadcrumb {
+                font-size: 14px;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 8px;
+            }
+
+            .card h6 {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+
+            .card h4 {
+                font-size: 1.2rem;
+            }
+
+            .card p {
+                font-size: 0.8rem;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+                padding: 0.3em 0.5em;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .quick-actions {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .quick-actions .btn {
+                padding: 14px;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+
+            /* Stack table on very small screens */
+            @media (max-width: 480px) {
+                table {
+                    display: block;
+                    border: none;
+                }
+
+                thead {
+                    display: none;
+                }
+
+                tbody,
+                tr,
+                td {
+                    display: block;
+                    width: 100%;
+                }
+
+                tr {
+                    border: 1px solid #e9ecef;
+                    border-radius: 8px;
+                    margin-bottom: 12px;
+                    padding: 12px;
+                    background: #fff;
+                }
+
+                td {
+                    border: none;
+                    padding: 4px 0;
+                    text-align: left;
+                }
+
+                td:before {
+                    content: attr(data-label) ": ";
+                    font-weight: bold;
+                    display: inline-block;
+                    min-width: 80px;
+                    color: #666;
+                }
+            }
         }
     </style>
 
@@ -125,22 +230,22 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>2025-08-28</td>
-                    <td>Graded Quiz 1</td>
-                    <td>Database Management</td>
-                    <td><span class="badge bg-light-success">Submitted</span></td>
+                    <td data-label="Date">2025-08-28</td>
+                    <td data-label="Activity">Graded Quiz 1</td>
+                    <td data-label="Subject">Database Management</td>
+                    <td data-label="Status"><span class="badge bg-light-success">Submitted</span></td>
                 </tr>
                 <tr>
-                    <td>2025-08-27</td>
-                    <td>Took Attendance</td>
-                    <td>College Algebra</td>
-                    <td><span class="badge bg-light-primary">Done</span></td>
+                    <td data-label="Date">2025-08-27</td>
+                    <td data-label="Activity">Took Attendance</td>
+                    <td data-label="Subject">College Algebra</td>
+                    <td data-label="Status"><span class="badge bg-light-primary">Done</span></td>
                 </tr>
                 <tr>
-                    <td>2025-08-26</td>
-                    <td>Created Exam</td>
-                    <td>English Communication</td>
-                    <td><span class="badge bg-light-warning">Pending</span></td>
+                    <td data-label="Date">2025-08-26</td>
+                    <td data-label="Activity">Created Exam</td>
+                    <td data-label="Subject">English Communication</td>
+                    <td data-label="Status"><span class="badge bg-light-warning">Pending</span></td>
                 </tr>
             </tbody>
         </table>

@@ -7,32 +7,30 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Submit Grades - Teacher Dashboard</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 0;
+    x-teacher-component {
+      background: linear-gradient(to right, #f0f4f8, #ffffff);
+      min-height: 100vh;
+      padding: 40px 60px;
+      display: block;
+      font-family: 'Poppins', sans-serif;
     }
-    header {
-      background: #ffffff;
-      padding: 15px 20px;
-      border-bottom: 1px solid #ddd;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    header h1 {
-      margin: 0;
-      font-size: 22px;
-      color: #333;
-    }
-    .content {
-      padding: 20px;
+    .page-header {
+      font-weight: 700;
+      color: #1e3a8a;
+      border-bottom: 3px solid #2563eb;
+      display: inline-block;
+      padding-bottom: 8px;
     }
     .card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 20px;
+      border: none;
+      border-radius: 16px;
+      transition: all 0.3s ease;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       margin-bottom: 20px;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
     }
     label {
       font-weight: 500;
@@ -66,13 +64,19 @@
     .btn {
       padding: 8px 12px;
       border: none;
-      border-radius: 6px;
+      border-radius: 30px;
       cursor: pointer;
       font-size: 14px;
       margin-right: 6px;
+      font-weight: 500;
+      transition: 0.3s;
     }
     .btn-submit {
-      background: #007bff;
+      background: #2563eb;
+      color: white;
+    }
+    .btn-submit:hover {
+      background-color: #1e40af;
       color: white;
     }
     .btn-export {
@@ -84,14 +88,35 @@
       color: #b33;
       margin-top: 10px;
     }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      x-teacher-component {
+        padding: 20px 30px;
+      }
+
+      .card {
+        border-radius: 12px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Submit Grades</h1>
-  </header>
-
-  <div class="content">
+  <div class="container mt-4">
+    <h3 class="page-header mb-4">📊 Submit Grades</h3>
     <div class="card">
       <label for="subject">Select Subject</label>
       <select id="subject">
@@ -114,7 +139,7 @@
     </div>
 
     <div class="card">
-      <h3>Grades Preview</h3>
+      <h3 style="margin-bottom: 10px;">Grade Preview</h3>
       <table>
         <thead>
           <tr>

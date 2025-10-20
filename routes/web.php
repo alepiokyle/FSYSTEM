@@ -12,7 +12,9 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\dean\DeanController;
 use App\Models\User;
 
-Route::get('/', [App\Http\Controllers\Auth\loginController::class, 'create'])->name('home');
+Route::get('/', function () {
+    return view('userAuth.login');
+})->name('home');
 
 Route::get('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'index'])->name('register');
 Route::post('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'store'])->name('register.store');
@@ -126,6 +128,7 @@ Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
         Route::get('/Manage', 'index')->name('teacher.Manage');
         Route::get('/Manage/{subjectId}/students', 'getStudents')->name('teacher.Manage.students');
         Route::post('/Manage/save-attendance', 'saveAttendance')->name('teacher.Manage.save-attendance');
+        Route::get('/Manage/past-records', 'getPastRecords')->name('teacher.Manage.past-records');
     });
 
     Route::controller(App\Http\Controllers\teacher\TeacherController::class)->group(function () {
@@ -160,29 +163,31 @@ Route::controller(App\Http\Controllers\student\NotifController::class)->group(fu
     Route::get('/Notif', 'index')->name('student.Notif');
 });
 
-Route::controller(App\Http\Controllers\student\SectionController::class)->group(function () {
+Route::middleware('auth:web')->controller(App\Http\Controllers\student\SectionController::class)->group(function () {
     Route::get('/Section', 'index')->name('student.Section');
     Route::post('/upload-profile-picture', 'uploadProfilePicture')->name('student.updateProfile');
 });
 
 // Parent
-Route::prefix('parent')->middleware('auth:web')->group(function () {
+Route::prefix('parent')->middleware('auth:parent')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\parent\parentDashboardController::class, 'index'])->name('parent.parentdashboard');
-});
 
-Route::controller(App\Http\Controllers\parent\AttendanceController::class)->middleware(['auth:parent', 'role:Parent'])->group(function () {
-    Route::get('/Attendance', 'index')->name('parent.Attendance');
-});
+    Route::controller(App\Http\Controllers\parent\AttendanceController::class)->group(function () {
+        Route::get('/Attendance', 'index')->name('parent.Attendance');
+        Route::get('/attendance/fetch', 'fetch')->name('parent.attendance.fetch');
+    });
 
-Route::controller(App\Http\Controllers\parent\NotesController::class)->middleware(['auth:parent', 'role:Parent'])->group(function () {
-    Route::get('/Notes', 'index')->name('parent.Notes');
-});
+    Route::controller(App\Http\Controllers\parent\NotesController::class)->group(function () {
+        Route::get('/Notes', 'index')->name('parent.Notes');
+    });
 
-Route::controller(App\Http\Controllers\parent\ExamController::class)->middleware(['auth:parent', 'role:Parent'])->group(function () {
-    Route::get('/Exam', 'index')->name('parent.Exam');
-});
+    Route::controller(App\Http\Controllers\parent\ExamController::class)->group(function () {
+        Route::get('/Exam', 'index')->name('parent.Exam');
+    });
 
-Route::controller(App\Http\Controllers\parent\GradesController::class)->middleware(['auth:parent', 'role:Parent'])->group(function () {
-    Route::get('/Grades', 'index')->name('parent.Grades');
+    Route::controller(App\Http\Controllers\parent\GradesController::class)->group(function () {
+        Route::get('/Grades', 'index')->name('parent.Grades');
+        Route::get('/Grades/fetch', 'fetch')->name('parent.Grades.fetch');
+    });
 });
 

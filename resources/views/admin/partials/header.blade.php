@@ -1,12 +1,12 @@
 
   <ul class="list-unstyled">
     <!-- ======= Menu collapse Icon ===== -->
-    <li class="pc-h-item pc-sidebar-collapse">
+    <li class="pc-h-item pc-sidebar-collapse d-none d-md-inline-flex">
       <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
         <i class="ti ti-menu-2"></i>
       </a>
     </li>
-    <li class="pc-h-item pc-sidebar-popup">
+    <li class="pc-h-item pc-sidebar-popup d-inline-flex d-md-none">
       <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
         <i class="ti ti-menu-2"></i>
       </a>

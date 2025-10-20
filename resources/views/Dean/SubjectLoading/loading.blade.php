@@ -79,6 +79,131 @@
             border-color: #1e7e34;
             color: white;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 767px) {
+            x-dean-component {
+                padding: 16px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .page-header-title h5 {
+                font-size: 1.5rem;
+            }
+
+            .breadcrumb {
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 16px;
+                border-radius: 8px;
+            }
+
+            .card h4 {
+                font-size: 1.2rem;
+                margin-bottom: 12px;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+            .table th,
+            .table td {
+                padding: 8px 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .table th:nth-child(8),
+            .table td:nth-child(8) {
+                width: 120px;
+                min-width: 120px;
+            }
+
+            .btn-action {
+                padding: 6px 8px;
+                font-size: 12px;
+                margin: 2px;
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
+
+            /* Stack table on very small screens */
+            @media (max-width: 480px) {
+                .table {
+                    display: block;
+                    border: none;
+                }
+
+                .table thead {
+                    display: none;
+                }
+
+                .table tbody,
+                .table tr,
+                .table td {
+                    display: block;
+                    width: 100%;
+                }
+
+                .table tr {
+                    border: 1px solid #e9ecef;
+                    border-radius: 8px;
+                    margin-bottom: 12px;
+                    padding: 12px;
+                    background: #fff;
+                }
+
+                .table td {
+                    border: none;
+                    padding: 4px 0;
+                    text-align: left;
+                }
+
+                .table td:before {
+                    content: attr(data-label) ": ";
+                    font-weight: bold;
+                    display: inline-block;
+                    min-width: 80px;
+                    color: #666;
+                }
+
+                .table td:last-child {
+                    margin-top: 8px;
+                    padding-top: 8px;
+                    border-top: 1px solid #eee;
+                }
+
+                .btn-action {
+                    margin: 4px 0;
+                }
+            }
+
+            /* Form adjustments */
+            .form-select,
+            .form-control {
+                font-size: 16px; /* Prevent zoom on iOS */
+                padding: 12px;
+            }
+
+            .form-text {
+                font-size: 14px;
+            }
+
+            .btn-primary {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+            }
+        }
     </style>
 
     <!-- ====== Page Header ====== -->
@@ -100,57 +225,59 @@
  <!-- ====== Uploaded Subjects from Admin ====== -->
 <div class="card mt-4">
     <h4>📘 Subjects Uploaded by Admin</h4>
-    <table class="table table-hover table-bordered align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Subject Code</th>
-                <th>Subject Name</th>
-                <th>Units</th>
-                <th>Department</th>
-                <th>Semester</th>
-                <th>Date Uploaded</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($subjects as $subject)
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-light">
                 <tr>
-                    <td><strong>{{ $subject->subject_code }}</strong></td>
-                    <td>{{ $subject->subject_name }}</td>
-                    <td>
-                        <span class="badge bg-primary">{{ $subject->units }} unit{{ $subject->units > 1 ? 's' : '' }}</span>
-                    </td>
-                    <td>{{ $subject->department->name }}</td>
-                    <td>{{ $subject->semester }}</td>
-                    <td>{{ $subject->created_at->format('M d, Y') }}</td>
-                    <td>
-                        @if($subject->status == 'Active')
-                            <span class="badge bg-success">Active</span>
-                        @elseif($subject->status == 'Inactive')
-                            <span class="badge bg-secondary">Inactive</span>
-                        @else
-                            <span class="badge bg-warning">Pending</span>
-                        @endif
-                    </td>
-                    <td>
-                        <button class="btn btn-edit btn-action" title="Edit Subject">
-                            <i class="ti ti-edit"></i> Edit
-                        </button>
-                        <button class="btn btn-delete btn-action" title="Delete Subject" onclick="deleteSubject({{ $subject->id }}, '{{ $subject->subject_code }} - {{ $subject->subject_name }}')">
-                            <i class="ti ti-trash"></i> Delete
-                        </button>
-                    </td>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Units</th>
+                    <th>Department</th>
+                    <th>Semester</th>
+                    <th>Date Uploaded</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="8" class="text-center text-muted py-4">
-                        <em>No subjects uploaded yet. Subjects will appear here once uploaded by admin.</em>
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @forelse($subjects as $subject)
+                    <tr>
+                        <td data-label="Subject Code"><strong>{{ $subject->subject_code }}</strong></td>
+                        <td data-label="Subject Name">{{ $subject->subject_name }}</td>
+                        <td data-label="Units">
+                            <span class="badge bg-primary">{{ $subject->units }} unit{{ $subject->units > 1 ? 's' : '' }}</span>
+                        </td>
+                        <td data-label="Department">{{ $subject->department->name }}</td>
+                        <td data-label="Semester">{{ $subject->semester }}</td>
+                        <td data-label="Date Uploaded">{{ $subject->created_at->format('M d, Y') }}</td>
+                        <td data-label="Status">
+                            @if($subject->status == 'Active')
+                                <span class="badge bg-success">Active</span>
+                            @elseif($subject->status == 'Inactive')
+                                <span class="badge bg-secondary">Inactive</span>
+                            @else
+                                <span class="badge bg-warning">Pending</span>
+                            @endif
+                        </td>
+                        <td data-label="Actions">
+                            <button class="btn btn-edit btn-action" title="Edit Subject">
+                                <i class="ti ti-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-delete btn-action" title="Delete Subject" onclick="deleteSubject({{ $subject->id }}, '{{ $subject->subject_code }} - {{ $subject->subject_name }}')">
+                                <i class="ti ti-trash"></i> Delete
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <em>No subjects uploaded yet. Subjects will appear here once uploaded by admin.</em>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
     </div>
     <!-- ====== Subject Loading Form ====== -->
     <div class="card">

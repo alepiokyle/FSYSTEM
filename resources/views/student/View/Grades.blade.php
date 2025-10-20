@@ -1,4 +1,39 @@
 <x-student-component>
+    <style>
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th, .table td {
+                padding: 8px;
+            }
+
+            .btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .form-select {
+                font-size: 14px;
+            }
+
+            .badge {
+                font-size: 10px;
+            }
+
+            .alert {
+                font-size: 14px;
+            }
+        }
+    </style>
+
     <div class="container mt-4">
         <h3 class="page-header mb-4">📊 View Grades</h3>
 
@@ -33,25 +68,27 @@
         <!-- Grades Table -->
         <div class="card shadow-sm">
             <div class="card-body">
-                <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Subject Code</th>
-                            <th>Subject Name</th>
-                            <th>Units</th>
-                            <th>Teacher</th>
-                            <th>Prelim</th>
-                            <th>Midterm</th>
-                            <th>Semi-Final</th>
-                            <th>Final</th>
-                            <th>Grade</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody id="gradesTableBody">
-                        <!-- Grades will be loaded here -->
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Subject Code</th>
+                                <th>Subject Name</th>
+                                <th>Units</th>
+                                <th>Teacher</th>
+                                <th>Prelim</th>
+                                <th>Midterm</th>
+                                <th>Semi-Final</th>
+                                <th>Final</th>
+                                <th>Grade</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradesTableBody">
+                            <!-- Grades will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

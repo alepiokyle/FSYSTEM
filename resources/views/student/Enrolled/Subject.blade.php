@@ -1,4 +1,35 @@
 <x-student-component>
+    <style>
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th, .table td {
+                padding: 8px;
+            }
+
+            .btn-sm {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
+            .badge {
+                font-size: 10px;
+            }
+
+            .modal-dialog {
+                margin: 10px;
+            }
+        }
+    </style>
+
     <div class="container mt-4">
         <h3 class="page-header mb-4">📚 Enrolled Subjects</h3>
 

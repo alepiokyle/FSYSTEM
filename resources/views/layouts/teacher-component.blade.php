@@ -16,6 +16,9 @@
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Mobile Overlay for Sidebar -->
+    <div class="mobile-overlay"></div>
+
    <!-- [Favicon] icon -->
     <link rel="icon" href="{{ asset('all/assets/images/remove.png')}}" type="image/x-icon"> <!-- [Google Font] Family -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">

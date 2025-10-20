@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\Subject;
 use App\Models\Attendance;
 
@@ -38,6 +39,7 @@ class AttendanceController extends Controller
                 $attendance = Attendance::where('student_id', $student->id)
                     ->where('subject_id', $subject->id)
                     ->where('date', $request->query('date'))
+                    ->where('time', $request->query('time'))
                     ->first();
 
                 return [
@@ -68,14 +70,16 @@ class AttendanceController extends Controller
         $request->validate([
             'subject_id' => 'required|exists:subjects,id',
             'date' => 'required|date',
+            'time' => 'required',
             'attendance' => 'required|array',
             'attendance.*' => 'in:Present,Absent,Late,Excused',
         ]);
 
-        $subjectId = $request->subject_id;
+        $subjectId = (int) $request->subject_id;
         $date = $request->date;
+        $time = $request->time;
         $attendanceData = $request->attendance;
-        $teacherId = Auth::guard('teacher')->id();
+        $teacherId = (int) Auth::guard('teacher')->id();
 
         // Check if subject is assigned to teacher
         $subject = Subject::findOrFail($subjectId);
@@ -96,11 +100,32 @@ class AttendanceController extends Controller
         }
 
         try {
+            // Get enrolled students for the subject
+            $enrolledStudentIds = $subject->students()->pluck('id')->toArray();
+
+            // Check if all students in attendance data are enrolled
+            $invalidStudents = [];
             foreach ($attendanceData as $studentId => $status) {
+                $studentId = (int) $studentId;
+                if (!in_array($studentId, $enrolledStudentIds)) {
+                    $invalidStudents[] = $studentId;
+                }
+            }
+
+            if (!empty($invalidStudents)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Some students are not enrolled in this subject.'
+                ], 400);
+            }
+
+            foreach ($attendanceData as $studentId => $status) {
+                $studentId = (int) $studentId;
                 Attendance::updateOrCreate(
                     [
                         'student_id' => $studentId,
                         'date' => $date,
+                        'time' => $time,
                         'subject_id' => $subjectId,
                     ],
                     [
@@ -116,9 +141,58 @@ class AttendanceController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Failed to save attendance: ' . $e->getMessage(), [
+                'subject_id' => $subjectId,
+                'date' => $date,
+                'teacher_id' => $teacherId,
+                'attendance_data' => $attendanceData,
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to save attendance. Please try again.'
+            ], 500);
+        }
+    }
+
+    public function getPastRecords(Request $request)
+    {
+        try {
+            $teacherId = Auth::guard('teacher')->id();
+
+            $records = Attendance::with(['student.profile', 'subject'])
+                ->where('teacher_id', $teacherId)
+                ->orderBy('date', 'desc')
+                ->orderBy('time', 'desc')
+                ->get()
+                ->map(function ($attendance) {
+                    $profile = $attendance->student->profile;
+                    if (!$profile) {
+                        return null; // Skip if no profile
+                    }
+                    $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
+                    return [
+                        'date' => $attendance->date,
+                        'time' => $attendance->time,
+                        'student_id' => $profile->student_id,
+                        'student_name' => $fullName,
+                        'status' => $attendance->status,
+                        'subject' => $attendance->subject ? $attendance->subject->subject_name : 'N/A',
+                    ];
+                })
+                ->filter() // Remove null entries
+                ->values(); // Reindex array
+
+            return response()->json([
+                'success' => true,
+                'records' => $records,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load past records. Please try again. Error: ' . $e->getMessage()
             ], 500);
         }
     }

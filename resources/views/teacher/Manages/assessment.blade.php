@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Manage Assessments - Teacher Dashboard</title>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -91,35 +92,19 @@
       margin-right: 6px;
     }
 
-    .btn-save {
-      background: #4CAF50;
-      color: white;
-    }
-
-    .btn-edit {
-      background: #f39c12;
-      color: white;
-    }
-
-    .btn-submit {
-      background: #007bff;
-      color: white;
-    }
-
-    .btn-export {
-      background: #6c757d;
-      color: white;
-    }
+    .btn-save { background: #4CAF50; color: white; }
+    .btn-edit { background: #f39c12; color: white; }
+    .btn-submit { background: #007bff; color: white; }
+    .btn-export { background: #6c757d; color: white; }
+    .btn-compute { background: #1e3a8a; color: #fff; }
 
     .note {
       font-size: 13px;
-      color: #b33;
+      color: #333;
       margin-top: 10px;
     }
 
-    .actions {
-      margin-top: 10px;
-    }
+    .actions { margin-top: 10px; }
 
     /* ===== Modal Styles ===== */
     .modal {
@@ -131,6 +116,8 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
     }
 
     .modal-content {
@@ -141,6 +128,12 @@
       width: 400px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       position: relative;
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     .close {
@@ -152,9 +145,7 @@
       cursor: pointer;
     }
 
-    .close:hover {
-      color: #000;
-    }
+    .close:hover { color: #000; }
 
     .modal-content input {
       width: 100%;
@@ -175,18 +166,48 @@
       cursor: pointer;
     }
 
-    .modal-content button:hover {
-      background: #1f2b32;
+    .modal-content button:hover { background: #1f2b32; }
+
+    #computeResult {
+      background: #f1f5ff;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    /* ===== Landscape Modal ===== */
+    .modal-content.landscape {
+      width: 450px;
+      margin-top: 4%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .modal-content.landscape .left,
+    .modal-content.landscape .right {
+      width: 47%;
+    }
+
+    .modal-content.landscape .right {
+      background: #f8f9ff;
+      padding: 12px;
+      border-radius: 8px;
+      min-height: 250px;
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Manage Assessments</h1>
   </header>
 
   <div class="content">
-    <!-- Subject Selector -->
     <div class="card">
       <label for="subject">Select Subject</label>
       <select id="subject">
@@ -197,7 +218,6 @@
       </select>
     </div>
 
-    <!-- Assessments Table -->
     <div class="card">
       <h3 style="margin-bottom: 10px;">Student Grades</h3>
       <table>
@@ -218,10 +238,13 @@
       </table>
     </div>
 
-    <!-- Action Buttons -->
     <div class="actions">
       <button class="btn btn-submit" id="submitBtn" onclick="showSubmitModal()">Submit to Dean</button>
       <button class="btn btn-export">Export to Excel</button>
+      <button class="btn btn-compute" onclick="openComputeModal()">Term-Based Grading Computation</button>
+   
+    
+
     </div>
 
     <p class="note">
@@ -260,13 +283,64 @@
     </div>
   </div>
 
+  <!-- ===== Compute Grade Modal (Landscape) ===== -->
+  <div id="computeModal" class="modal">
+    <div class="modal-content landscape">
+      <span class="close" onclick="closeComputeModal()">&times;</span>
+
+      <div class="left">
+        <h3>Compute Term Grade</h3>
+        <form id="computeForm">
+          <label>Prelim (20%)</label>
+          <input type="number" id="prelim" min="0" max="100" required>
+          <label>Midterm (30%)</label>
+          <input type="number" id="midterm" min="0" max="100" required>
+          <label>Semi-Final (20%)</label>
+          <input type="number" id="semi" min="0" max="100" required>
+          <label>Final (30%)</label>
+          <input type="number" id="final" min="0" max="100" required>
+          <button type="submit">Compute</button>
+        </form>
+      </div>
+
+      <div class="right">
+        <!-- Toggle Button -->
+        <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;" onclick="toggleFormulaNote()">
+          <strong>▼ Term-Based Grading Computation</strong>
+          <span id="arrowIcon" style="font-size: 18px;">▼</span>
+        </div>
+
+        <!-- Hidden Note -->
+        <div id="formulaNote" class="note" style="background:#f1f3f5; padding:10px; border-radius:6px; font-size:13px; color:#333; margin-top: 30px;">
+          Final Grade = (Prelim × 20%) + (Midterm × 30%) + (Semi-Final × 20%) + (Final × 30%)<br>
+          Example: (85 × 0.20) + (90 × 0.30) + (80 × 0.20) + (88 × 0.30) = <strong>85.4</strong><br>
+          <em>Remarks:</em> “PASSED” if Final Grade ≥ 75, otherwise “FAILED”.
+        </div>
+
+        <div id="computeResult"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Load students dynamically
+    // ===== Toggle Note Section =====
+    function toggleFormulaNote() {
+      const note = document.getElementById("formulaNote");
+      const arrow = document.getElementById("arrowIcon");
+      if (note.style.display === "none" || note.style.display === "") {
+        note.style.display = "block";
+        arrow.textContent = "▼";
+      } else {
+        note.style.display = "none";
+        arrow.textContent = "▶";
+      }
+    }
+
+    // ===== Load Students =====
     document.getElementById('subject').addEventListener('change', function() {
       const subjectId = this.value;
       const tbody = document.getElementById('studentsTableBody');
       tbody.innerHTML = '';
-
       if (!subjectId) return;
 
       fetch(`/teacher/Manages/${subjectId}/students`)
@@ -292,15 +366,14 @@
             tbody.appendChild(row);
           });
         })
-        .catch(err => alert('Error loading students.'));
+        .catch(() => alert('Error loading students.'));
     });
 
-    // Save student grades
+    // ===== Save Grades =====
     function saveStudentGrades(studentId) {
       const subjectId = document.getElementById('subject').value;
       const inputs = document.querySelectorAll(`.grade-input[data-student-id="${studentId}"]`);
       const grades = {};
-
       inputs.forEach(input => grades[input.dataset.field] = input.value || 0);
 
       fetch(`/teacher/Manages/${subjectId}/save-grades`, {
@@ -316,109 +389,78 @@
       .catch(() => alert('Error saving grades.'));
     }
 
-    // Open Edit Modal
+    // ===== Edit Modal =====
     function openEditModal(studentId) {
       const modal = document.getElementById('editModal');
       document.getElementById('editStudentId').value = studentId;
-
-      // Fill modal with current values
-      const prelimInput = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="prelim"]`);
-      if (prelimInput) document.getElementById('editPrelim').value = prelimInput.value;
-
-      const midtermInput = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="midterm"]`);
-      if (midtermInput) document.getElementById('editMidterm').value = midtermInput.value;
-
-      const semiFinalInput = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="semi_final"]`);
-      if (semiFinalInput) document.getElementById('editSemiFinal').value = semiFinalInput.value;
-
-      const finalInput = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="final"]`);
-      if (finalInput) document.getElementById('editFinal').value = finalInput.value;
-
-      modal.style.display = 'block';
+      document.getElementById('editPrelim').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="prelim"]`).value;
+      document.getElementById('editMidterm').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="midterm"]`).value;
+      document.getElementById('editSemiFinal').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="semi_final"]`).value;
+      document.getElementById('editFinal').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="final"]`).value;
+      modal.style.display = 'flex';
     }
 
-    // Close Modal
-    function closeModal() {
-      document.getElementById('editModal').style.display = 'none';
-    }
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
 
-    // Submit Edit Form
     document.getElementById('editForm').addEventListener('submit', e => {
       e.preventDefault();
-      const studentId = document.getElementById('editStudentId').value;
-
-      const prelimModal = document.getElementById('editPrelim');
-      const prelimTable = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="prelim"]`);
-      if (prelimModal && prelimTable) prelimTable.value = prelimModal.value;
-
-      const midtermModal = document.getElementById('editMidterm');
-      const midtermTable = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="midterm"]`);
-      if (midtermModal && midtermTable) midtermTable.value = midtermModal.value;
-
-      const semiFinalModal = document.getElementById('editSemiFinal');
-      const semiFinalTable = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="semi_final"]`);
-      if (semiFinalModal && semiFinalTable) semiFinalTable.value = semiFinalModal.value;
-
-      const finalModal = document.getElementById('editFinal');
-      const finalTable = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="final"]`);
-      if (finalModal && finalTable) finalTable.value = finalModal.value;
-
-      alert('Grade update submitted for approval!');
+      const id = document.getElementById('editStudentId').value;
+      ['prelim', 'midterm', 'semi_final', 'final'].forEach(field => {
+        const modalVal = document.getElementById('edit' + field.charAt(0).toUpperCase() + field.slice(1));
+        const tableVal = document.querySelector(`.grade-input[data-student-id="${id}"][data-field="${field}"]`);
+        if (modalVal && tableVal) tableVal.value = modalVal.value;
+      });
+      alert('Grade update submitted!');
       closeModal();
     });
 
-    window.onclick = function(event) {
-      const editModal = document.getElementById('editModal');
-      const submitModal = document.getElementById('submitModal');
-      if (event.target === editModal) editModal.style.display = 'none';
-      if (event.target === submitModal) submitModal.style.display = 'none';
-    }
+    // ===== Submit to Dean =====
+    function showSubmitModal() { document.getElementById('submitModal').style.display = 'flex'; }
+    function closeSubmitModal() { document.getElementById('submitModal').style.display = 'none'; }
+    function confirmSubmit() { closeSubmitModal(); submitToDean(); }
 
-    // Show Submit Modal
-    function showSubmitModal() {
-      const subjectId = document.getElementById('subject').value;
-      if (!subjectId) {
-        alert('Please select a subject.');
-        return;
-      }
-      document.getElementById('submitModal').style.display = 'block';
-    }
-
-    // Close Submit Modal
-    function closeSubmitModal() {
-      document.getElementById('submitModal').style.display = 'none';
-    }
-
-    // Confirm Submit
-    function confirmSubmit() {
-      closeSubmitModal();
-      submitToDean();
-    }
-
-    // Submit to Dean
     function submitToDean() {
       const subjectId = document.getElementById('subject').value;
-
-      // Submit the grades
       fetch(`/teacher/Manages/${subjectId}/submit-grades`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        headers: { 
+          'Content-Type': 'application/json', 
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') 
         }
       })
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          alert(data.message);
-          // Reload students to reflect status change
-          document.getElementById('subject').dispatchEvent(new Event('change'));
-        } else {
-          alert(data.error || 'Error submitting grades.');
-        }
-      })
-      .catch(() => alert('Error submitting grades.'));
+        alert(data.success ? data.message : data.error);
+        document.getElementById('subject').dispatchEvent(new Event('change'));
+      });
     }
+
+    // ===== Compute Modal =====
+    const computeModal = document.getElementById("computeModal");
+
+    function openComputeModal() { computeModal.style.display = "flex"; }
+    function closeComputeModal() {
+      computeModal.style.display = "none";
+      document.getElementById("computeResult").innerHTML = "";
+      document.getElementById("computeForm").reset();
+    }
+
+    window.onclick = function(e) {
+      if (e.target === computeModal) closeComputeModal();
+    }
+
+    document.getElementById("computeForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const prelim = parseFloat(document.getElementById("prelim").value);
+      const midterm = parseFloat(document.getElementById("midterm").value);
+      const semi = parseFloat(document.getElementById("semi").value);
+      const final = parseFloat(document.getElementById("final").value);
+      const grade = (prelim * 0.2) + (midterm * 0.3) + (semi * 0.2) + (final * 0.3);
+      const remark = grade >= 75 ? "PASSED ✅" : "FAILED ❌";
+      document.getElementById("computeResult").innerHTML = `
+        <p>Final Grade: <b>${grade.toFixed(2)}</b><br>Remarks: <b>${remark}</b></p>
+      `;
+    });
   </script>
 </body>
 </html>

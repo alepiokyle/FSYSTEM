@@ -143,6 +143,139 @@
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 767px) {
+      .card {
+        padding: 16px;
+        margin: 16px;
+        border-radius: 8px;
+      }
+
+      .card h2 {
+        font-size: 18px;
+        margin-bottom: 16px;
+      }
+
+      .add-btn {
+        position: static;
+        width: 100%;
+        margin-bottom: 16px;
+        justify-content: center;
+        padding: 12px;
+        font-size: 16px;
+      }
+
+      table {
+        font-size: 14px;
+        margin-top: 0;
+      }
+
+      table th, table td {
+        padding: 8px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      table th:nth-child(7),
+      table td:nth-child(7) {
+        width: 120px;
+        min-width: 120px;
+      }
+
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .actions button {
+        width: 100%;
+        padding: 8px 6px;
+        font-size: 12px;
+        min-height: 32px;
+      }
+
+      /* Stack table on very small screens */
+      @media (max-width: 480px) {
+        table {
+          display: block;
+          border: none;
+        }
+
+        table thead {
+          display: none;
+        }
+
+        table tbody,
+        table tr,
+        table td {
+          display: block;
+          width: 100%;
+        }
+
+        table tr {
+          border: 1px solid #e9ecef;
+          border-radius: 8px;
+          margin-bottom: 12px;
+          padding: 12px;
+          background: #fff;
+        }
+
+        table td {
+          border: none;
+          padding: 4px 0;
+          text-align: left;
+        }
+
+        table td:before {
+          content: attr(data-label) ": ";
+          font-weight: bold;
+          display: inline-block;
+          min-width: 80px;
+          color: #666;
+        }
+
+        .actions {
+          margin-top: 8px;
+          padding-top: 8px;
+          border-top: 1px solid #eee;
+        }
+      }
+
+      /* Modal adjustments */
+      .modal-content {
+        width: 90%;
+        max-width: 400px;
+        padding: 16px;
+      }
+
+      .modal-content h3 {
+        font-size: 18px;
+      }
+
+      .modal-content label {
+        font-size: 14px;
+      }
+
+      .modal-content input,
+      .modal-content select {
+        font-size: 16px; /* Prevent zoom on iOS */
+        padding: 12px;
+      }
+
+      .modal-content .form-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .modal-content button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+      }
+    }
   </style>
   <div class="card">
     <h2>Staff Accounts (Deans & Teachers)</h2>
@@ -164,65 +297,67 @@
       <i class="fas fa-user-plus"></i> Add Staff
     </button>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Staff ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Department</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @foreach($deans as $dean)
-        <tr>
-          <td>D-{{ $dean->id }}</td>
-          <td>{{ $dean->name }}</td>
-          <td>{{ $dean->username }}</td>
-          <td>Dean</td>
-          <td>{{ $dean->profile->department->name ?? 'N/A' }}</td>
-          <td><span class="{{ $dean->is_active ? 'status-active' : 'status-inactive' }}">{{ $dean->is_active ? 'Active' : 'Inactive' }}</span></td>
-          <td class="actions">
-            <form method="POST" action="{{ route('admin.dean.suspend', $dean->id) }}" style="display:inline;">
-              @csrf
-              @method('PATCH')
-              <button class="suspend">{{ $dean->is_active ? 'Suspend' : 'Activate' }}</button>
-            </form>
-            <form method="POST" action="{{ route('admin.dean.destroy', $dean->id) }}" style="display:inline;">
-              @csrf
-              @method('DELETE')
-              <button class="delete">Delete</button>
-            </form>
-          </td>
-        </tr>
-        @endforeach
-        @foreach($teachers as $teacher)
-        <tr>
-          <td>T-{{ $teacher->id }}</td>
-          <td>{{ $teacher->name }}</td>
-          <td>{{ $teacher->username }}</td>
-          <td>Teacher</td>
-          <td>{{ $teacher->profile->department->name ?? 'N/A' }}</td>
-          <td><span class="{{ $teacher->is_active ? 'status-active' : 'status-inactive' }}">{{ $teacher->is_active ? 'Active' : 'Inactive' }}</span></td>
-          <td class="actions">
-            <form method="POST" action="{{ route('admin.teacher.suspend', $teacher->id) }}" style="display:inline;">
-              @csrf
-              @method('PATCH')
-              <button class="suspend">{{ $teacher->is_active ? 'Suspend' : 'Activate' }}</button>
-            </form>
-            <form method="POST" action="{{ route('admin.teacher.destroy', $teacher->id) }}" style="display:inline;">
-              @csrf
-              @method('DELETE')
-              <button class="delete">Delete</button>
-            </form>
-          </td>
-        </tr>
-        @endforeach
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Staff ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach($deans as $dean)
+          <tr>
+            <td data-label="Staff ID">D-{{ $dean->id }}</td>
+            <td data-label="Name">{{ $dean->name }}</td>
+            <td data-label="Email">{{ $dean->username }}</td>
+            <td data-label="Role">Dean</td>
+            <td data-label="Department">{{ $dean->profile->department->name ?? 'N/A' }}</td>
+            <td data-label="Status"><span class="{{ $dean->is_active ? 'status-active' : 'status-inactive' }}">{{ $dean->is_active ? 'Active' : 'Inactive' }}</span></td>
+            <td data-label="Actions" class="actions">
+              <form method="POST" action="{{ route('admin.dean.suspend', $dean->id) }}" style="display:inline;">
+                @csrf
+                @method('PATCH')
+                <button class="suspend">{{ $dean->is_active ? 'Suspend' : 'Activate' }}</button>
+              </form>
+              <form method="POST" action="{{ route('admin.dean.destroy', $dean->id) }}" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button class="delete">Delete</button>
+              </form>
+            </td>
+          </tr>
+          @endforeach
+          @foreach($teachers as $teacher)
+          <tr>
+            <td data-label="Staff ID">T-{{ $teacher->id }}</td>
+            <td data-label="Name">{{ $teacher->name }}</td>
+            <td data-label="Email">{{ $teacher->username }}</td>
+            <td data-label="Role">Teacher</td>
+            <td data-label="Department">{{ $teacher->profile->department->name ?? 'N/A' }}</td>
+            <td data-label="Status"><span class="{{ $teacher->is_active ? 'status-active' : 'status-inactive' }}">{{ $teacher->is_active ? 'Active' : 'Inactive' }}</span></td>
+            <td data-label="Actions" class="actions">
+              <form method="POST" action="{{ route('admin.teacher.suspend', $teacher->id) }}" style="display:inline;">
+                @csrf
+                @method('PATCH')
+                <button class="suspend">{{ $teacher->is_active ? 'Suspend' : 'Activate' }}</button>
+              </form>
+              <form method="POST" action="{{ route('admin.teacher.destroy', $teacher->id) }}" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button class="delete">Delete</button>
+              </form>
+            </td>
+          </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Modal -->

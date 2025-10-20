@@ -1,6 +1,48 @@
 <x-dean-component>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            x-dean-component {
+                padding: 10px 15px;
+            }
+
+            .page-header-title h5 {
+                font-size: 1.5rem;
+            }
+
+            .card {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th, .table td {
+                padding: 8px;
+            }
+
+            .btn-action {
+                padding: 4px 8px;
+                font-size: 11px;
+                margin: 0 2px;
+            }
+
+            .btn-filter {
+                font-size: 12px;
+            }
+
+            .form-select {
+                font-size: 14px;
+            }
+
+            .badge {
+                font-size: 10px;
+            }
+        }
+
         /* ====== Background & Page ====== */
         x-dean-component {
             background: linear-gradient(to right, #f0f4f8, #ffffff);
@@ -180,62 +222,68 @@
     <!-- ====== Pending Grades Table ====== -->
     <div class="card">
         <h4>Pending Grades</h4>
-        <table id="pendingTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Prelim</th>
-                    <th>Midterm</th>
-                    <th>Semi-Final</th>
-                    <th>Final</th>
-                    <th>Term Grade</th>
-                    <th>Remarks</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="pendingTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Prelim</th>
+                        <th>Midterm</th>
+                        <th>Semi-Final</th>
+                        <th>Final</th>
+                        <th>Term Grade</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <!-- ====== Approved Grades Table ====== -->
     <div class="card">
         <h4>Approved Grades</h4>
-        <table id="approvedTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Prelim</th>
-                    <th>Midterm</th>
-                    <th>Semi-Final</th>
-                    <th>Final</th>
-                    <th>Term Grade</th>
-                    <th>Remarks</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="approvedTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Prelim</th>
+                        <th>Midterm</th>
+                        <th>Semi-Final</th>
+                        <th>Final</th>
+                        <th>Term Grade</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <!-- ====== Rejected Grades Table ====== -->
     <div class="card">
         <h4>Rejected Grades</h4>
-        <table id="rejectedTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Prelim</th>
-                    <th>Midterm</th>
-                    <th>Semi-Final</th>
-                    <th>Final</th>
-                    <th>Term Grade</th>
-                    <th>Remarks</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="table-responsive">
+            <table id="rejectedTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Prelim</th>
+                        <th>Midterm</th>
+                        <th>Semi-Final</th>
+                        <th>Final</th>
+                        <th>Term Grade</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
