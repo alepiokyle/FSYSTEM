@@ -1,24 +1,12 @@
 <x-auth-component>
-    {{-- Full-screen Background Overlay --}}
-    <div class="auth-background" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1;">
-        <div style="background: url('{{ asset('all/assets/images/school.png') }}') no-repeat center center;
-                    background-size: cover;
-                    filter: blur(8px);
-                    width: 100%;
-                    height: 100%;
-                    transform: scale(1.1); /* Prevent blur edges */"></div>
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.3);"></div>
-    </div>
-
-    {{-- Centered Auth Form --}}
-    <div class="auth-form d-flex flex-column align-items-center justify-content-center"
-         style="min-height: 100vh;
+    <div class="auth-form d-flex flex-column align-items-center justify-content-center min-vh-100"
+         style="background: url('{{ asset('all/assets/images/school.png') }}') no-repeat center center;
+                background-size: cover;
                 font-family: 'Poppins', sans-serif;
-                position: relative;
-                z-index: 2;">
+                position: relative;">
 
         {{-- Login Card --}}
-        <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 15px; background-color: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+        <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 15px; z-index: 2; background-color: rgba(255,255,255,0.95);">
             <div class="card-body p-4">
 
                 {{-- Logo & Heading --}}
