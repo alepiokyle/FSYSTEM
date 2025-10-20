@@ -28,15 +28,43 @@ class UploadController extends Controller
     {
         // Handle subject upload logic
         $validated = $request->validate([
-            'department' => 'required|string|max:255',
+            'department' => 'required|integer|exists:departments,id',
             'subject_code' => 'required|string|max:10',
             'subject_name' => 'required|string|max:255',
-            'units' => 'required|integer|min:1|max:6',
+            'units' => 'required|integer|min:1',
+            'year_level' => 'nullable|string|max:255',
+            'section' => 'nullable|string|max:255',
             'semester' => 'required|string|max:255',
             'school_year' => 'required|string|max:20',
             'description' => 'nullable|string',
             'status' => 'required|string|max:255',
         ]);
+
+        // Find the department by ID
+        $department = Department::find($validated['department']);
+        if (!$department) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid department selected.'
+            ]);
+        }
+
+        // Check for existing subject with same code, name, and department
+        $existing = Subject::where('subject_code', $validated['subject_code'])
+            ->where('subject_name', $validated['subject_name'])
+            ->where('department_id', $validated['department'])
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'success' => false,
+                'message' => 'A subject with the same code and name already exists in this department.'
+            ]);
+        }
+
+        // Prepare data for creation
+        unset($validated['department']);
+        $validated['department_id'] = $department->id;
 
         $subject = Subject::create($validated);
 

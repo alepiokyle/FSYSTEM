@@ -79,37 +79,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Sample data; replace with dynamic data -->
+                        @forelse($grades as $grade)
                         <tr>
-                            <td>Juan Dela Cruz</td>
-                            <td>Introduction to Programming</td>
-                            <td>85</td>
-                            <td>88</td>
-                            <td>90</td>
-                            <td>92</td>
-                            <td><strong>89</strong></td>
+                            <td>{{ $grade->student->name }}</td>
+                            <td>{{ $grade->subject->subject_name }}</td>
+                            <td>{{ $grade->prelim }}</td>
+                            <td>{{ $grade->midterm }}</td>
+                            <td>{{ $grade->semi_final }}</td>
+                            <td>{{ $grade->final }}</td>
+                            <td><strong>{{ $grade->term_grade }}</strong></td>
                             <td><span class="status-approved">Approved</span></td>
                         </tr>
+                        @empty
                         <tr>
-                            <td>Maria Santos</td>
-                            <td>Business Management</td>
-                            <td>80</td>
-                            <td>82</td>
-                            <td>85</td>
-                            <td>87</td>
-                            <td><strong>84</strong></td>
-                            <td><span class="status-approved">Approved</span></td>
+                            <td colspan="8" class="text-center">No approved grades available yet.</td>
                         </tr>
-                        <tr>
-                            <td>Carlos Reyes</td>
-                            <td>Mathematics</td>
-                            <td>70</td>
-                            <td>75</td>
-                            <td>78</td>
-                            <td>80</td>
-                            <td><strong>76</strong></td>
-                            <td><span class="status-pending">Pending</span></td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

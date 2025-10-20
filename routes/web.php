@@ -12,7 +12,9 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\dean\DeanController;
 use App\Models\User;
 
-Route::get('/', [App\Http\Controllers\Auth\loginController::class, 'create']);
+Route::get('/', function () {
+    return view('userAuth.login');
+})->name('home');
 
 Route::get('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'index'])->name('register');
 Route::post('/register', [App\Http\Controllers\Auth\RegistrationController::class, 'store'])->name('register.store');
@@ -53,7 +55,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     Route::controller(App\Http\Controllers\Admin\viewstudentController::class)->group(function () {
         Route::get('/view-student', 'index')->name('view.student');
+        Route::get('/import-student', 'importPage')->name('admin.student.import.page');
+        Route::post('/import-student', 'import')->name('admin.student.import');
         Route::delete('/student/{id}', 'destroy')->name('admin.student.destroy');
+        Route::get('/download-sample-student', function () {
+            return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\SampleStudentExport, 'Student_Summary.xlsx');
+        })->name('admin.student.download.sample');
     });
 
     Route::controller(App\Http\Controllers\Admin\ParentAccountController::class)->group(function () {
@@ -79,81 +86,108 @@ Route::prefix('dean')->middleware('auth:dean')->group(function () {
 
     Route::controller(App\Http\Controllers\dean\AssignController::class)->group(function () {
         Route::get('/AssignTeacher', 'index')->name('dean.AssignTeacher');
+        Route::post('/AssignTeacher', 'store')->name('dean.AssignTeacher.store');
+        Route::delete('/AssignTeacher/{id}', 'destroy')->name('dean.AssignTeacher.destroy');
+        Route::get('/AssignTeacher/check/{teacher_id}', 'checkAssignments')->name('dean.AssignTeacher.check');
+        Route::get('/AssignTeacher/creator/{teacher_id}', 'getCreator')->name('dean.AssignTeacher.creator');
     });
 
     Route::controller(App\Http\Controllers\dean\SubjectLoadingController::class)->group(function () {
         Route::get('/SubjectLoading', 'index')->name('Dean.SubjectLoading');
+        Route::post('/SubjectLoading', 'store')->name('Dean.SubjectLoading.store');
         Route::delete('/SubjectLoading/{id}', 'destroy')->name('Dean.SubjectLoading.destroy');
+        Route::get('/get-subjects/{department}', 'getSubjectsByDepartment')->name('dean.getSubjectsByDepartment');
     });
 
     Route::controller(App\Http\Controllers\dean\ApproveGradesController::class)->group(function () {
         Route::get('/ApproveGrades', 'index')->name('Dean.ApproveGrades');
+        Route::get('/ApproveGrades/fetch-grades', 'fetchGrades')->name('Dean.ApproveGrades.fetch-grades');
+        Route::post('/ApproveGrades/approve', 'approveGrade')->name('Dean.ApproveGrades.approve');
+        Route::post('/ApproveGrades/reject', 'rejectGrade')->name('Dean.ApproveGrades.reject');
+        Route::get('/ApproveGrades/subjects-by-teacher/{teacher_id}', 'getSubjectsByTeacher')->name('Dean.ApproveGrades.subjects-by-teacher');
     });
 
     Route::controller(App\Http\Controllers\dean\PostGradesController::class)->group(function () {
         Route::get('/PostGrades', 'index')->name('Dean.PostGrades');
+        Route::get('/PostGrades/fetch-grades', 'fetchGrades')->name('Dean.PostGrades.fetch-grades');
+        Route::post('/PostGrades/post', 'postGrade')->name('Dean.PostGrades.post');
     });
 });
 
 // Teacher
 Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\teacher\TeacherDashboardController::class, 'index'])->name('teacher.teacherdashboard');
-});
 
-Route::controller(App\Http\Controllers\teacher\ViewController::class)->group(function () {
-    Route::get('/ViewAssign', 'index')->name('teacher.ViewAssign');
-});
+    Route::controller(App\Http\Controllers\teacher\ViewController::class)->group(function () {
+        Route::get('/ViewAssign', 'index')->name('teacher.ViewAssign');
+        Route::delete('/ViewAssign/{id}', 'unassign')->name('teacher.ViewAssign.unassign');
+        Route::get('/ViewAssign/{id}/students', 'getStudents')->name('teacher.ViewAssign.students');
+    });
 
-Route::controller(App\Http\Controllers\teacher\AttendanceController::class)->group(function () {
-    Route::get('/Manage', 'index')->name('teacher.Manage');
-});
+    Route::controller(App\Http\Controllers\teacher\AttendanceController::class)->group(function () {
+        Route::get('/Manage', 'index')->name('teacher.Manage');
+        Route::get('/Manage/{subjectId}/students', 'getStudents')->name('teacher.Manage.students');
+        Route::post('/Manage/save-attendance', 'saveAttendance')->name('teacher.Manage.save-attendance');
+        Route::get('/Manage/past-records', 'getPastRecords')->name('teacher.Manage.past-records');
+    });
 
-Route::controller(App\Http\Controllers\teacher\AssessmentController::class)->group(function () {
-    Route::get('/Manages', 'index')->name('teacher.Manages');
-});
+    Route::controller(App\Http\Controllers\teacher\TeacherController::class)->group(function () {
+        Route::get('/Manages', 'index')->name('teacher.Manages');
+        Route::get('/Manages/{subjectId}/students', 'getStudents')->name('teacher.Manages.students');
+        Route::post('/Manages/{subjectId}/save-grades', 'saveGrades')->name('teacher.Manages.save-grades');
+        Route::post('/Manages/{subjectId}/submit-grades', 'submitGrades')->name('teacher.Manages.submit-grades');
+    });
 
-Route::controller(App\Http\Controllers\teacher\GradesController::class)->group(function () {
-    Route::get('/Submit', 'index')->name('teacher.Grades');
+    Route::controller(App\Http\Controllers\teacher\GradesController::class)->group(function () {
+        Route::get('/Submit', 'index')->name('teacher.Grades');
+        Route::post('/Submit/fetch-grades', 'fetchGrades')->name('teacher.Submit.fetch-grades');
+        Route::post('/Submit/submit-grades', 'submitGrades')->name('teacher.Submit.submit-grades');
+    });
 });
 
 // Student
 Route::prefix('student')->middleware('auth:web')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\student\studentDashboardController::class, 'index'])->name('student.studentdashboard');
+
+    Route::controller(App\Http\Controllers\Student\GradesController::class)->group(function () {
+        Route::get('/grades', 'index')->name('student.grades');
+        Route::get('/grades/fetch', 'fetch')->name('student.grades.fetch');
+    });
 });
 
 Route::controller(App\Http\Controllers\student\SubjectController::class)->group(function () {
     Route::get('/Subject', 'index')->name('student.Subject');
 });
 
-Route::controller(App\Http\Controllers\Student\GradesController::class)->group(function () {
-    Route::get('/grades', 'index')->name('student.grades');
-});
-
 Route::controller(App\Http\Controllers\student\NotifController::class)->group(function () {
     Route::get('/Notif', 'index')->name('student.Notif');
 });
 
-Route::controller(App\Http\Controllers\student\SectionController::class)->group(function () {
+Route::middleware('auth:web')->controller(App\Http\Controllers\student\SectionController::class)->group(function () {
     Route::get('/Section', 'index')->name('student.Section');
+    Route::post('/upload-profile-picture', 'uploadProfilePicture')->name('student.updateProfile');
 });
 
 // Parent
-Route::prefix('parent')->middleware('auth:web')->group(function () {
+Route::prefix('parent')->middleware('auth:parent')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\parent\parentDashboardController::class, 'index'])->name('parent.parentdashboard');
+
+    Route::controller(App\Http\Controllers\parent\AttendanceController::class)->group(function () {
+        Route::get('/Attendance', 'index')->name('parent.Attendance');
+        Route::get('/attendance/fetch', 'fetch')->name('parent.attendance.fetch');
+    });
+
+    Route::controller(App\Http\Controllers\parent\NotesController::class)->group(function () {
+        Route::get('/Notes', 'index')->name('parent.Notes');
+    });
+
+    Route::controller(App\Http\Controllers\parent\ExamController::class)->group(function () {
+        Route::get('/Exam', 'index')->name('parent.Exam');
+    });
+
+    Route::controller(App\Http\Controllers\parent\GradesController::class)->group(function () {
+        Route::get('/Grades', 'index')->name('parent.Grades');
+        Route::get('/Grades/fetch', 'fetch')->name('parent.Grades.fetch');
+    });
 });
 
-Route::controller(App\Http\Controllers\parent\AttendanceController::class)->middleware(['auth:parent', 'role:Parent'])->group(function () {
-    Route::get('/Attendance', 'index')->name('parent.Attendance');
-});
-
-Route::controller(App\Http\Controllers\parent\NotesController::class)->middleware(['auth:parent', 'role:Parent'])->group(function () {
-    Route::get('/Notes', 'index')->name('parent.Notes');
-});
-
-Route::controller(App\Http\Controllers\parent\ExamController::class)->middleware(['auth:parent', 'role:Parent'])->group(function () {
-    Route::get('/Exam', 'index')->name('parent.Exam');
-});
-
-Route::controller(App\Http\Controllers\parent\GradesController::class)->middleware(['auth:parent', 'role:Parent'])->group(function () {
-    Route::get('/Grades', 'index')->name('parent.Grades');
-});

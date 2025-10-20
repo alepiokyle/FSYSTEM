@@ -38,6 +38,9 @@
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Mobile Overlay for Sidebar -->
+    <div class="mobile-overlay"></div>
+
     <!-- Custom Styles -->
     @stack('styles')
 </head>

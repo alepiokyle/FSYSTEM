@@ -30,7 +30,7 @@ body {
     margin-bottom: 20px;
 }
 
-.search-bar input, 
+.search-bar input,
 .search-bar select {
     flex: 1;
     padding: 8px;
@@ -98,6 +98,106 @@ body {
 
 .delete-btn { background: #e74c3c; }
 .delete-btn:hover { background: #c0392b; }
+
+/* Mobile Responsiveness */
+@media (max-width: 767px) {
+    .glass-card {
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+    }
+
+    .search-bar {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search-bar input,
+    .search-bar select,
+    .search-bar button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .glass-table {
+        font-size: 14px;
+        border-radius: 8px;
+    }
+
+    .glass-table th,
+    .glass-table td {
+        padding: 8px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .glass-table th:nth-child(5),
+    .glass-table td:nth-child(5) {
+        width: 120px;
+        min-width: 120px;
+    }
+
+    .action-group {
+        flex-direction: column;
+        gap: 4px;
+        align-items: stretch;
+    }
+
+    .action-btn {
+        font-size: 12px;
+        padding: 8px 6px;
+        min-height: 32px;
+    }
+
+    /* Stack table on very small screens */
+    @media (max-width: 480px) {
+        .glass-table {
+            display: block;
+            border: none;
+        }
+
+        .glass-table thead {
+            display: none;
+        }
+
+        .glass-table tbody,
+        .glass-table tr,
+        .glass-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .glass-table tr {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .glass-table td {
+            border: none;
+            padding: 4px 0;
+            text-align: left;
+        }
+
+        .glass-table td:before {
+            content: attr(data-label) ": ";
+            font-weight: bold;
+            display: inline-block;
+            min-width: 80px;
+            color: #666;
+        }
+
+        .action-group {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+        }
+    }
+}
 </style>
 
 <div class="glass-card">
@@ -110,51 +210,53 @@ body {
     </form>
 
     <!-- Parent Table -->
-    <table class="glass-table">
-        <thead>
-            <tr>
-                <th>Parent ID</th>
-                <th>Name</th>
-                <th>Username</th>
-                <th>Linked Student</th>
-                <th style="width: 200px;">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($parents as $parent)
-            <tr>
-                <td>{{ $parent->id }}</td>
-                <td>{{ $parent->name }}</td>
-                <td>{{ $parent->username }}</td>
-                <td>
-                    @if($parent->profile && $parent->profile->students->count() > 0)
-                        @foreach($parent->profile->students as $studentProfile)
-                            {{ $studentProfile->user->name }} ({{ $studentProfile->user->username }})
-                            @if(!$loop->last), @endif
-                        @endforeach
-                    @else
-                        No linked student
-                    @endif
-                </td>
-                <td>
-                    <div class="action-group">
-                        <button class="action-btn edit-btn">Edit</button>
-                     
-                        <form method="POST" action="{{ route('admin.parent.destroy', $parent->id) }}" onsubmit="return confirm('Are you sure you want to delete this parent?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="action-btn delete-btn">Delete</button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="5">No parent accounts found.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="glass-table">
+            <thead>
+                <tr>
+                    <th>Parent ID</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Linked Student</th>
+                    <th style="width: 200px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($parents as $parent)
+                <tr>
+                    <td data-label="Parent ID">{{ $parent->id }}</td>
+                    <td data-label="Name">{{ $parent->name }}</td>
+                    <td data-label="Username">{{ $parent->username }}</td>
+                    <td data-label="Linked Student">
+                        @if($parent->profile && $parent->profile->students->count() > 0)
+                            @foreach($parent->profile->students as $studentProfile)
+                                {{ $studentProfile->user->name }} ({{ $studentProfile->user->username }})
+                                @if(!$loop->last), @endif
+                            @endforeach
+                        @else
+                            No linked student
+                        @endif
+                    </td>
+                    <td data-label="Action">
+                        <div class="action-group">
+                            <button class="action-btn edit-btn">Edit</button>
+
+                            <form method="POST" action="{{ route('admin.parent.destroy', $parent->id) }}" onsubmit="return confirm('Are you sure you want to delete this parent?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="action-btn delete-btn">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5">No parent accounts found.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 
 </x-admin-component>

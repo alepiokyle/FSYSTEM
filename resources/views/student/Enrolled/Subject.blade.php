@@ -1,4 +1,35 @@
 <x-student-component>
+    <style>
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table th, .table td {
+                padding: 8px;
+            }
+
+            .btn-sm {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
+            .badge {
+                font-size: 10px;
+            }
+
+            .modal-dialog {
+                margin: 10px;
+            }
+        }
+    </style>
+
     <div class="container mt-4">
         <h3 class="page-header mb-4">📚 Enrolled Subjects</h3>
 
@@ -18,26 +49,32 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Example Row -->
-                        <tr>
-                            <td>IT101</td>
-                            <td>Introduction to Computing</td>
-                            <td>3</td>
-                            <td>Mon/Wed 10:00–11:00 AM</td>
-                            <td>Mr. Dela Cruz</td>
-                            <td><span class="badge bg-success">Active</span></td>
-                            <td>
-                                <!-- View Info Button -->
-                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#subjectInfoModal">
-                                    View Info
-                                </button>
-                                <!-- Teacher Button -->
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#teacherInfoModal">
-                                    Teacher
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- Add more rows as needed -->
+                        @forelse($enrolledSubjects as $subject)
+                            <tr>
+                                <td>{{ $subject->subject_code }}</td>
+                                <td>{{ $subject->subject_name }}</td>
+                                <td>{{ $subject->units }}</td>
+                                <td>{{ $subject->schedule ?? 'TBD' }}</td>
+                                <td>{{ $subject->teacher ? $subject->teacher->name : 'TBD' }}</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                                <td>
+                                    <!-- View Info Button -->
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#subjectInfoModal{{ $subject->id }}">
+                                        View Info
+                                    </button>
+                                    <!-- Teacher Button -->
+                                    <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" data-bs-target="#teacherInfoModal{{ $subject->id }}">
+                                        Teacher
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <em>No enrolled subjects yet.</em>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

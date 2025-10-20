@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UsersProfile;
 use App\Models\ParentProfile;
 use App\Models\ParentAccount;
+use App\Models\Department;
 use Illuminate\Support\Facades\Hash;
 
 class RegistrationController extends Controller
@@ -39,7 +40,7 @@ class RegistrationController extends Controller
     {
         // Validate
         $request->validate([
-            'student_id'         => 'required|unique:users_profile,student_id',
+            'student_id'         => 'required|exists:imported_student_ids,student_id|unique:users_profile,student_id',
             'first_name'         => 'required',
             'last_name'          => 'required',
             'gender'             => 'required',
@@ -128,7 +129,7 @@ class RegistrationController extends Controller
         /* ===========================
      * 6) CREATE STUDENT PROFILE
      * =========================== */
-        UsersProfile::create([
+        $usersProfile = UsersProfile::create([
             'users_id'           => $studentUser->id,
             'parents_profile_id' => $parentProfile->id,
             'student_id'         => $request->student_id,
@@ -138,7 +139,17 @@ class RegistrationController extends Controller
             'suffix'             => $request->suffix,
             'date_of_birth'      => $request->date_of_birth,
             'gender'             => $request->gender, // student gender
+            'course'             => $request->course,
+            'year_level'         => $request->year_level,
         ]);
+
+        /* ===========================
+     * 7) SET DEPARTMENT BASED ON COURSE
+     * =========================== */
+        $department = Department::where('name', $request->course)->first();
+        if ($department) {
+            $usersProfile->update(['department_id' => $department->id]);
+        }
 
         /* ===========================
      * 7) PREVIEW SESSION

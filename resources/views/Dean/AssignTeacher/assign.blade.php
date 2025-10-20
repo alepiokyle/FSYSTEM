@@ -84,6 +84,145 @@
         .action-links a.edit { color: #0d6efd; }
         .action-links a.remove { color: #dc3545; }
         .action-links a:hover { text-decoration: underline; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 767px) {
+            x-dean-component {
+                padding: 16px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .page-header-title h5 {
+                font-size: 1.5rem;
+            }
+
+            .breadcrumb {
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 16px;
+                border-radius: 8px;
+            }
+
+            .card h2 {
+                font-size: 1.1rem;
+                margin-bottom: 16px;
+            }
+
+            .row.mb-3 {
+                margin-bottom: 16px !important;
+            }
+
+            .col-md-6 {
+                margin-bottom: 16px;
+            }
+
+            .col-md-6:last-child {
+                margin-bottom: 0;
+            }
+
+            label {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+
+            select,
+            p[style*="border"] {
+                font-size: 16px; /* Prevent zoom on iOS */
+                padding: 12px 10px;
+            }
+
+            .btn-assign {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            th:nth-child(4),
+            td:nth-child(4) {
+                width: 100px;
+                min-width: 100px;
+            }
+
+            .action-links {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .action-links a {
+                margin: 0;
+                padding: 4px 8px;
+                border-radius: 4px;
+                background: #f8f9fa;
+                display: block;
+                text-align: center;
+                font-size: 12px;
+            }
+
+            /* Stack table on very small screens */
+            @media (max-width: 480px) {
+                table {
+                    display: block;
+                    border: none;
+                }
+
+                thead {
+                    display: none;
+                }
+
+                tbody,
+                tr,
+                td {
+                    display: block;
+                    width: 100%;
+                }
+
+                tr {
+                    border: 1px solid #e9ecef;
+                    border-radius: 8px;
+                    margin-bottom: 12px;
+                    padding: 12px;
+                    background: #fff;
+                }
+
+                td {
+                    border: none;
+                    padding: 4px 0;
+                    text-align: left;
+                }
+
+                td:before {
+                    content: attr(data-label) ": ";
+                    font-weight: bold;
+                    display: inline-block;
+                    min-width: 80px;
+                    color: #666;
+                }
+
+                .action-links {
+                    margin-top: 8px;
+                    padding-top: 8px;
+                    border-top: 1px solid #eee;
+                }
+            }
+        }
     </style>
 
     <!-- ====== Page Header ====== -->
@@ -105,39 +244,47 @@
     <!-- ====== Assign Teacher Form Card ====== -->
     <div class="card">
         <h2>New Assignment</h2>
-        <form class="row" style="display: flex; flex-wrap: wrap; gap: 20px;">
-            <div class="form-group" style="flex:1;">
-                <label for="department">Department</label>
-                <select id="department">
-                    <option>-- Select Department --</option>
-                    <option>BSIT</option>
-                    <option>BSED</option>
-                    <option>BEED</option>
-                </select>
+        <form id="assignForm">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Department</label>
+                    <p style="margin: 0; padding: 8px 10px; border: 1px solid #ccc; border-radius: 8px; background: #f8f9fa;">{{ $departmentName }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label for="year_level">Year Level</label>
+                    <select id="year_level" name="year_level" class="form-control">
+                        <option value="">-- Select Year Level --</option>
+                        @foreach($yearLevels as $yl)
+                            <option value="{{ $yl }}">{{ $yl }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-
-            <div class="form-group" style="flex:1;">
-                <label for="subject">Subject</label>
-                <select id="subject">
-                    <option>-- Select Subject --</option>
-                    <option>IT101 - Database Management</option>
-                    <option>ENG102 - English Communication</option>
-                    <option>MATH103 - College Algebra</option>
-                </select>
-            </div>
-
-            <div class="form-group" style="flex:1;">
-                <label for="teacher">Teacher</label>
-                <select id="teacher">
-                    <option>-- Select Teacher --</option>
-                    <option>Mr. Santos</option>
-                    <option>Ms. Cruz</option>
-                    <option>Mr. Dela Cruz</option>
-                </select>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="subject">Subject</label>
+                    <select id="subject" name="subject_id" class="form-control">
+                        <option value="">-- Select Subject --</option>
+                        @foreach($subjects as $subject)
+                            <option value="{{ $subject->id }}" data-year="{{ $subject->year_level }}">{{ $subject->subject_code }} - {{ $subject->subject_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="teacher">Teacher</label>
+                    <select id="teacher" name="teacher_id" class="form-control">
+                        <option value="">-- Select Teacher --</option>
+                        @foreach($teachers as $teacher)
+                            <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                        @endforeach
+                    </select>
+                    <div id="teacherMessage" style="margin-top: 10px; font-weight: bold;"></div>
+                    <div id="creatorMessage" style="margin-top: 5px; font-style: italic; color: #666;"></div>
+                </div>
             </div>
         </form>
         <div style="margin-top:20px; text-align:right;">
-            <button type="button" class="btn-assign">Assign Teacher</button>
+            <button type="button" class="btn-assign" id="assignBtn">Assign Teacher</button>
         </div>
     </div>
 
@@ -148,46 +295,198 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Subject Code</th>
-                        <th>Subject Name</th>
                         <th>Department</th>
-                        <th>Assigned Teacher</th>
+                        <th>Subject</th>
+                        <th>Assign teacher</th>
                         <th style="text-align:center;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>IT101</td>
-                        <td>Database Management</td>
-                        <td>BSIT</td>
-                        <td>Mr. Santos</td>
-                        <td class="action-links" style="text-align:center;">
+                    @foreach($subjects as $subject)
+                    <tr data-subject-id="{{ $subject->id }}">
+                        <td data-label="Department">{{ $subject->department->name }}</td>
+                        <td data-label="Subject">{{ $subject->subject_code }} - {{ $subject->subject_name }}</td>
+                        <td data-label="Assign teacher">{{ $subject->teacher ? $subject->teacher->name : 'Not Assigned' }}</td>
+                        <td data-label="Action" class="action-links" style="text-align:center;">
                             <a href="#" class="edit">✏ Reassign</a>
-                            <a href="#" class="remove">🗑 Remove</a>
+                            <a href="#" class="remove" data-id="{{ $subject->id }}">🗑 Remove</a>
                         </td>
                     </tr>
-                    <tr>
-                        <td>ENG102</td>
-                        <td>English Communication</td>
-                        <td>BSED</td>
-                        <td>Ms. Cruz</td>
-                        <td class="action-links" style="text-align:center;">
-                            <a href="#" class="edit">✏ Reassign</a>
-                            <a href="#" class="remove">🗑 Remove</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>MATH103</td>
-                        <td>College Algebra</td>
-                        <td>BSIT</td>
-                        <td>Mr. Dela Cruz</td>
-                        <td class="action-links" style="text-align:center;">
-                            <a href="#" class="edit">✏ Reassign</a>
-                            <a href="#" class="remove">🗑 Remove</a>
-                        </td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script>
+        // Filter subjects based on year level
+        function filterSubjects() {
+            const selectedYL = document.getElementById('year_level').value;
+            const subjectSelect = document.getElementById('subject');
+            const options = subjectSelect.querySelectorAll('option');
+
+            options.forEach(option => {
+                if (option.value === '') return; // Skip the placeholder
+                const year = option.getAttribute('data-year');
+                if (selectedYL === '' || year === selectedYL) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+
+            // Reset subject selection if not matching
+            const currentSubject = subjectSelect.value;
+            if (currentSubject) {
+                const currentOption = subjectSelect.querySelector(`option[value="${currentSubject}"]`);
+                if (currentOption && currentOption.style.display === 'none') {
+                    subjectSelect.value = '';
+                }
+            }
+        }
+
+        // Add event listeners for filtering
+        document.getElementById('year_level').addEventListener('change', filterSubjects);
+
+        // Handle teacher selection change
+        document.getElementById('teacher').addEventListener('change', function() {
+            const teacherId = this.value;
+            const messageDiv = document.getElementById('teacherMessage');
+            const creatorDiv = document.getElementById('creatorMessage');
+            const btn = document.getElementById('assignBtn');
+
+            if (!teacherId) {
+                messageDiv.textContent = '';
+                creatorDiv.textContent = '';
+                btn.disabled = false;
+                return;
+            }
+
+            // Fetch assignment count
+            fetch(`{{ route('dean.AssignTeacher.check', ':teacherId') }}`.replace(':teacherId', teacherId))
+                .then(response => response.json())
+                .then(data => {
+                    const count = data.count;
+                    if (count === 0) {
+                        messageDiv.innerHTML = '🟢 Available (0 subjects assigned)';
+                        messageDiv.style.color = 'green';
+                        btn.disabled = false;
+                    } else if (count < 5) {
+                        messageDiv.innerHTML = `⚠️ Already assigned to ${count} subjects`;
+                        messageDiv.style.color = 'orange';
+                        btn.disabled = false;
+                    } else {
+                        messageDiv.innerHTML = `🚫 Fully assigned (Limit reached, e.g., 5)`;
+                        messageDiv.style.color = 'red';
+                        btn.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messageDiv.textContent = 'Error checking assignments.';
+                    messageDiv.style.color = 'red';
+                    btn.disabled = false;
+                });
+
+            // Fetch creator name
+            fetch(`{{ route('dean.AssignTeacher.creator', ':teacherId') }}`.replace(':teacherId', teacherId))
+                .then(response => response.json())
+                .then(data => {
+                    creatorDiv.textContent = 'Created by: ' + data.creator_name;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    creatorDiv.textContent = 'Error fetching creator.';
+                });
+        });
+
+        // Handle assign button click
+        document.querySelector('.btn-assign').addEventListener('click', function() {
+            const form = document.getElementById('assignForm');
+            const formData = new FormData(form);
+
+            if (!formData.get('subject_id') || !formData.get('teacher_id')) {
+                alert('Please select both subject and teacher.');
+                return;
+            }
+
+            fetch('{{ route("dean.AssignTeacher.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // Update the table dynamically
+                    const subjectSelect = document.getElementById('subject');
+                    const teacherSelect = document.getElementById('teacher');
+                    const selectedSubjectText = subjectSelect.options[subjectSelect.selectedIndex].text;
+                    const selectedTeacherText = teacherSelect.options[teacherSelect.selectedIndex].text;
+                    // Find the row and update the teacher column
+                    const rows = document.querySelectorAll('tbody tr');
+                    for (let row of rows) {
+                        if (row.cells[1].textContent === selectedSubjectText) {
+                            row.cells[2].textContent = selectedTeacherText;
+                            break;
+                        }
+                    }
+                    // Clear the selects
+                    document.getElementById('year_level').value = '';
+                    subjectSelect.value = '';
+                    teacherSelect.value = '';
+                    document.getElementById('teacherMessage').textContent = '';
+                    document.getElementById('assignBtn').disabled = false;
+                    filterSubjects(); // Reset filter
+                } else {
+                    alert('Failed to assign teacher: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error assigning teacher.');
+                console.error('Error:', error);
+            });
+        });
+
+        // Handle remove button click
+        document.querySelectorAll('.remove').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const subjectId = this.getAttribute('data-id');
+                if (!subjectId) return;
+
+                if (confirm('Are you sure you want to remove this assignment?')) {
+                    fetch(`/dean/AssignTeacher/${subjectId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            // Remove the row from the table
+                            const row = event.target.closest('tr');
+                            if (row) row.remove();
+                        } else {
+                            alert('Failed to remove assignment: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error removing assignment.');
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        });
+
+
+    </script>
 </x-dean-component>

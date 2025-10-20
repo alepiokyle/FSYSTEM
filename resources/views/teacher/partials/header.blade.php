@@ -1,12 +1,12 @@
 <div class="me-auto pc-mob-drp">
   <ul class="list-unstyled">
     <!-- ======= Menu collapse Icon ===== -->
-    <li class="pc-h-item pc-sidebar-collapse">
+    <li class="pc-h-item pc-sidebar-collapse d-none d-md-inline-flex">
       <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
         <i class="ti ti-menu-2"></i>
       </a>
     </li>
-    <li class="pc-h-item pc-sidebar-popup">
+    <li class="pc-h-item pc-sidebar-popup d-inline-flex d-md-none">
       <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
         <i class="ti ti-menu-2"></i>
       </a>
@@ -138,7 +138,7 @@
             </div>
             <div class="flex-grow-1 ms-3">
               <h6 class="mb-1">{{ optional(auth()->user())->name ?? 'Guest' }}</h6>
-              <span>{{ auth()->user()->role ? auth()->user()->role->role : 'No Role' }}</span>
+<span>{{ optional(auth()->user())->role?->role ?? 'No Role' }}</span>
             </div>
             <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
           </div>
@@ -181,14 +181,7 @@
               <i class="ti ti-user"></i>
               <span>View Profile</span>
             </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-clipboard-list"></i>
-              <span>Social Profile</span>
-            </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-wallet"></i>
-              <span>Billing</span>
-            </a>
+           
             <form id="logout-form" method="POST" action="{{ route('logout') }}">
                 @csrf
                 <a href="#" class="dropdown-item" onclick="logoutConfirm(event)">
@@ -198,26 +191,12 @@
             </form>
           </div>
           <div class="tab-pane fade" id="drp-tab-2" role="tabpanel" aria-labelledby="drp-t2" tabindex="0">
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-help"></i>
-              <span>Support</span>
-            </a>
+           
             <a href="#!" class="dropdown-item">
               <i class="ti ti-user"></i>
               <span>Account Settings</span>
             </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-lock"></i>
-              <span>Privacy Center</span>
-            </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-messages"></i>
-              <span>Feedback</span>
-            </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-list"></i>
-              <span>History</span>
-            </a>
+           
           </div>
         </div>
       </div>

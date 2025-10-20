@@ -318,40 +318,40 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
 
         <div class="row mb-3">
             <div class="col-md-6">
-                <label for="department">Department</label>
-                <select id="department" name="department" class="form-select" required>
-                    <option value="">-- Select Department --</option>
-                    @foreach($departments as $department)
-                        <option value="{{ $department->name }}">{{ $department->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-6">
                 <label for="subject_code">Subject Code</label>
                 <input type="text" id="subject_code" name="subject_code" class="form-control"
                        placeholder="e.g., IT101, MATH101" required maxlength="10">
             </div>
-        </div>
-
-        <div class="mb-3">
-            <label for="subject_name">Subject Name</label>
-            <input type="text" id="subject_name" name="subject_name" class="form-control"
-                   placeholder="e.g., Introduction to Programming" required maxlength="255">
+            <div class="col-md-6">
+                <label for="subject_name">Subject Name</label>
+                <input type="text" id="subject_name" name="subject_name" class="form-control"
+                       placeholder="e.g., Introduction to Programming" required maxlength="255">
+            </div>
         </div>
 
         <div class="row mb-3">
-            <div class="col-md-4">
-                <label for="units">Units</label>
-                <select id="units" name="units" class="form-select" required>
-                    <option value="">-- Select Units --</option>
-                    <option value="1">1 Unit</option>
-                    <option value="2">2 Units</option>
-                    <option value="3">3 Units</option>
-                    <option value="4">4 Units</option>
-                    <option value="5">5 Units</option>
-                    <option value="6">6 Units</option>
+            <div class="col-md-6">
+                <label for="department">Department</label>
+                <select id="department" name="department" class="form-control" required>
+                    <option value="">-- Select Department --</option>
+                    @foreach($departments as $dept)
+                        <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                    @endforeach
                 </select>
             </div>
+            <div class="col-md-6">
+                <label for="year_level">Year Level</label>
+                <select id="year_level" name="year_level" class="form-select">
+                    <option value="">-- Select Year Level --</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
             <div class="col-md-4">
                 <label for="semester">Semester</label>
                 <select id="semester" name="semester" class="form-select" required>
@@ -370,6 +370,10 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
                     <option value="2026-2027">2026–2027</option>
                     <option value="2027-2028">2027–2028</option>
                 </select>
+            </div>
+            <div class="col-md-4">
+                <label for="units">Units</label>
+                <input type="number" id="units" name="units" class="form-control" placeholder="Enter units" required min="1">
             </div>
         </div>
 
@@ -411,6 +415,7 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
                     <th>Department</th>
                     <th>Units</th>
                     <th>Semester</th>
+                    <th>Year Level</th>
                     <th>Year</th>
                     <th>Status</th>
                     <th>Date</th>
@@ -421,9 +426,10 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
                 <tr>
                     <td>{{ $subject->subject_code }}</td>
                     <td>{{ $subject->subject_name }}</td>
-                    <td>{{ $subject->department }}</td>
+                    <td>{{ $subject->department->name }}</td>
                     <td>{{ $subject->units }}</td>
                     <td>{{ $subject->semester }}</td>
+                    <td>{{ $subject->year_level }}</td>
                     <td>{{ $subject->school_year }}</td>
                     <td>
                         <span class="status-{{ strtolower($subject->status) }}">
@@ -434,7 +440,7 @@ textarea::placeholder { color: rgba(80,80,80,0.6); font-style: italic; }
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center text-muted py-3">
+                    <td colspan="9" class="text-center text-muted py-3">
                         No subjects uploaded yet. Use the form above to add subjects.
                     </td>
                 </tr>
@@ -534,10 +540,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle subjects table visibility
     const toggleBtn = document.getElementById('toggleSubjects');
     const tableBody = document.getElementById('subjectsTableBody');
-    let isTableHidden = false;
+    let isTableHidden = localStorage.getItem('subjectsTableHidden') === 'true';
+
+    // Set initial state based on localStorage
+    if (isTableHidden) {
+        tableBody.style.display = 'none';
+        toggleBtn.textContent = '▲';
+    } else {
+        tableBody.style.display = '';
+        toggleBtn.textContent = '▼';
+    }
 
     toggleBtn.addEventListener('click', function() {
         isTableHidden = !isTableHidden;
+        localStorage.setItem('subjectsTableHidden', isTableHidden);
         if (isTableHidden) {
             tableBody.style.display = 'none';
             toggleBtn.textContent = '▲';
@@ -599,6 +615,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 // setTimeout(() => {
                 //     location.reload(); // Refresh page to show updated data
                 // }, 2000);
+            } else if (data.errors) {
+                // Handle validation errors
+                let errorMessages = [];
+                for (let field in data.errors) {
+                    errorMessages = errorMessages.concat(data.errors[field]);
+                }
+                showToast(errorMessages.join('<br>'), 'error');
             } else {
                 // Show error toast
                 showToast(data.message || 'An error occurred while uploading the subject.', 'error');

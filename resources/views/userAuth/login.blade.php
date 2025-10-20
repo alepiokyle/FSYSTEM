@@ -11,7 +11,7 @@
 
                 {{-- Logo & Heading --}}
                 <div class="text-center mb-4">
-                    <a href="#"><img src="{{ asset('all/assets/images/logo1.png')}}" alt="Logo" style="width: 60px;"></a>
+                    <a href="#"><img src="{{ asset('all/assets/images/logo1.png')}}" alt="Logo" class="d-block mx-auto" style="width: 60px;"></a>
                     <h3 class="mt-3"><b>Login</b></h3>
                     <small class="text-muted">Welcome back! Please login to your account.</small>
                 </div>
@@ -75,9 +75,8 @@
                         <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 10px;">Login</button>
                     </div>
 
-                 
 
-               
+
                 </form>
             </div>
         </div>
@@ -92,7 +91,4 @@
 
 
 
-    <div class="col-md-4">
-                    <label for="units">Units</label>
-                    <input type="number" id="units" name="units" class="form-control" placeholder="Auto-filled or enter manually" min="1" required>
-                </div>
+ 

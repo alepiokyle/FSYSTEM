@@ -63,4 +63,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(UsersProfile::class, 'users_id', 'id');
     }
+
+    /**
+     * Get the subjects enrolled by this student.
+     */
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'student_subject', 'student_id', 'subject_id');
+    }
 }

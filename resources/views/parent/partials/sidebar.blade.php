@@ -24,14 +24,6 @@
       </a>
     </li>
 
-    <!-- Quiz & Exam -->
-    <li class="pc-item">
-      <a href="{{ route('parent.Exam')}}" class="pc-link">
-        <span class="pc-micon"><i class="ti ti-book"></i></span>
-        <span class="pc-mtext">Quiz & Exam</span>
-      </a>
-    </li>
-
     <!-- Final Grades -->
     <li class="pc-item">
       <a href="{{ route('parent.Grades')}}" class="pc-link">

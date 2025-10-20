@@ -10,10 +10,12 @@ class UploadSubjectController extends Controller
 {
     public function index()
     {
-        // Debug: Log that this controller method is being called
-        \Log::info('UploadSubjectController@index called - returning empty collection');
+        // Fetch all subjects ordered by year_level, section, school_year, then creation date (newest first)
+        $subjects = Subject::orderBy('year_level')->orderBy('section')->orderBy('school_year')->orderBy('created_at', 'desc')->get();
 
-        $subjects = collect([]); // Return empty collection to show empty table
-        return view('admin.uploadSubject.subject', compact('subjects'));
+        // Get departments for the form
+        $departments = \App\Models\Department::all();
+
+        return view('admin.uploadSubject.subject', compact('subjects', 'departments'));
     }
 }

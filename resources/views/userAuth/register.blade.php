@@ -11,7 +11,7 @@
 
                 {{-- Logo & Heading --}}
                 <div class="text-center mb-4">
-                    <a href="#"><img src="{{ asset('all/assets/images/logo1.png') }}" alt="Logo" style="width: 60px;"></a>
+                    <a href="#"><img src="{{ asset('all/assets/images/logo1.png') }}" alt="Logo" style="width: 60px; display: block; margin: 0 auto;"></a>
                     <h3 class="mt-3 fw-bold">Student & Parent Registration</h3>
                     <small class="text-muted">Fill out the form to register a new student and parent account.</small>
                 </div>
@@ -75,6 +75,17 @@
                                 <option value="Male" {{ old('gender')=='Male'?'selected':'' }}>Male</option>
                                 <option value="Female" {{ old('gender')=='Female'?'selected':'' }}>Female</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Course</label>
+                            <input type="text" name="course" class="form-control" placeholder="Enter Course" value="{{ old('course') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Year Level</label>
+                            <input type="text" name="year_level" class="form-control" placeholder="Enter Year Level" value="{{ old('year_level') }}">
                         </div>
                     </div>
 

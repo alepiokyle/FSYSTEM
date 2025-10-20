@@ -26,6 +26,7 @@ class TeacherAccount extends Authenticatable
         'user_role_id',
         'is_active',
         'last_login_at',
+        'created_by',
     ];
 
     // Hidden fields
@@ -50,6 +51,18 @@ class TeacherAccount extends Authenticatable
     public function profile()
     {
         return $this->belongsTo(TeacherProfile::class, 'teachers_profile_id', 'id');
+    }
+
+    // Creator relationship (admin who created this teacher account)
+    public function creator()
+    {
+        return $this->belongsTo(AdminAccount::class, 'created_by', 'id');
+    }
+
+    // Grades relationship
+    public function grades()
+    {
+        return $this->hasMany(Grade::class, 'teacher_id');
     }
 
     // Authentication identifier

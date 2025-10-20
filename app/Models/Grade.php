@@ -17,7 +17,8 @@ class Grade extends Model
         'midterm',
         'semi_final',
         'final',
-        'final_grade',
+        'term_grade',
+        'remarks',
         'status',
         'semester',
         'school_year',
@@ -35,6 +36,11 @@ class Grade extends Model
 
     public function teacher()
     {
-        return $this->belongsTo(User::class, 'teacher_id');
+        return $this->belongsTo(TeacherAccount::class, 'teacher_id');
+    }
+
+    public function scopeDraft($query)
+    {
+        return $query->where('status', 'draft');
     }
 }
