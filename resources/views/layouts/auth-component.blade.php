@@ -14,7 +14,7 @@
 
 
     <!-- Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js']) 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
    <!-- [Favicon] icon -->
     <link rel="icon" href="{{ asset('all/assets/images/remove.png')}}" type="image/x-icon"> <!-- [Google Font] Family -->
@@ -36,8 +36,7 @@
 
   <div class="auth-main">
     <div class="auth-wrapper v3">
-      @yield('content')
-      {{$slot}}
+     {{$slot}}
     </div>
   </div>
 
