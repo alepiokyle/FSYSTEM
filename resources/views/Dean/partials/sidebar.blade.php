@@ -34,14 +34,12 @@
             <span class="pc-mtext">Post Grades</span>
           </a>
         </li>
-        @if(Auth::guard('dean')->user()->created_by)
         <li class="pc-item">
           <a href="javascript:void(0)" onclick="switchRole()" class="pc-link">
             <span class="pc-micon"><i class="ti ti-refresh"></i></span>
             <span class="pc-mtext">Switch Role</span>
           </a>
         </li>
-        @endif
 
 
       
