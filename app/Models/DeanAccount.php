@@ -24,6 +24,7 @@ class DeanAccount extends Authenticatable
         'password',
         'user_role_id',
         'is_active',
+        'created_by',
     ];
     // Hidden fields
     protected $hidden = [
@@ -41,6 +42,12 @@ class DeanAccount extends Authenticatable
     public function profile()
     {
         return $this->belongsTo(DeanProfile::class, 'deans_profile_id', 'id');
+    }
+
+    // Creator relationship (admin who created this dean account)
+    public function creator()
+    {
+        return $this->belongsTo(AdminAccount::class, 'created_by', 'id');
     }
 
     // Authentication identifier

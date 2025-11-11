@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('teachers_account', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('user_role_id')->constrained('admins_account')->onDelete('set null');
+        Schema::table('deans_account', function (Blueprint $table) {
+            $table->foreignId('created_by')->nullable()->constrained('admins_account')->onDelete('set null')->after('is_active');
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('teachers_account', function (Blueprint $table) {
+        Schema::table('deans_account', function (Blueprint $table) {
             $table->dropForeign(['created_by']);
             $table->dropColumn('created_by');
         });

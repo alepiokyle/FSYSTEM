@@ -133,6 +133,31 @@
             }
         });
     }
+
+    function switchRole() {
+        Swal.fire({
+            title: "<i class='fas fa-exchange-alt text-blue-500'></i> Switch Role",
+            html: "<p style='font-size:14px; color:#4b5563;'>Are you sure you want to switch your role? You are currently logged in as Dean. Switching roles will redirect you to the Teacher Dashboard.</p>",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "<i class='fas fa-check'></i> Switch",
+            cancelButtonText: "<i class='fas fa-times'></i> Cancel",
+            confirmButtonColor: "#0d6efd", // blue
+            cancelButtonColor: "#6c757d",  // gray
+            background: "#f3f4f6",
+            color: "#111827",
+            customClass: {
+                popup: "rounded-xl shadow-2xl border border-gray-300",
+                title: "text-lg font-semibold text-gray-800",
+                confirmButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-blue-700",
+                cancelButton: "px-4 py-2 rounded-md font-medium shadow hover:bg-gray-600"
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ route('dean.switch-role') }}";
+            }
+        });
+    }
 </script>
 
 </html>

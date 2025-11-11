@@ -112,11 +112,7 @@ class loginController extends Controller
                 return redirect()->route('suspended');
             }
 
-            // optional: role check
-            if ((int)  $admin->user_role_id !== 4) {
-                Auth::guard('admin')->logout();
-                return back()->withErrors(['login_error' => 'Unauthorized role for admin guard.'])->withInput();
-            }
+            // optional: role check - removed to allow login, middleware will handle role validation
 
             return redirect()->route('admin.dashboard')->with('success', 'Logged In Successfully');
         }

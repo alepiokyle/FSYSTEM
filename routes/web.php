@@ -1,12 +1,9 @@
 <?php
 
-use App\Http\Controllers\admin\adminController;
-use App\Http\Controllers\admin\AdminGradeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\AdminLoginController;
-use App\Http\Controllers\Admin\DeanAccountController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\dean\DeanController;
@@ -30,6 +27,7 @@ Route::get('/suspended', function () {
 
 // Admin
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
+
     Route::get('/dashboard', [App\Http\Controllers\admin\adminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // Upload Subject Routes - Fixed to use UploadController
@@ -39,7 +37,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     });
 
 
-     Route::controller(App\Http\Controllers\Admin\GradeController::class)->group(function () {
+     Route::controller(App\Http\Controllers\admin\GradeController::class)->group(function () {
         Route::get('/admin_Grade', 'index')->name('admin.Grade');
     });
 
@@ -49,11 +47,11 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         Route::get('/view-dean', 'index')->name('view.dean');
     });
 
-    Route::controller(App\Http\Controllers\Admin\ViewTeacherController::class)->group(function () {
+    Route::controller(App\Http\Controllers\admin\ViewTeacherController::class)->group(function () {
         Route::get('/view-teacher', 'index')->name('view.teacher');
     });
 
-    Route::controller(App\Http\Controllers\Admin\viewstudentController::class)->group(function () {
+    Route::controller(App\Http\Controllers\admin\viewstudentController::class)->group(function () {
         Route::get('/view-student', 'index')->name('view.student');
         Route::get('/import-student', 'importPage')->name('admin.student.import.page');
         Route::post('/import-student', 'import')->name('admin.student.import');
@@ -63,12 +61,12 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         })->name('admin.student.download.sample');
     });
 
-    Route::controller(App\Http\Controllers\Admin\ParentAccountController::class)->group(function () {
+    Route::controller(App\Http\Controllers\admin\ParentAccountController::class)->group(function () {
         Route::get('/view-parent', 'index')->name('view.parent');
         Route::delete('/parent/{id}', 'destroy')->name('admin.parent.destroy');
     });
 
-    Route::controller(App\Http\Controllers\Admin\ViewAddStaffController::class)->group(function () {
+    Route::controller(App\Http\Controllers\admin\ViewAddStaffController::class)->group(function () {
         Route::get('/view-addstaff', 'index')->name('view.addstaff');
         Route::post('/view-addstaff', 'store')->name('admin.addstaff.store');
         Route::delete('/dean/{id}', 'destroyDean')->name('admin.dean.destroy');
@@ -77,12 +75,16 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
         Route::patch('/teacher/{id}/suspend', 'suspendTeacher')->name('admin.teacher.suspend');
     });
 
-    Route::get('/uploadsubject', [App\Http\Controllers\Admin\UploadSubjectController::class, 'index'])->name('admin.uploadsubject');
+    Route::get('/uploadsubject', [App\Http\Controllers\admin\UploadSubjectController::class, 'index'])->name('admin.uploadsubject');
 });
 
 // Dean
 Route::prefix('dean')->middleware('auth:dean')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\dean\DashboardController::class, 'index'])->name('Dean.deandashboard');
+
+    Route::controller(App\Http\Controllers\dean\SwitchRoleController::class)->group(function () {
+        Route::get('/switch-role', 'switchToTeacher')->name('dean.switch-role');
+    });
 
     Route::controller(App\Http\Controllers\dean\AssignController::class)->group(function () {
         Route::get('/AssignTeacher', 'index')->name('dean.AssignTeacher');
@@ -117,6 +119,10 @@ Route::prefix('dean')->middleware('auth:dean')->group(function () {
 // Teacher
 Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\teacher\TeacherDashboardController::class, 'index'])->name('teacher.teacherdashboard');
+
+    Route::controller(App\Http\Controllers\dean\SwitchRoleController::class)->group(function () {
+        Route::get('/switch-role', 'switchToDean')->name('teacher.switch-role');
+    });
 
     Route::controller(App\Http\Controllers\teacher\ViewController::class)->group(function () {
         Route::get('/ViewAssign', 'index')->name('teacher.ViewAssign');

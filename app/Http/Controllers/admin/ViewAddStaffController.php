@@ -92,6 +92,7 @@ class ViewAddStaffController extends Controller
                     'password' => Hash::make($validated['password']),
                     'user_role_id' => $userRole->id,
                     'is_active' => true,
+                    'created_by' => Auth::guard('admin')->id(),
                 ]);
             }
 

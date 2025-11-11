@@ -38,5 +38,13 @@
         <span class="pc-mtext">Submit Grades</span>
       </a>
     </li>
+
+    <!-- Switch Role -->
+    <li class="pc-item">
+      <a href="javascript:void(0)" onclick="switchRole()" class="pc-link">
+        <span class="pc-micon"><i class="ti ti-refresh"></i></span>
+        <span class="pc-mtext">Switch Role</span>
+      </a>
+    </li>
   </ul>
 </div>

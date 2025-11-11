@@ -10,11 +10,12 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        // Check if logged-in user is admin
-        if (Auth::check() && Auth::user()->role_name === 'admin') {
+        // Check if logged-in user is admin using the admin guard
+        $user = Auth::guard('admin')->user();
+        if (Auth::guard('admin')->check() && $user && (int) $user->user_role_id === 4) {
             return $next($request);
         }
 
-        return redirect()->route('login')->with('error', 'Unauthorized access.');
+        return redirect()->route('login')->with('error', 'Unauthorized role for admin guard.');
     }
 }

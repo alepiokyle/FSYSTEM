@@ -1,6 +1,3 @@
-# TODO: Fix Login and Registration Form Designs
+# TODO: Modify Dean Sidebar Switch Role Condition
 
-## Tasks
-- [x] Update `resources/views/userAuth/login.blade.php` to center the form and add full-screen blurred glassy background
-- [x] Update `resources/views/userAuth/register.blade.php` to center the form and add full-screen blurred glassy background
-- [x] Test the forms to ensure proper display and responsiveness (Server running on http://127.0.0.1:8000)
+- [x] Edit resources/views/dean/partials/sidebar.blade.php to change the @if condition for the Switch Role menu item to only check for 'created_by' (remove the TeacherAccount existence check).
