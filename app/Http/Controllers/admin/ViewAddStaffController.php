@@ -71,13 +71,16 @@ class ViewAddStaffController extends Controller
                     'created_by' => Auth::guard('admin')->id(),
                 ]);
             } else {
-                $userRole = UserRole::where('role', 'Dean')->first();
-                if (!$userRole) {
-                    return redirect()->back()->withErrors(['role' => 'Dean role not found. Please seed the database.']);
+                // For Dean role, create both Dean and Teacher accounts with same credentials
+                $deanUserRole = UserRole::where('role', 'Dean')->first();
+                $teacherUserRole = UserRole::where('role', 'Teacher')->first();
+
+                if (!$deanUserRole || !$teacherUserRole) {
+                    return redirect()->back()->withErrors(['role' => 'Required roles not found. Please seed the database.']);
                 }
 
                 // Create dean profile
-                $profile = DeanProfile::create([
+                $deanProfile = DeanProfile::create([
                     'first_name' => $firstName,
                     'middle_name' => $middleName,
                     'last_name' => $lastName,
@@ -86,11 +89,30 @@ class ViewAddStaffController extends Controller
 
                 // Create dean account
                 DeanAccount::create([
-                    'deans_profile_id' => $profile->id,
+                    'deans_profile_id' => $deanProfile->id,
                     'name' => $validated['name'],
                     'username' => $validated['email'],
                     'password' => Hash::make($validated['password']),
-                    'user_role_id' => $userRole->id,
+                    'user_role_id' => $deanUserRole->id,
+                    'is_active' => true,
+                    'created_by' => Auth::guard('admin')->id(),
+                ]);
+
+                // Create corresponding teacher profile
+                $teacherProfile = TeacherProfile::create([
+                    'first_name' => $firstName,
+                    'middle_name' => $middleName,
+                    'last_name' => $lastName,
+                    'department_id' => $department->id,
+                ]);
+
+                // Create corresponding teacher account with same credentials
+                TeacherAccount::create([
+                    'teachers_profile_id' => $teacherProfile->id,
+                    'name' => $validated['name'],
+                    'username' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    'user_role_id' => $teacherUserRole->id,
                     'is_active' => true,
                     'created_by' => Auth::guard('admin')->id(),
                 ]);

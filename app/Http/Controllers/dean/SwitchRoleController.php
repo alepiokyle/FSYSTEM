@@ -22,7 +22,28 @@ class SwitchRoleController extends Controller
         $teacher = TeacherAccount::where('username', $dean->username)->first();
 
         if (!$teacher) {
-            return back()->withErrors(['error' => 'No associated Teacher account found.']);
+            // Create teacher account with same credentials if it doesn't exist
+            $teacherProfile = \App\Models\TeacherProfile::create([
+                'first_name' => $dean->profile->first_name,
+                'middle_name' => $dean->profile->middle_name,
+                'last_name' => $dean->profile->last_name,
+                'department_id' => $dean->profile->department_id,
+            ]);
+
+            $teacherUserRole = \App\Models\UserRole::where('role', 'Teacher')->first();
+            if (!$teacherUserRole) {
+                return back()->withErrors(['error' => 'Teacher role not found.']);
+            }
+
+            $teacher = TeacherAccount::create([
+                'teachers_profile_id' => $teacherProfile->id,
+                'name' => $dean->name,
+                'username' => $dean->username,
+                'password' => $dean->password, // Same password
+                'user_role_id' => $teacherUserRole->id,
+                'is_active' => true,
+                'created_by' => $dean->created_by,
+            ]);
         }
 
         // Check if teacher is active
@@ -35,7 +56,7 @@ class SwitchRoleController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Manually login as teacher (assuming same password or no password check for switching)
+        // Manually login as teacher
         Auth::guard('teacher')->login($teacher);
         $request->session()->regenerate();
         return redirect()->route('teacher.teacherdashboard')->with('success', 'Switched to Teacher role.');
@@ -53,7 +74,28 @@ class SwitchRoleController extends Controller
         $dean = DeanAccount::where('username', $teacher->username)->first();
 
         if (!$dean) {
-            return back()->withErrors(['error' => 'No associated Dean account found.']);
+            // Create dean account with same credentials if it doesn't exist
+            $deanProfile = \App\Models\DeanProfile::create([
+                'first_name' => $teacher->profile->first_name,
+                'middle_name' => $teacher->profile->middle_name,
+                'last_name' => $teacher->profile->last_name,
+                'department_id' => $teacher->profile->department_id,
+            ]);
+
+            $deanUserRole = \App\Models\UserRole::where('role', 'Dean')->first();
+            if (!$deanUserRole) {
+                return back()->withErrors(['error' => 'Dean role not found.']);
+            }
+
+            $dean = DeanAccount::create([
+                'deans_profile_id' => $deanProfile->id,
+                'name' => $teacher->name,
+                'username' => $teacher->username,
+                'password' => $teacher->password, // Same password
+                'user_role_id' => $deanUserRole->id,
+                'is_active' => true,
+                'created_by' => $teacher->created_by,
+            ]);
         }
 
         // Check if dean is active
