@@ -24,3 +24,7 @@ class AdminComponent extends Component
         return view('layouts.admin-component');
     }
 }
+
+
+
+

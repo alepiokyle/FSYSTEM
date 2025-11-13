@@ -25,7 +25,7 @@ class TeacherController extends Controller
         $teacherId = Auth::guard('teacher')->id();
         $subject = Subject::where('id', $subjectId)
             ->where('teacher_id', $teacherId)
-            ->with('students')
+            ->with('students.profile')
             ->first();
 
         if (!$subject) {
@@ -49,15 +49,21 @@ class TeacherController extends Controller
         }
 
         $students = $subject->students->map(function ($student) use ($subjectId, $teacherId) {
+            if (!$student->profile) {
+                return null; // Skip students without profile
+            }
             // Fetch existing grades
             $grade = Grade::where('student_id', $student->id)
                 ->where('subject_id', $subjectId)
                 ->where('teacher_id', $teacherId)
                 ->first();
 
+            $profile = $student->profile;
+            $fullName = $profile ? trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : '')) : 'N/A';
+
             return [
                 'id' => $student->id,
-                'name' => $student->name,
+                'name' => $fullName,
                 'prelim' => $grade ? $grade->prelim : null,
                 'midterm' => $grade ? $grade->midterm : null,
                 'semi_final' => $grade ? $grade->semi_final : null,
@@ -66,7 +72,7 @@ class TeacherController extends Controller
                 'remarks' => $grade ? $grade->remarks : '-',
                 'status' => $grade ? $grade->status : 'draft',
             ];
-        });
+        })->filter()->values(); // Remove null entries
 
         return response()->json($students);
     }

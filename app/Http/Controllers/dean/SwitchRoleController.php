@@ -74,28 +74,7 @@ class SwitchRoleController extends Controller
         $dean = DeanAccount::where('username', $teacher->username)->first();
 
         if (!$dean) {
-            // Create dean account with same credentials if it doesn't exist
-            $deanProfile = \App\Models\DeanProfile::create([
-                'first_name' => $teacher->profile->first_name,
-                'middle_name' => $teacher->profile->middle_name,
-                'last_name' => $teacher->profile->last_name,
-                'department_id' => $teacher->profile->department_id,
-            ]);
-
-            $deanUserRole = \App\Models\UserRole::where('role', 'Dean')->first();
-            if (!$deanUserRole) {
-                return back()->withErrors(['error' => 'Dean role not found.']);
-            }
-
-            $dean = DeanAccount::create([
-                'deans_profile_id' => $deanProfile->id,
-                'name' => $teacher->name,
-                'username' => $teacher->username,
-                'password' => $teacher->password, // Same password
-                'user_role_id' => $deanUserRole->id,
-                'is_active' => true,
-                'created_by' => $teacher->created_by,
-            ]);
+            return back()->withErrors(['error' => 'You do not have permission to switch to Dean role. Only registered Deans can switch roles.']);
         }
 
         // Check if dean is active

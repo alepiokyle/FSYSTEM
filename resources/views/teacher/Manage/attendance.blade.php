@@ -406,7 +406,7 @@
             data.students.forEach(student => {
               const option = document.createElement('option');
               option.value = student.id;
-              option.textContent = student.name;
+              option.textContent = student.name || 'N/A';
               studentSelect.appendChild(option);
               });
             // Populate summary table
@@ -436,7 +436,7 @@
 
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${student.name}</td>
+          <td>${student.name || 'N/A'}</td>
           <td>${quizWeighted}</td>
           <td>${assignmentWeighted}</td>
           <td>${attendanceWeighted}</td>
@@ -486,7 +486,7 @@
 
         // Student Name Cell
         const studentNameCell = document.createElement('td');
-        studentNameCell.textContent = student.name;
+        studentNameCell.textContent = student.name || 'N/A';
         row.appendChild(studentNameCell);
 
         // Total Items Cell

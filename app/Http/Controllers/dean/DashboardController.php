@@ -14,18 +14,25 @@ class DashboardController extends Controller
         // Get the authenticated dean
         $dean = Auth::guard('dean')->user();
 
-        // Get the dean's department name
-        $departmentName = $dean->profile->department->name;
+        // Initialize counts
+        $totalSubjects = 0;
+        $teachersAssigned = 0;
 
-        // Count total subjects uploaded in the department
-        $totalSubjects = Subject::whereHas('department', function($q) use ($departmentName) {
-            $q->where('name', $departmentName);
-        })->count();
+        // Check if dean has profile and department
+        if ($dean && $dean->profile && $dean->profile->department) {
+            // Get the dean's department name
+            $departmentName = $dean->profile->department->name;
 
-        // Count teachers assigned (subjects with teacher_id not null)
-        $teachersAssigned = Subject::whereHas('department', function($q) use ($departmentName) {
-            $q->where('name', $departmentName);
-        })->whereNotNull('teacher_id')->count();
+            // Count total subjects uploaded in the department
+            $totalSubjects = Subject::whereHas('department', function($q) use ($departmentName) {
+                $q->where('name', $departmentName);
+            })->count();
+
+            // Count teachers assigned (subjects with teacher_id not null)
+            $teachersAssigned = Subject::whereHas('department', function($q) use ($departmentName) {
+                $q->where('name', $departmentName);
+            })->whereNotNull('teacher_id')->count();
+        }
 
         return view('Dean.deandashboard', compact('totalSubjects', 'teachersAssigned'));
     }

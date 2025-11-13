@@ -39,6 +39,11 @@
       </a>
     </li>
 
+    @php
+        $hasDeanAccount = \App\Models\DeanAccount::where('username', Auth::guard('teacher')->user()->username)->exists();
+    @endphp
+
+    @if($hasDeanAccount)
     <!-- Switch Role -->
     <li class="pc-item">
       <a href="javascript:void(0)" onclick="switchRole()" class="pc-link">
@@ -46,5 +51,6 @@
         <span class="pc-mtext">Switch Role</span>
       </a>
     </li>
+    @endif
   </ul> 
 </div>

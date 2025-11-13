@@ -35,6 +35,9 @@ class AttendanceController extends Controller
 
             $students = $subject->students()->with(['profile.department'])->get()->map(function ($student) use ($request, $subject) {
                 $profile = $student->profile;
+                if (!$profile) {
+                    return null; // Skip students without profile
+                }
                 $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
                 $attendance = Attendance::where('student_id', $student->id)
                     ->where('subject_id', $subject->id)
@@ -45,12 +48,12 @@ class AttendanceController extends Controller
                 return [
                     'id' => $student->id,
                     'student_id' => $profile->student_id,
-                    'full_name' => $fullName,
+                    'name' => $fullName,
                     'department' => $profile->department ? $profile->department->name : 'N/A',
                     'year_level' => $profile->year_level,
                     'status' => $attendance ? $attendance->status : null,
                 ];
-            });
+            })->filter()->values(); // Remove null entries
 
             return response()->json([
                 'success' => true,
@@ -114,6 +117,9 @@ class AttendanceController extends Controller
 
             $students = $subject->students()->with(['profile.department'])->get()->map(function ($student) use ($subject) {
                 $profile = $student->profile;
+                if (!$profile) {
+                    return null; // Skip students without profile
+                }
                 $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
 
                 // Fetch existing grade record
@@ -152,7 +158,7 @@ class AttendanceController extends Controller
                     'total_performance' => $grade ? $grade->total_performance : null,
                     'final_grade' => $grade ? $grade->term_grade : null,
                 ];
-            });
+            })->filter()->values(); // Remove null entries
 
             return response()->json([
                 'success' => true,

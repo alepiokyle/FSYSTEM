@@ -351,7 +351,7 @@
             const isEditable = student.status === 'draft' || student.status === 'saved';
             row.innerHTML = `
               <td>${student.id}</td>
-              <td>${student.name}</td>
+              <td>${student.name || 'N/A'}</td>
               <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="prelim" value="${student.prelim ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
               <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="midterm" value="${student.midterm ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
               <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="semi_final" value="${student.semi_final ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
