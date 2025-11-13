@@ -65,6 +65,197 @@ class AttendanceController extends Controller
         }
     }
 
+    public function getSubjectDetails($subjectId)
+    {
+        try {
+            $subject = Subject::findOrFail($subjectId);
+
+            // Check if the subject is assigned to the current teacher
+            if ($subject->teacher_id != Auth::guard('teacher')->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to view this subject.'
+                ], 403);
+            }
+
+            $teacherProfile = $subject->teacher->profile;
+            $teacherName = trim($teacherProfile->first_name . ' ' . ($teacherProfile->middle_name ? $teacherProfile->middle_name . ' ' : '') . $teacherProfile->last_name . ($teacherProfile->suffix ? ' ' . $teacherProfile->suffix : ''));
+
+            return response()->json([
+                'success' => true,
+                'subject' => [
+                    'subject_code' => $subject->subject_code,
+                    'subject_name' => $subject->subject_name,
+                    'section' => $subject->section,
+                    'teacher_name' => $teacherName,
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load subject details. Please try again.'
+            ], 500);
+        }
+    }
+
+    public function getGradingStudents($subjectId)
+    {
+        try {
+            $subject = Subject::findOrFail($subjectId);
+
+            // Check if the subject is assigned to the current teacher
+            if ($subject->teacher_id != Auth::guard('teacher')->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to view students for this subject.'
+                ], 403);
+            }
+
+            $students = $subject->students()->with(['profile.department'])->get()->map(function ($student) use ($subject) {
+                $profile = $student->profile;
+                $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
+
+                // Fetch existing grade record
+                $grade = Grade::where('student_id', $student->id)
+                    ->where('subject_id', $subject->id)
+                    ->where('teacher_id', Auth::guard('teacher')->id())
+                    ->first();
+
+                // Calculate attendance score (percentage of present days)
+                $totalAttendanceDays = Attendance::where('student_id', $student->id)
+                    ->where('subject_id', $subject->id)
+                    ->count();
+
+                $presentDays = Attendance::where('student_id', $student->id)
+                    ->where('subject_id', $subject->id)
+                    ->where('status', 'Present')
+                    ->count();
+
+                $attendanceScore = $totalAttendanceDays > 0 ? ($presentDays / $totalAttendanceDays) * 100 : null;
+
+                return [
+                    'id' => $student->id,
+                    'name' => $fullName,
+                    'student_id' => $profile->student_id,
+                    'department' => $profile->department ? $profile->department->name : 'N/A',
+                    'year_level' => $profile->year_level,
+                    'quiz' => $grade ? $grade->quiz : null,
+                    'total_quiz' => $grade ? $grade->total_quiz : null,
+                    'assignment' => $grade ? $grade->assignment : null,
+                    'total_assignment' => $grade ? $grade->total_assignment : null,
+                    'attendance_score' => $attendanceScore,
+                    'total_attendance_score' => $totalAttendanceDays > 0 ? 100 : null,
+                    'exam' => $grade ? $grade->exam : null,
+                    'total_exam' => $grade ? $grade->total_exam : null,
+                    'performance' => $grade ? $grade->performance : null,
+                    'total_performance' => $grade ? $grade->total_performance : null,
+                    'final_grade' => $grade ? $grade->term_grade : null,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'students' => $students,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load students. Please try again.'
+            ], 500);
+        }
+    }
+
+    public function saveGradingComponent(Request $request)
+    {
+        $request->validate([
+            'subject_id' => 'required|exists:subjects,id',
+            'component' => 'required|in:quiz,assignment,attendance_score,exam,performance',
+            'student_id' => 'required|exists:users,id',
+            'score' => 'nullable|numeric|min:0|max:100',
+            'total' => 'nullable|numeric|min:1',
+        ]);
+
+        $subjectId = $request->subject_id;
+        $component = $request->component;
+        $studentId = $request->student_id;
+        $score = $request->score;
+        $total = $request->total;
+        $teacherId = Auth::guard('teacher')->id();
+
+        // Check if subject is assigned to teacher
+        $subject = Subject::findOrFail($subjectId);
+        if ($subject->teacher_id != $teacherId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized to save grades for this subject.'
+            ], 403);
+        }
+
+        try {
+            // Ensure grade record exists
+            $grade = Grade::firstOrCreate(
+                [
+                    'student_id' => $studentId,
+                    'subject_id' => $subjectId,
+                    'teacher_id' => $teacherId,
+                ],
+                [
+                    'status' => 'draft',
+                    'semester' => $subject->semester,
+                    'school_year' => $subject->school_year,
+                ]
+            );
+
+            // Update the specific component
+            $grade->update([
+                $component => $score,
+                "total_{$component}" => $total,
+            ]);
+
+            // Recalculate final grade if all components are present
+            $components = ['quiz', 'assignment', 'attendance_score', 'exam', 'performance'];
+            $allPresent = true;
+            $finalGrade = 0;
+
+            foreach ($components as $comp) {
+                if ($grade->$comp === null || $grade->{"total_{$comp}"} === null) {
+                    $allPresent = false;
+                    break;
+                }
+                $percentage = ($grade->$comp / $grade->{"total_{$comp}"}) * 100;
+                $weight = in_array($comp, ['quiz', 'assignment', 'attendance_score']) ? 0.10 : ($comp === 'exam' ? 0.30 : 0.40);
+                $finalGrade += $percentage * $weight;
+            }
+
+            if ($allPresent) {
+                $grade->update([
+                    'term_grade' => round($finalGrade, 2),
+                    'remarks' => $finalGrade >= 75 ? 'Passed' : 'Failed',
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Score saved successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to save grading component: ' . $e->getMessage(), [
+                'subject_id' => $subjectId,
+                'component' => $component,
+                'student_id' => $studentId,
+                'teacher_id' => $teacherId,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save score. Please try again.'
+            ], 500);
+        }
+    }
+
     public function saveAttendance(Request $request)
     {
         $request->validate([

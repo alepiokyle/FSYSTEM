@@ -135,6 +135,9 @@ Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
         Route::get('/Manage/{subjectId}/students', 'getStudents')->name('teacher.Manage.students');
         Route::post('/Manage/save-attendance', 'saveAttendance')->name('teacher.Manage.save-attendance');
         Route::get('/Manage/past-records', 'getPastRecords')->name('teacher.Manage.past-records');
+        Route::get('/Manage/{subjectId}/subject-details', 'getSubjectDetails')->name('teacher.Manage.subject-details');
+        Route::get('/Manage/{subjectId}/grading-students', 'getGradingStudents')->name('teacher.Manage.grading-students');
+        Route::post('/Manage/save-grading-component', 'saveGradingComponent')->name('teacher.Manage.save-grading-component');
     });
 
     Route::controller(App\Http\Controllers\teacher\TeacherController::class)->group(function () {

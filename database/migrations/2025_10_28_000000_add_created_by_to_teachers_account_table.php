@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('teachers_account', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->constrained('admins_account')->onDelete('set null')->after('is_active');
-        });
+        if (!Schema::hasColumn('teachers_account', 'created_by')) {
+            Schema::table('teachers_account', function (Blueprint $table) {
+                $table->foreignId('created_by')->nullable()->constrained('admins_account')->onDelete('set null')->after('is_active');
+            });
+        }
     }
 
     /**

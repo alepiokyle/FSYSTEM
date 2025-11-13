@@ -22,6 +22,16 @@ class Grade extends Model
         'status',
         'semester',
         'school_year',
+        'quiz',
+        'total_quiz',
+        'assignment',
+        'total_assignment',
+        'attendance_score',
+        'total_attendance_score',
+        'exam',
+        'total_exam',
+        'performance',
+        'total_performance',
     ];
 
     public function student()
