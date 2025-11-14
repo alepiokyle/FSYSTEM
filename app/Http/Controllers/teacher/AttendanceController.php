@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\Subject;
 use App\Models\Attendance;
+use App\Models\Grade;
 
 class AttendanceController extends Controller
 {

@@ -153,6 +153,58 @@
       margin-bottom: 10px;
       text-align: center;
     }
+
+    /* Subject Details Section */
+    .subject-details {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin: 20px 0;
+      display: none; /* Hidden initially */
+    }
+
+    .subject-details h3 {
+      color: #333;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .subject-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .subject-info div {
+      flex: 1 1 200px;
+    }
+
+    .subject-info label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .subject-info p {
+      margin: 5px 0 0 0;
+      color: #333;
+    }
+
+    /* Enrolled Students Section */
+    .enrolled-students {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin: 20px 0;
+      display: none; /* Hidden initially */
+    }
+
+    .enrolled-students h3 {
+      color: #333;
+      margin-bottom: 15px;
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -174,46 +226,26 @@
 
       </select>
 
-      <label for="student">Select Student</label>
-      <select id="student">
-        <option value="">-- Choose Student --</option>
-        <!-- Students will be populated dynamically -->
-      </select>
-
-      <!-- Grading Breakdown Table -->
-      <div class="card" style="margin-top: 15px; background: #fefefe;">
-        <h3 style="margin-bottom: 10px; color: #333;">Grading Breakdown</h3>
-        <table>
-          <thead>
-            <tr style="background: #f1f3f5;">
-              <th>Component</th>
-              <th>Percentage</th>
+      <!-- Enrolled Students Section -->
+      <div class="enrolled-students" id="enrolledStudents">
+        <h3>Enrolled Students</h3>
+        <table id="enrolledStudentsTable">
+          <thead id="enrolledStudentsTableHead">
+            <tr>
+              <th>Student ID</th>
+              <th>Student Name</th>
+              <th>Department</th>
+              <th>Year Level</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td><span class="clickable" id="openQuizModal">Quiz</span></td>
-              <td>10%</td>
-            </tr>
-            <tr>
-              <td><span class="clickable" id="openAssignmentModal">Assignment</span></td>
-              <td>10%</td>
-            </tr>
-            <tr>
-              <td><span class="clickable" id="openAttendanceModal">Attendance</span></td>
-              <td>10%</td>
-            </tr>
-            <tr>
-              <td><span class="clickable" id="openExamModal">Exam</span></td>
-              <td>30%</td>
-            </tr>
-            <tr>
-              <td><span class="clickable" id="openPerformanceModal">Performance</span></td>
-              <td>40%</td>
-            </tr>
+            <!-- Enrolled students will be populated here -->
           </tbody>
         </table>
       </div>
+
+
 
       <label for="date">Select Date and Time</label>
       <div style="display: flex; gap: 10px; align-items: center;">
@@ -223,120 +255,45 @@
     </div>
   </div>
 
-  <!-- ================= MODALS (same as your provided code) ================= -->
-  <!-- QUIZ -->
-  <div id="quizModal" class="modal">
+  <!-- ================= GRADING BREAKDOWN MODAL ================= -->
+  <div id="gradingModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <span>Quiz Scores</span>
-        <span class="close" id="closeQuizModal">&times;</span>
+        <span id="modalTitle">Grading Breakdown</span>
+        <span class="close" id="closeGradingModal">&times;</span>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Items</th>
-            <th>Score</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Table body will be populated dynamically -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ASSIGNMENT -->
-  <div id="assignmentModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>Assignment Grades</span>
-        <span class="close" id="closeAssignmentModal">&times;</span>
+      <div id="modalBody">
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('quiz')">Quiz</span></td>
+              <td>10%</td>
+            </tr>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('assignment')">Assignment</span></td>
+              <td>10%</td>
+            </tr>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('attendance_score')">Attendance</span></td>
+              <td>10%</td>
+            </tr>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('exam')">Exam</span></td>
+              <td>30%</td>
+            </tr>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('performance')">Performance</span></td>
+              <td>40%</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Assignment Title</th>
-            <th>Score (1–100)</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Table body will be populated dynamically -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ATTENDANCE -->
-  <div id="attendanceModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>Attendance Record</span>
-        <span class="close" id="closeAttendanceModal">&times;</span>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Subject Name</th>
-            <th>Date & Time</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Table body will be populated dynamically -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- EXAM -->
-  <div id="examModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>Exam Results</span>
-        <span class="close" id="closeExamModal">&times;</span>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Exam Items</th>
-            <th>Score</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Table body will be populated dynamically -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- PERFORMANCE -->
-  <div id="performanceModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span>Performance Evaluation</span>
-        <span class="close" id="closePerformanceModal">&times;</span>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Activity</th>
-            <th>Score (1–100)</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Table body will be populated dynamically -->
-        </tbody>
-      </table>
     </div>
   </div>
 
@@ -344,6 +301,14 @@
   <div class="summary-section">
     <h3>Quiz–Performance Results Summary</h3>
     <form>
+      <label for="term">Select Term</label>
+      <select id="term">
+        <option value="prelim">Prelim</option>
+        <option value="midterm">Midterm</option>
+        <option value="semi-final">Semi-Final</option>
+        <option value="final">Final</option>
+        <option value="term-grade">Term Grade</option>
+      </select>
       <table>
         <thead>
           <tr>
@@ -354,6 +319,7 @@
             <th>Exam (30%)</th>
             <th>Performance (40%)</th>
             <th>Final Grade</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -366,21 +332,22 @@
   <script>
     let currentSubjectId = null;
     let studentsData = [];
+    let currentStudentId = null;
 
     // Load students when subject changes
-    function loadStudents() {
+    function loadSubjectDetails() {
       currentSubjectId = document.getElementById('subject').value;
-      const studentSelect = document.getElementById('student');
-      studentSelect.innerHTML = '<option value="">-- Choose Student --</option>';
+      const enrolledStudentsDiv = document.getElementById('enrolledStudents');
 
       if (!currentSubjectId) {
-        alert('Please select a subject first.');
+        // Hide sections if no subject selected
+        enrolledStudentsDiv.style.display = 'none';
         // Clear summary table
         document.querySelector('.summary-section tbody').innerHTML = '';
         return;
       }
 
-      // Load students for grading
+      // Load students for grading and enrolled students display
       fetch(`/teacher/Manage/${currentSubjectId}/grading-students`, {
         method: 'GET',
         headers: {
@@ -402,13 +369,9 @@
         .then(data => {
           if (data.success) {
             studentsData = data.students;
-            // Populate student select
-            data.students.forEach(student => {
-              const option = document.createElement('option');
-              option.value = student.id;
-              option.textContent = student.name || 'N/A';
-              studentSelect.appendChild(option);
-              });
+            // Populate enrolled students table
+            populateEnrolledStudentsTable(data.students);
+            enrolledStudentsDiv.style.display = 'block';
             // Populate summary table
             populateSummaryTable(data.students);
           } else {
@@ -421,7 +384,26 @@
         });
     }
 
-    document.getElementById('subject').addEventListener('change', loadStudents);
+    document.getElementById('subject').addEventListener('change', loadSubjectDetails);
+
+    function populateEnrolledStudentsTable(students) {
+      const tbody = document.querySelector('#enrolledStudentsTable tbody');
+      tbody.innerHTML = '';
+      students.forEach(student => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${student.student_id || 'N/A'}</td>
+          <td>${student.name || 'N/A'}</td>
+          <td>${student.department || 'N/A'}</td>
+          <td>${student.year_level || 'N/A'}</td>
+          <td>
+
+            <button class="btn" onclick="openGradingModal('${student.id}')">Edit</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
 
     function populateSummaryTable(students) {
       const tbody = document.querySelector('.summary-section tbody');
@@ -443,95 +425,112 @@
           <td>${examWeighted}</td>
           <td>${performanceWeighted}</td>
           <td><strong>${student.final_grade ? student.final_grade.toFixed(2) : '-'}</strong></td>
+          <td><button class="btn" onclick="saveFinalGrade('${student.id}')">Save</button></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    // Modal handling
-    const modals = {
-      quiz: ["openQuizModal", "quizModal", "closeQuizModal", "quiz"],
-      assignment: ["openAssignmentModal", "assignmentModal", "closeAssignmentModal", "assignment"],
-      attendance: ["openAttendanceModal", "attendanceModal", "closeAttendanceModal", "attendance_score"],
-      exam: ["openExamModal", "examModal", "closeExamModal", "exam"],
-      performance: ["openPerformanceModal", "performanceModal", "closePerformanceModal", "performance"]
+    // Grading modal handling
+    const gradingModal = document.getElementById('gradingModal');
+    const closeGradingModal = document.getElementById('closeGradingModal');
+    closeGradingModal.onclick = () => {
+      gradingModal.style.display = "none";
+      resetModalToGradingBreakdown();
+    };
+    window.onclick = e => {
+      if (e.target === gradingModal) {
+        gradingModal.style.display = "none";
+        resetModalToGradingBreakdown();
+      }
     };
 
-    for (const key in modals) {
-      const [openId, modalId, closeId, component] = modals[key];
-      const openBtn = document.getElementById(openId);
-      const modal = document.getElementById(modalId);
-      const closeBtn = document.getElementById(closeId);
+    function openGradingModal(studentId) {
+      currentStudentId = studentId;
+      const student = studentsData.find(s => s.id == studentId);
+      if (!student) {
+        alert('Student not found.');
+        return;
+      }
+      document.getElementById('modalTitle').textContent = `Grading for ${student.name}`;
+      gradingModal.style.display = "block";
+    }
 
-      openBtn.onclick = () => {
-        if (!currentSubjectId) {
-          alert('Please select a subject first.');
-          return;
-        }
-        populateModalTable(modal, component);
-        modal.style.display = "block";
+    function resetModalToGradingBreakdown() {
+      document.getElementById('modalTitle').textContent = 'Grading Breakdown';
+      document.getElementById('modalBody').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('quiz')">Quiz</span></td>
+              <td>10%</td>
+            </tr>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('assignment')">Assignment</span></td>
+              <td>10%</td>
+            </tr>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('attendance_score')">Attendance</span></td>
+              <td>10%</td>
+            </tr>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('exam')">Exam</span></td>
+              <td>30%</td>
+            </tr>
+            <tr>
+              <td><span class="clickable" onclick="showGradingForComponent('performance')">Performance</span></td>
+              <td>40%</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    }
+
+    function showGradingForComponent(component) {
+      const componentNames = {
+        quiz: 'Quiz',
+        assignment: 'Assignment',
+        attendance_score: 'Attendance',
+        exam: 'Exam',
+        performance: 'Performance'
       };
-      closeBtn.onclick = () => modal.style.display = "none";
-      window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+      const student = studentsData.find(s => s.id == currentStudentId);
+      document.getElementById('modalTitle').textContent = `${componentNames[component]} Grading for ${student.name}`;
+      const modalBody = document.getElementById('modalBody');
+      modalBody.innerHTML = `
+        <button class="btn" onclick="resetModalToGradingBreakdown()">Back to Grading Breakdown</button>
+        <table style="margin-top: 10px;">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Total Items</th>
+              <th>Score</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${student.name || 'N/A'}</td>
+              <td><input type="number" placeholder="Total" value="${student[`total_${component}`] || (component === 'quiz' || component === 'exam' ? '100' : '')}" /></td>
+              <td><input type="number" placeholder="Score" value="${student[component] || ''}" min="0" max="100" data-student-id="${student.id}" data-component="${component}" /></td>
+              <td><button class="btn" onclick="saveScoreFromModal('${student.id}', '${component}', this)">Save</button></td>
+            </tr>
+          </tbody>
+        </table>
+      `;
     }
 
-    function populateModalTable(modal, component) {
-      const tbody = modal.querySelector('tbody');
-      tbody.innerHTML = '';
-
-      studentsData.forEach(student => {
-        const row = document.createElement('tr');
-        const score = student[component] ?? '';
-        const placeholder = component === 'quiz' ? 'Enter items' : component === 'assignment' ? 'Enter title' : component === 'exam' ? 'Enter exam items' : 'Enter activity';
-
-        // Student Name Cell
-        const studentNameCell = document.createElement('td');
-        studentNameCell.textContent = student.name || 'N/A';
-        row.appendChild(studentNameCell);
-
-        // Total Items Cell
-        const totalCell = document.createElement('td');
-        const totalInput = document.createElement('input');
-        totalInput.type = 'number';
-        totalInput.placeholder = 'Enter total items';
-        totalInput.value = component === 'quiz' || component === 'exam' ? '100' : '';
-        totalInput.min = 1;
-        totalCell.appendChild(totalInput);
-        row.appendChild(totalCell);
-
-        // Score Cell
-        const scoreCell = document.createElement('td');
-        const scoreInput = document.createElement('input');
-        scoreInput.type = 'number';
-        scoreInput.placeholder = 'Enter score';
-        scoreInput.value = score;
-        scoreInput.min = 0;
-        scoreInput.max = 100;
-        scoreInput.dataset.studentId = student.id;
-        scoreInput.dataset.component = component;
-        scoreCell.appendChild(scoreInput);
-        row.appendChild(scoreCell);
-
-        // Actions Cell
-        const actionsCell = document.createElement('td');
-        actionsCell.className = 'actions-cell';
-        const saveButton = document.createElement('button');
-        saveButton.className = 'btn';
-        saveButton.textContent = 'Save';
-        saveButton.addEventListener('click', () => saveScore(student.id, component, saveButton));
-        actionsCell.appendChild(saveButton);
-        row.appendChild(actionsCell);
-
-        tbody.appendChild(row);
-      });
-    }
-
-    function saveScore(studentId, component, button) {
+    function saveScoreFromModal(studentId, component, button) {
       const row = button.closest('tr');
-      const totalInput = row.querySelector('input[type="number"]:not([data-student-id])');
-      const scoreInput = row.querySelector(`input[data-student-id="${studentId}"][data-component="${component}"]`);
-      const total = totalInput.value;
-      const score = scoreInput.value;
+      const inputs = row.querySelectorAll('input[type="number"]');
+      const total = inputs[0].value;
+      const score = inputs[1].value;
 
       fetch('/teacher/Manage/save-grading-component', {
         method: 'POST',
@@ -556,13 +555,8 @@
           if (student) {
             student[component] = score;
             student[`total_${component}`] = total;
-            // Calculate final grade
             student.final_grade = calculateFinalGrade(student);
-            // Update summary table
             populateSummaryTable(studentsData);
-            // Update modal inputs
-            totalInput.value = total;
-            scoreInput.value = score;
           }
         } else {
           alert(data.message || 'Error saving score.');
@@ -584,6 +578,36 @@
         }
       }
       return total;
+    }
+
+    function saveFinalGrade(studentId) {
+      const student = studentsData.find(s => s.id == studentId);
+      if (!student || student.final_grade === null) {
+        alert('Final grade is not calculated yet.');
+        return;
+      }
+
+      fetch('/teacher/Manage/save-final-grade', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          subject_id: currentSubjectId,
+          student_id: studentId,
+          final_grade: student.final_grade
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Final grade saved successfully!');
+        } else {
+          alert(data.message || 'Error saving final grade.');
+        }
+      })
+      .catch(() => alert('Error saving final grade.'));
     }
   </script>
 </body>
