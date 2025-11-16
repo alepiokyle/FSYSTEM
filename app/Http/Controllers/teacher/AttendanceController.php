@@ -106,17 +106,31 @@ class AttendanceController extends Controller
     public function getGradingStudents($subjectId)
     {
         try {
-            $subject = Subject::findOrFail($subjectId);
+            $teacherId = Auth::guard('teacher')->id();
+            if (!$teacherId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Authentication error. Please log in as a teacher.'
+                ], 401);
+            }
+
+            $subject = Subject::find($subjectId);
+            if (!$subject) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Subject not found.'
+                ], 404);
+            }
 
             // Check if the subject is assigned to the current teacher
-            if ($subject->teacher_id != Auth::guard('teacher')->id()) {
+            if ($subject->teacher_id != $teacherId) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You are not authorized to view students for this subject.'
                 ], 403);
             }
 
-            $students = $subject->students()->with(['profile.department'])->get()->unique('id')->map(function ($student) use ($subject) {
+            $students = $subject->students()->with(['profile.department'])->get()->unique('id')->map(function ($student) use ($subject, $teacherId) {
                 $profile = $student->profile;
                 if (!$profile) {
                     return null; // Skip students without profile
@@ -126,7 +140,7 @@ class AttendanceController extends Controller
                 // Fetch existing grade record where is_done = 0 (enrolled)
                 $grade = Grade::where('student_id', $student->id)
                     ->where('subject_id', $subject->id)
-                    ->where('teacher_id', Auth::guard('teacher')->id())
+                    ->where('teacher_id', $teacherId)
                     ->where('is_done', 0)
                     ->first();
 
@@ -169,6 +183,11 @@ class AttendanceController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Failed to load grading students: ' . $e->getMessage(), [
+                'subject_id' => $subjectId,
+                'teacher_id' => Auth::guard('teacher')->id(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load students. Please try again.'
