@@ -16,7 +16,9 @@ class AttendanceController extends Controller
     public function index()
     {
         $teacherId = Auth::guard('teacher')->id();
-        $assignedSubjects = Subject::where('teacher_id', $teacherId)->get();
+        $assignedSubjects = Subject::where('teacher_id', $teacherId)
+            ->whereHas('students')
+            ->get();
 
         return view('teacher.Manage.attendance', compact('assignedSubjects'));
     }
