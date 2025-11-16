@@ -373,14 +373,12 @@
         credentials: 'same-origin'
       })
         .then(response => {
-          if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
-              alert('Authentication error. Please log in as a teacher.');
-              return;
-            }
-            throw new Error(`HTTP error! status: ${response.status}`);
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            return response.json();
+          } else {
+            throw new Error('Authentication error. Please log in as a teacher.');
           }
-          return response.json();
         })
         .then(data => {
           if (data.success) {
@@ -401,7 +399,7 @@
         })
         .catch(error => {
           console.error('Error loading students:', error);
-          alert('Error loading students. Please check your authentication.');
+          alert(error.message || 'Error loading students. Please check your authentication.');
         });
     }
 
