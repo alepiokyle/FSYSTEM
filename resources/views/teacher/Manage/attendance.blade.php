@@ -303,6 +303,7 @@
     <form>
       <label for="term">Select Term</label>
       <select id="term">
+        <option value="">-- Select Term --</option>
         <option value="prelim">Prelim</option>
         <option value="midterm">Midterm</option>
         <option value="semi-final">Semi-Final</option>
@@ -332,7 +333,18 @@
   <script>
     let currentSubjectId = null;
     let studentsData = [];
+    let enrolledStudentsData = [];
+    let completedStudentsData = [];
     let currentStudentId = null;
+
+    // Load saved subject on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      const savedSubjectId = localStorage.getItem('selectedSubjectId');
+      if (savedSubjectId) {
+        document.getElementById('subject').value = savedSubjectId;
+        loadSubjectDetails();
+      }
+    });
 
     // Load students when subject changes
     function loadSubjectDetails() {
@@ -344,8 +356,12 @@
         enrolledStudentsDiv.style.display = 'none';
         // Clear summary table
         document.querySelector('.summary-section tbody').innerHTML = '';
+        localStorage.removeItem('selectedSubjectId');
         return;
       }
+
+      // Save selected subject to localStorage
+      localStorage.setItem('selectedSubjectId', currentSubjectId);
 
       // Load students for grading and enrolled students display
       fetch(`/teacher/Manage/${currentSubjectId}/grading-students`, {
@@ -369,11 +385,16 @@
         .then(data => {
           if (data.success) {
             studentsData = data.students;
+            // Separate enrolled (incomplete and not done) and completed (done) students
+            enrolledStudentsData = [...new Map(studentsData.filter(student => !student.is_done).map(s => [s.id, s])).values()];
+            completedStudentsData = [...new Map(studentsData.filter(student => student.is_done).map(s => [s.id, s])).values()];
             // Populate enrolled students table
-            populateEnrolledStudentsTable(data.students);
+            populateEnrolledStudentsTable(enrolledStudentsData);
             enrolledStudentsDiv.style.display = 'block';
-            // Populate summary table
-            populateSummaryTable(data.students);
+            // Populate summary table with completed students (those marked as done)
+            populateSummaryTable(completedStudentsData);
+            // Update save buttons visibility
+            updateSaveButtons();
           } else {
             alert(data.message || 'Error loading students.');
           }
@@ -382,6 +403,11 @@
           console.error('Error loading students:', error);
           alert('Error loading students. Please check your authentication.');
         });
+    }
+
+    function isGradingComplete(student) {
+      const components = ['quiz', 'assignment', 'attendance_score', 'exam', 'performance'];
+      return components.every(comp => student[comp] !== null && student[`total_${comp}`] !== null);
     }
 
     document.getElementById('subject').addEventListener('change', loadSubjectDetails);
@@ -407,6 +433,7 @@
 
     function populateSummaryTable(students) {
       const tbody = document.querySelector('.summary-section tbody');
+      const term = document.getElementById('term').value;
       tbody.innerHTML = '';
       students.forEach(student => {
         // Calculate weighted scores
@@ -425,7 +452,7 @@
           <td>${examWeighted}</td>
           <td>${performanceWeighted}</td>
           <td><strong>${student.final_grade ? student.final_grade.toFixed(2) : '-'}</strong></td>
-          <td><button class="btn" onclick="saveFinalGrade('${student.id}')">Save</button></td>
+          <td><button class="btn save-btn" id="save-btn-${student.id}" style="display: ${student.is_done && term ? 'block' : 'none'};" onclick="saveFinalGrade('${student.id}')">Save</button></td>
         `;
         tbody.appendChild(row);
       });
@@ -457,6 +484,8 @@
     }
 
     function resetModalToGradingBreakdown() {
+      const student = studentsData.find(s => s.id == currentStudentId);
+      const isComplete = isGradingComplete(student);
       document.getElementById('modalTitle').textContent = 'Grading Breakdown';
       document.getElementById('modalBody').innerHTML = `
         <table>
@@ -489,6 +518,10 @@
             </tr>
           </tbody>
         </table>
+        <div style="text-align: center; margin-top: 10px;">
+          <button class="btn" id="saveBtn" onclick="saveAllComponents()">Save</button>
+          <button class="btn" id="doneBtn" onclick="markAsDone()" ${isComplete && !student.is_done ? '' : 'disabled'}>Done</button>
+        </div>
       `;
     }
 
@@ -517,20 +550,21 @@
           <tbody>
             <tr>
               <td>${student.name || 'N/A'}</td>
-              <td><input type="number" placeholder="Total" value="${student[`total_${component}`] || (component === 'quiz' || component === 'exam' ? '100' : '')}" /></td>
+              <td><input type="number" placeholder="Total" value="${student[`total_${component}`] || (component === 'quiz' || component === 'exam' || component === 'attendance_score' ? '100' : '')}" /></td>
               <td><input type="number" placeholder="Score" value="${student[component] || ''}" min="0" max="100" data-student-id="${student.id}" data-component="${component}" /></td>
               <td><button class="btn" onclick="saveScoreFromModal('${student.id}', '${component}', this)">Save</button></td>
             </tr>
           </tbody>
         </table>
+
       `;
     }
 
     function saveScoreFromModal(studentId, component, button) {
       const row = button.closest('tr');
       const inputs = row.querySelectorAll('input[type="number"]');
-      const total = inputs[0].value;
-      const score = inputs[1].value;
+      const total = inputs[0].value.trim() === '' ? null : inputs[0].value;
+      const score = inputs[1].value.trim() === '' ? null : inputs[1].value;
 
       fetch('/teacher/Manage/save-grading-component', {
         method: 'POST',
@@ -542,8 +576,8 @@
           subject_id: currentSubjectId,
           component: component,
           student_id: studentId,
-          score: score || null,
-          total: total || null
+          score: score,
+          total: total
         })
       })
       .then(response => response.json())
@@ -556,13 +590,61 @@
             student[component] = score;
             student[`total_${component}`] = total;
             student.final_grade = calculateFinalGrade(student);
-            populateSummaryTable(studentsData);
+            // Do not move to completed until Done is clicked
+            populateEnrolledStudentsTable(enrolledStudentsData);
+            const editedEnrolledStudents = enrolledStudentsData.filter(student => student.quiz !== null || student.assignment !== null || student.attendance_score !== null || student.exam !== null || student.performance !== null);
+            populateSummaryTable(editedEnrolledStudents);
           }
         } else {
           alert(data.message || 'Error saving score.');
         }
       })
       .catch(() => alert('Error saving score.'));
+    }
+
+    function saveAllComponents() {
+      // This function can be used to save all components at once if needed
+      alert('All components saved!');
+      resetModalToGradingBreakdown();
+    }
+
+    function markAsDone() {
+      const student = studentsData.find(s => s.id == currentStudentId);
+      if (!student) return;
+
+      // Send request to mark as done
+      fetch('/teacher/Manage/mark-as-done', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          subject_id: currentSubjectId,
+          student_id: currentStudentId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Student marked as done successfully!');
+          // Update local data
+          student.is_done = true;
+          // Move student from enrolled to completed
+          enrolledStudentsData = enrolledStudentsData.filter(s => s.id != currentStudentId);
+          if (!completedStudentsData.find(s => s.id == currentStudentId)) {
+            completedStudentsData.push(student);
+          }
+          // Update tables
+          populateEnrolledStudentsTable(enrolledStudentsData);
+          populateSummaryTable(completedStudentsData);
+          // Close modal
+          gradingModal.style.display = "none";
+        } else {
+          alert(data.message || 'Error marking as done.');
+        }
+      })
+      .catch(() => alert('Error marking as done.'));
     }
 
     function calculateFinalGrade(student) {
@@ -580,7 +662,25 @@
       return total;
     }
 
+    function updateSaveButtons() {
+      const term = document.getElementById('term').value;
+      const saveButtons = document.querySelectorAll('.save-btn');
+      saveButtons.forEach(btn => {
+        const studentId = btn.id.replace('save-btn-', '');
+        const student = studentsData.find(s => s.id == studentId);
+        btn.style.display = student && student.is_done && term ? 'block' : 'none';
+      });
+    }
+
+    document.getElementById('term').addEventListener('change', updateSaveButtons);
+
     function saveFinalGrade(studentId) {
+      const term = document.getElementById('term').value;
+      if (!term) {
+        alert('Please select a term first.');
+        return;
+      }
+
       const student = studentsData.find(s => s.id == studentId);
       if (!student || student.final_grade === null) {
         alert('Final grade is not calculated yet.');
@@ -596,13 +696,16 @@
         body: JSON.stringify({
           subject_id: currentSubjectId,
           student_id: studentId,
-          final_grade: student.final_grade
+          term: term,
+          grade: student.final_grade
         })
       })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
           alert('Final grade saved successfully!');
+          // Auto-refresh the summary table
+          loadSubjectDetails();
         } else {
           alert(data.message || 'Error saving final grade.');
         }

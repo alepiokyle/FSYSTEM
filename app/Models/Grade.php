@@ -32,6 +32,7 @@ class Grade extends Model
         'total_exam',
         'performance',
         'total_performance',
+        'is_done',
     ];
 
     public function student()

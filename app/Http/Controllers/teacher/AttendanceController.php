@@ -116,17 +116,18 @@ class AttendanceController extends Controller
                 ], 403);
             }
 
-            $students = $subject->students()->with(['profile.department'])->get()->map(function ($student) use ($subject) {
+            $students = $subject->students()->with(['profile.department'])->get()->unique('id')->map(function ($student) use ($subject) {
                 $profile = $student->profile;
                 if (!$profile) {
                     return null; // Skip students without profile
                 }
                 $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
 
-                // Fetch existing grade record
+                // Fetch existing grade record where is_done = 0 (enrolled)
                 $grade = Grade::where('student_id', $student->id)
                     ->where('subject_id', $subject->id)
                     ->where('teacher_id', Auth::guard('teacher')->id())
+                    ->where('is_done', 0)
                     ->first();
 
                 // Calculate attendance score (percentage of present days)
@@ -158,6 +159,7 @@ class AttendanceController extends Controller
                     'performance' => $grade ? $grade->performance : null,
                     'total_performance' => $grade ? $grade->total_performance : null,
                     'final_grade' => $grade ? $grade->term_grade : null,
+                    'is_done' => $grade ? $grade->is_done : false,
                 ];
             })->filter()->values(); // Remove null entries
 
@@ -391,6 +393,165 @@ class AttendanceController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load past records. Please try again. Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function markAsDone(Request $request)
+    {
+        $request->validate([
+            'subject_id' => 'required|exists:subjects,id',
+            'student_id' => 'required|exists:users,id',
+        ]);
+
+        $subjectId = $request->subject_id;
+        $studentId = $request->student_id;
+        $teacherId = Auth::guard('teacher')->id();
+
+        // Check if subject is assigned to teacher
+        $subject = Subject::findOrFail($subjectId);
+        if ($subject->teacher_id != $teacherId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized to save grades for this subject.'
+            ], 403);
+        }
+
+        try {
+            // Find the grade record
+            $grade = Grade::where('student_id', $studentId)
+                ->where('subject_id', $subjectId)
+                ->where('teacher_id', $teacherId)
+                ->first();
+
+            if (!$grade) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Grade record not found.'
+                ], 404);
+            }
+
+            // Recalculate final grade if all components are present
+            $components = ['quiz', 'assignment', 'attendance_score', 'exam', 'performance'];
+            $allPresent = true;
+            $finalGrade = 0;
+
+            foreach ($components as $comp) {
+                if ($grade->$comp === null || $grade->{"total_{$comp}"} === null) {
+                    $allPresent = false;
+                    break;
+                }
+                $percentage = ($grade->$comp / $grade->{"total_{$comp}"}) * 100;
+                $weight = in_array($comp, ['quiz', 'assignment', 'attendance_score']) ? 0.10 : ($comp === 'exam' ? 0.30 : 0.40);
+                $finalGrade += $percentage * $weight;
+            }
+
+            if ($allPresent) {
+                $grade->update([
+                    'term_grade' => round($finalGrade, 2),
+                    'remarks' => $finalGrade >= 75 ? 'Passed' : 'Failed',
+                    'is_done' => 1,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'All grading components must be completed before marking as done.'
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Student marked as done successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to mark as done: ' . $e->getMessage(), [
+                'subject_id' => $subjectId,
+                'student_id' => $studentId,
+                'teacher_id' => $teacherId,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to mark as done. Please try again.'
+            ], 500);
+        }
+    }
+
+    public function saveFinalGrade(Request $request)
+    {
+        $request->validate([
+            'subject_id' => 'required|exists:subjects,id',
+            'student_id' => 'required|exists:users,id',
+            'term' => 'required|in:prelim,midterm,semi-final,final,term-grade',
+            'grade' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $subjectId = $request->subject_id;
+        $studentId = $request->student_id;
+        $term = $request->term;
+        $grade = $request->grade;
+        $teacherId = Auth::guard('teacher')->id();
+
+        // Check if subject is assigned to teacher
+        $subject = Subject::findOrFail($subjectId);
+        if ($subject->teacher_id != $teacherId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized to save grades for this subject.'
+            ], 403);
+        }
+
+        try {
+            // Map term to column
+            $columnMap = [
+                'prelim' => 'prelim',
+                'midterm' => 'midterm',
+                'semi-final' => 'semi_final',
+                'final' => 'final',
+                'term-grade' => 'term_grade',
+            ];
+            $column = $columnMap[$term];
+
+            // Ensure grade record exists
+            $gradeRecord = Grade::firstOrCreate(
+                [
+                    'student_id' => $studentId,
+                    'subject_id' => $subjectId,
+                    'teacher_id' => $teacherId,
+                ],
+                [
+                    'status' => 'draft',
+                    'semester' => $subject->semester,
+                    'school_year' => $subject->school_year,
+                ]
+            );
+
+            // Update the specific term column
+            $gradeRecord->update([$column => round($grade, 2)]);
+
+            // If term-grade, update remarks
+            if ($term === 'term-grade') {
+                $remarks = $grade >= 75 ? 'Passed' : 'Failed';
+                $gradeRecord->update(['remarks' => $remarks]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Final grade saved successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to save final grade: ' . $e->getMessage(), [
+                'subject_id' => $subjectId,
+                'student_id' => $studentId,
+                'term' => $term,
+                'teacher_id' => $teacherId,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save final grade. Please try again.'
             ], 500);
         }
     }

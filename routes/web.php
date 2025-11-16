@@ -138,6 +138,8 @@ Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
         Route::get('/Manage/{subjectId}/subject-details', 'getSubjectDetails')->name('teacher.Manage.subject-details');
         Route::get('/Manage/{subjectId}/grading-students', 'getGradingStudents')->name('teacher.Manage.grading-students');
         Route::post('/Manage/save-grading-component', 'saveGradingComponent')->name('teacher.Manage.save-grading-component');
+        Route::post('/Manage/save-final-grade', 'saveFinalGrade')->name('teacher.Manage.save-final-grade');
+        Route::post('/Manage/mark-as-done', 'markAsDone')->name('teacher.Manage.mark-as-done');
     });
 
     Route::controller(App\Http\Controllers\teacher\TeacherController::class)->group(function () {

@@ -289,8 +289,9 @@
       <span class="close" onclick="closeComputeModal()">&times;</span>
 
       <div class="left">
-        <h3>Compute Term Grade</h3>
+        <h3 id="modalTitle">Compute Term Grade</h3>
         <form id="computeForm">
+          <input type="hidden" id="modalStudentId">
           <label>Prelim (20%)</label>
           <input type="number" id="prelim" min="0" max="100" required>
           <label>Midterm (30%)</label>
@@ -300,6 +301,7 @@
           <label>Final (30%)</label>
           <input type="number" id="final" min="0" max="100" required>
           <button type="submit">Compute</button>
+          <button type="button" class="btn btn-save" onclick="saveFromModal()">Save Grades</button>
         </form>
       </div>
 
@@ -356,11 +358,12 @@
               <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="midterm" value="${student.midterm ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
               <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="semi_final" value="${student.semi_final ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
               <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="final" value="${student.final ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
-              <td>${student.term_grade ?? '-'}</td>
-              <td>${student.remarks ?? '-'}</td>
+              <td>${student.term_grade ?? '—'}</td>
+              <td>${student.remarks ?? '—'}</td>
               <td>
                 <button class="btn btn-save" onclick="saveStudentGrades(${student.id})" ${isEditable ? '' : 'disabled'}>Save</button>
                 <button class="btn btn-edit" onclick="openEditModal(${student.id})" ${isEditable ? '' : 'disabled'}>Edit</button>
+                <button class="btn btn-compute" onclick="openComputeModal(${student.id})" ${isEditable ? '' : 'disabled'}>Grade</button>
               </td>
             `;
             tbody.appendChild(row);
@@ -438,11 +441,32 @@
     // ===== Compute Modal =====
     const computeModal = document.getElementById("computeModal");
 
-    function openComputeModal() { computeModal.style.display = "flex"; }
+    function openComputeModal(studentId = null) {
+      if (studentId) {
+        // Populate modal for specific student
+        document.getElementById('modalStudentId').value = studentId;
+        const studentName = document.querySelector(`tr:has([data-student-id="${studentId}"]) td:nth-child(2)`).textContent;
+        document.getElementById('modalTitle').textContent = `Grade for ${studentName}`;
+        // Populate inputs with existing grades
+        document.getElementById('prelim').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="prelim"]`).value || '';
+        document.getElementById('midterm').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="midterm"]`).value || '';
+        document.getElementById('semi').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="semi_final"]`).value || '';
+        document.getElementById('final').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="final"]`).value || '';
+      } else {
+        // General compute modal
+        document.getElementById('modalStudentId').value = '';
+        document.getElementById('modalTitle').textContent = 'Compute Term Grade';
+        document.getElementById("computeForm").reset();
+      }
+      computeModal.style.display = "flex";
+    }
+
     function closeComputeModal() {
       computeModal.style.display = "none";
       document.getElementById("computeResult").innerHTML = "";
       document.getElementById("computeForm").reset();
+      document.getElementById('modalStudentId').value = '';
+      document.getElementById('modalTitle').textContent = 'Compute Term Grade';
     }
 
     window.onclick = function(e) {
@@ -461,6 +485,42 @@
         <p>Final Grade: <b>${grade.toFixed(2)}</b><br>Remarks: <b>${remark}</b></p>
       `;
     });
+
+    // ===== Save Grades from Modal =====
+    function saveFromModal() {
+      const studentId = document.getElementById('modalStudentId').value;
+      if (!studentId) {
+        alert('No student selected.');
+        return;
+      }
+      const subjectId = document.getElementById('subject').value;
+      const grades = {
+        prelim: document.getElementById('prelim').value || 0,
+        midterm: document.getElementById('midterm').value || 0,
+        semi_final: document.getElementById('semi').value || 0,
+        final: document.getElementById('final').value || 0
+      };
+
+      fetch(`/teacher/Manages/${subjectId}/save-grades`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ grades: { [studentId]: grades } })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Grades saved successfully!');
+          closeComputeModal();
+          document.getElementById('subject').dispatchEvent(new Event('change'));
+        } else {
+          alert(data.error || 'Error saving grades.');
+        }
+      })
+      .catch(() => alert('Error saving grades.'));
+    }
   </script>
 </body>
 </html>
