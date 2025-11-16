@@ -136,50 +136,55 @@ class AttendanceController extends Controller
             }
 
             $students = $subject->students()->with(['profile.department'])->get()->unique('id')->map(function ($student) use ($subject, $teacherId) {
-                $profile = $student->profile;
-                if (!$profile) {
-                    return null; // Skip students without profile
+                try {
+                    $profile = $student->profile;
+                    if (!$profile) {
+                        return null; // Skip students without profile
+                    }
+                    $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
+
+                    // Fetch existing grade record where is_done = 0 (enrolled)
+                    $grade = Grade::where('student_id', $student->id)
+                        ->where('subject_id', $subject->id)
+                        ->where('teacher_id', $teacherId)
+                        ->where('is_done', 0)
+                        ->first();
+
+                    // Calculate attendance score (percentage of present days)
+                    $totalAttendanceDays = Attendance::where('student_id', $student->id)
+                        ->where('subject_id', $subject->id)
+                        ->count();
+
+                    $presentDays = Attendance::where('student_id', $student->id)
+                        ->where('subject_id', $subject->id)
+                        ->where('status', 'Present')
+                        ->count();
+
+                    $attendanceScore = $totalAttendanceDays > 0 ? ($presentDays / $totalAttendanceDays) * 100 : null;
+
+                    return [
+                        'id' => $student->id,
+                        'name' => $fullName,
+                        'student_id' => $profile->student_id,
+                        'department' => $profile->department ? $profile->department->name : 'N/A',
+                        'year_level' => $profile->year_level,
+                        'quiz' => $grade ? $grade->quiz : null,
+                        'total_quiz' => $grade ? $grade->total_quiz : null,
+                        'assignment' => $grade ? $grade->assignment : null,
+                        'total_assignment' => $grade ? $grade->total_assignment : null,
+                        'attendance_score' => $attendanceScore,
+                        'total_attendance_score' => $totalAttendanceDays > 0 ? 100 : null,
+                        'exam' => $grade ? $grade->exam : null,
+                        'total_exam' => $grade ? $grade->total_exam : null,
+                        'performance' => $grade ? $grade->performance : null,
+                        'total_performance' => $grade ? $grade->total_performance : null,
+                        'final_grade' => $grade ? $grade->term_grade : null,
+                        'is_done' => $grade ? $grade->is_done : false,
+                    ];
+                } catch (\Exception $e) {
+                    Log::error('Error processing student ' . $student->id . ' in getGradingStudents: ' . $e->getMessage());
+                    return null; // Skip problematic students
                 }
-                $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
-
-                // Fetch existing grade record where is_done = 0 (enrolled)
-                $grade = Grade::where('student_id', $student->id)
-                    ->where('subject_id', $subject->id)
-                    ->where('teacher_id', $teacherId)
-                    ->where('is_done', 0)
-                    ->first();
-
-                // Calculate attendance score (percentage of present days)
-                $totalAttendanceDays = Attendance::where('student_id', $student->id)
-                    ->where('subject_id', $subject->id)
-                    ->count();
-
-                $presentDays = Attendance::where('student_id', $student->id)
-                    ->where('subject_id', $subject->id)
-                    ->where('status', 'Present')
-                    ->count();
-
-                $attendanceScore = $totalAttendanceDays > 0 ? ($presentDays / $totalAttendanceDays) * 100 : null;
-
-                return [
-                    'id' => $student->id,
-                    'name' => $fullName,
-                    'student_id' => $profile->student_id,
-                    'department' => $profile->department ? $profile->department->name : 'N/A',
-                    'year_level' => $profile->year_level,
-                    'quiz' => $grade ? $grade->quiz : null,
-                    'total_quiz' => $grade ? $grade->total_quiz : null,
-                    'assignment' => $grade ? $grade->assignment : null,
-                    'total_assignment' => $grade ? $grade->total_assignment : null,
-                    'attendance_score' => $attendanceScore,
-                    'total_attendance_score' => $totalAttendanceDays > 0 ? 100 : null,
-                    'exam' => $grade ? $grade->exam : null,
-                    'total_exam' => $grade ? $grade->total_exam : null,
-                    'performance' => $grade ? $grade->performance : null,
-                    'total_performance' => $grade ? $grade->total_performance : null,
-                    'final_grade' => $grade ? $grade->term_grade : null,
-                    'is_done' => $grade ? $grade->is_done : false,
-                ];
             })->filter()->values(); // Remove null entries
 
             return response()->json([
