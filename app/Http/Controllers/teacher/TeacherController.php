@@ -13,9 +13,7 @@ class TeacherController extends Controller
     public function index()
     {
         $teacherId = Auth::guard('teacher')->id();
-        $subjects = Subject::where('teacher_id', $teacherId)
-            ->whereHas('students')
-            ->get();
+        $subjects = Subject::where('teacher_id', $teacherId)->get();
 
         return view('teacher.Manages.assessment', compact('subjects'));
     }
