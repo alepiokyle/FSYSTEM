@@ -62,6 +62,11 @@ class AttendanceController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Failed to load students: ' . $e->getMessage(), [
+                'subject_id' => $subjectId,
+                'teacher_id' => Auth::guard('teacher')->id(),
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load students. Please try again.'
