@@ -205,6 +205,122 @@
       margin-bottom: 15px;
       text-align: center;
     }
+
+    /* Calendar Styles */
+    #calendarContainer {
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    #calendarHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    #calendarHeader button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    #calendarHeader button:hover {
+      background: #0056b3;
+    }
+
+    #monthYear {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    #calendarDays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 5px;
+    }
+
+    #calendarDays div {
+      text-align: center;
+      font-weight: bold;
+      padding: 5px;
+    }
+
+    #calendarDates {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar-date {
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .calendar-date:hover {
+      background-color: #f0f0f0;
+    }
+
+    .calendar-date.selected {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .calendar-date.present {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .calendar-date.absent {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    .calendar-date.excused {
+      background-color: #6c757d;
+      color: #fff;
+    }
+
+    #attendanceButtons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .attendance-btn {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .attendance-btn.present {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .attendance-btn.absent {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    .attendance-btn.excused {
+      background-color: #6c757d;
+      color: #fff;
+    }
+
+    .attendance-btn.active {
+      border: 2px solid #000;
+    }
   </style>
 </head>
 
@@ -247,11 +363,7 @@
 
 
 
-      <label for="date">Select Date and Time</label>
-      <div style="display: flex; gap: 10px; align-items: center;">
-        <input type="date" id="date" style="flex: 1;" />
-        <input type="time" id="time" style="flex: 1;" />
-      </div>
+   
     </div>
   </div>
 
@@ -297,6 +409,38 @@
     </div>
   </div>
 
+  <!-- ================= ATTENDANCE RECORD MODAL ================= -->
+  <div id="attendanceRecordModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>Attendance Record</span>
+        <div id="attendanceButtons">
+          <button class="attendance-btn present" onclick="setAttendanceStatus('present')">Present</button>
+          <button class="attendance-btn absent" onclick="setAttendanceStatus('absent')">Absent</button>
+          <button class="attendance-btn excused" onclick="setAttendanceStatus('excused')">Excused</button>
+        </div>
+        <span class="close" id="closeAttendanceRecordModal">&times;</span>
+      </div>
+      <div id="calendarContainer">
+        <div id="calendarHeader">
+          <button id="prevMonth"><</button>
+          <span id="monthYear"></span>
+          <button id="nextMonth">></button>
+        </div>
+        <div id="calendarDays">
+          <div>Sun</div>
+          <div>Mon</div>
+          <div>Tue</div>
+          <div>Wed</div>
+          <div>Thu</div>
+          <div>Fri</div>
+          <div>Sat</div>
+        </div>
+        <div id="calendarDates"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= QUIZ–PERFORMANCE RESULTS TABLE ================= -->
   <div class="summary-section">
     <h3>Quiz–Performance Results Summary</h3>
@@ -336,6 +480,9 @@
     let enrolledStudentsData = [];
     let completedStudentsData = [];
     let currentStudentId = null;
+    let selectedDates = new Map(); // key: date string, value: status ('present', 'absent', 'excused')
+    let currentCalendarDate = new Date();
+    let currentAttendanceStatus = 'present'; // default status
 
     // Load saved subject on page load
     window.addEventListener('DOMContentLoaded', function() {
@@ -470,6 +617,18 @@
       }
     };
 
+    // Attendance Record modal handling
+    const attendanceRecordModal = document.getElementById('attendanceRecordModal');
+    const closeAttendanceRecordModal = document.getElementById('closeAttendanceRecordModal');
+    closeAttendanceRecordModal.onclick = () => {
+      attendanceRecordModal.style.display = "none";
+    };
+    window.onclick = e => {
+      if (e.target === attendanceRecordModal) {
+        attendanceRecordModal.style.display = "none";
+      }
+    };
+
     function openGradingModal(studentId) {
       currentStudentId = studentId;
       const student = studentsData.find(s => s.id == studentId);
@@ -536,6 +695,7 @@
       const modalBody = document.getElementById('modalBody');
       modalBody.innerHTML = `
         <button class="btn" onclick="resetModalToGradingBreakdown()">Back to Grading Breakdown</button>
+        <button class="btn" onclick="openAttendanceRecordModal()">Attendance Record</button>
         <table style="margin-top: 10px;">
           <thead>
             <tr>
@@ -710,6 +870,85 @@
       })
       .catch(() => alert('Error saving final grade.'));
     }
+
+    function openAttendanceRecordModal() {
+      attendanceRecordModal.style.display = "block";
+      setAttendanceStatus('present'); // Reset to default
+      renderCalendar();
+    }
+
+    function highlightDate(input) {
+      input.style.backgroundColor = "#e0f7fa"; // Light blue highlight
+      setTimeout(() => {
+        input.style.backgroundColor = ""; // Reset after a short time
+      }, 1000);
+    }
+
+    function renderCalendar() {
+      const monthYear = document.getElementById('monthYear');
+      const calendarDates = document.getElementById('calendarDates');
+
+      monthYear.textContent = currentCalendarDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+      calendarDates.innerHTML = '';
+
+      const firstDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth(), 1);
+      const lastDay = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 1, 0);
+      const startDate = new Date(firstDay);
+      startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+      for (let i = 0; i < 42; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'calendar-date';
+        dateDiv.textContent = date.getDate();
+
+        if (date.getMonth() !== currentCalendarDate.getMonth()) {
+          dateDiv.classList.add('other-month');
+        }
+
+        const dateKey = date.toDateString();
+        const status = selectedDates.get(dateKey);
+        if (status) {
+          dateDiv.classList.add(status);
+        }
+
+        dateDiv.onclick = () => selectDate(date);
+        calendarDates.appendChild(dateDiv);
+      }
+    }
+
+    function selectDate(date) {
+      const dateKey = date.toDateString();
+      const currentStatus = selectedDates.get(dateKey);
+      if (currentStatus === currentAttendanceStatus) {
+        selectedDates.delete(dateKey);
+      } else {
+        selectedDates.set(dateKey, currentAttendanceStatus);
+      }
+      renderCalendar();
+    }
+
+    function setAttendanceStatus(status) {
+      currentAttendanceStatus = status;
+      // Update button active states
+      document.querySelectorAll('.attendance-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`.attendance-btn.${status}`).classList.add('active');
+    }
+
+    document.getElementById('prevMonth').onclick = () => {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+      renderCalendar();
+    };
+
+    document.getElementById('nextMonth').onclick = () => {
+      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+      renderCalendar();
+    };
   </script>
 </body>
 </html>
