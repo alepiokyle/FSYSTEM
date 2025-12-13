@@ -69,7 +69,12 @@ class PostGradesController extends Controller
 
         $baseQuery = Grade::with(['student', 'subject', 'teacher'])->whereHas('subject.department', function($q) use ($departmentName) {
             $q->where('name', $departmentName);
-        })->where('status', 'approved');
+        });
+
+        // Only filter by approved status if no term is selected (for the table)
+        if (!$term) {
+            $baseQuery->where('status', 'approved');
+        }
 
         if ($schoolYear) {
             $baseQuery->where('school_year', $schoolYear);

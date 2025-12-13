@@ -597,7 +597,7 @@
           <td>${attendanceWeighted}</td>
           <td>${examWeighted}</td>
           <td>${performanceWeighted}</td>
-          <td><strong>${student.final_grade ? student.final_grade.toFixed(2) : '-'}</strong></td>
+          <td><strong>${student.final_grade ? parseFloat(student.final_grade).toFixed(2) : '-'}</strong></td>
           <td><button class="btn save-btn" id="save-btn-${student.id}" style="display: ${student.is_done && term ? 'block' : 'none'};" onclick="saveFinalGrade('${student.id}')">Save</button></td>
         `;
         tbody.appendChild(row);

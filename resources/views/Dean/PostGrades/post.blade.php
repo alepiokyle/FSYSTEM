@@ -203,6 +203,7 @@
                         <option value="midterm">Midterm</option>
                         <option value="semi-final">Semi-Final</option>
                         <option value="final">Final</option>
+                        <option value="term-grade">Term Grade</option>
                     </select>
                 </div>
                 <div class="table-responsive">

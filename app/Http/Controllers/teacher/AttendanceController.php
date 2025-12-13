@@ -145,11 +145,10 @@ class AttendanceController extends Controller
                     }
                     $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
 
-                    // Fetch existing grade record where is_done = 0 (enrolled)
+                    // Fetch existing grade record
                     $grade = Grade::where('student_id', $student->id)
                         ->where('subject_id', $subject->id)
                         ->where('teacher_id', $teacherId)
-                        ->where('is_done', 0)
                         ->first();
 
                     // Calculate attendance score (percentage of present days)
