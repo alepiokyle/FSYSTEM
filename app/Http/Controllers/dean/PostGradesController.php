@@ -48,6 +48,7 @@ class PostGradesController extends Controller
             'semester' => 'nullable|string',
             'subject_id' => 'nullable|integer',
             'teacher_id' => 'nullable|integer',
+            'term' => 'nullable|string|in:prelim,midterm,semi-final,final',
         ]);
 
         if ($validator->fails()) {
@@ -64,6 +65,7 @@ class PostGradesController extends Controller
         $semester = $request->input('semester');
         $subjectId = $request->input('subject_id');
         $teacherId = $request->input('teacher_id');
+        $term = $request->input('term');
 
         $baseQuery = Grade::with(['student', 'subject', 'teacher'])->whereHas('subject.department', function($q) use ($departmentName) {
             $q->where('name', $departmentName);
@@ -84,7 +86,33 @@ class PostGradesController extends Controller
 
         $grades = $baseQuery->get();
 
-        $mapGrade = function ($grade) {
+        $mapGrade = function ($grade) use ($term) {
+            $termGrade = null;
+            $remarks = $grade->remarks;
+
+            if ($term) {
+                // Map term to the corresponding field
+                $termFieldMap = [
+                    'prelim' => 'prelim',
+                    'midterm' => 'midterm',
+                    'semi-final' => 'semi_final',
+                    'final' => 'final',
+                ];
+
+                $field = $termFieldMap[$term] ?? null;
+                if ($field) {
+                    $termGrade = $grade->$field;
+                    // Adjust remarks based on term grade
+                    if ($termGrade !== null) {
+                        $remarks = $termGrade >= 75 ? 'Passed' : 'Failed';
+                    } else {
+                        $remarks = 'Incomplete';
+                    }
+                }
+            } else {
+                $termGrade = $grade->term_grade;
+            }
+
             return [
                 'id' => $grade->id,
                 'student_id' => $grade->student_id,
@@ -93,8 +121,8 @@ class PostGradesController extends Controller
                 'midterm' => $grade->midterm,
                 'semi_final' => $grade->semi_final,
                 'final' => $grade->final,
-                'term_grade' => $grade->term_grade,
-                'remarks' => $grade->remarks,
+                'term_grade' => $termGrade,
+                'remarks' => $remarks,
             ];
         };
 

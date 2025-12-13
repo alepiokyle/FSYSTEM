@@ -1,31 +1,22 @@
-# TODO: Fix Quiz-Performance Results Summary Page Issues
+# Task: Display Quiz–Performance Results Summary Data in Dean PostGrades Modal
 
-## Database Changes
-- [x] Add `is_done` column to `grades` table via migration
-- [x] Update Grade model to include `is_done` in fillable
+## Overview
+Implement functionality to display saved data from the "Quiz–Performance Results Summary" table in teacher/Manage section in the "Student Term Grades" modal in dean/PostGrades section for a specific term.
 
-## Controller Updates
-- [x] Modify `getGradingStudents` to filter enrolled students where `is_done = 0` and completed where `is_done = 1`
-- [x] Add new method `markAsDone` to set `is_done = 1` and update `term_grade`
-- [x] Ensure `saveGradingComponent` does not set `is_done` (only for Save button in modal)
-- [x] Update `saveFinalGrade` if needed for term-specific saving
+## Completed Tasks
+- [x] Analyzed the task requirements and existing code structure
+- [x] Identified relevant files: attendance.blade.php (teacher/Manage), post.blade.php (dean/PostGrades), PostGradesController.php
+- [x] Updated post.blade.php to add term select in the modal and simplified table to show Student ID, Name, Term Grade, Remarks
+- [x] Updated JavaScript in post.blade.php to load grades based on selected term
+- [x] Modified PostGradesController.php fetchGrades method to handle term parameter and filter grades accordingly
 
-## Blade Template Updates
-- [x] Ensure modal Save button calls `saveScoreFromModal` without moving student
-- [x] Ensure Done button calls new `markAsDone` endpoint
-- [x] Update summary table population logic
+## Pending Tasks
+- [ ] Test the implementation to ensure data displays correctly for each term
+- [ ] Verify that saved data from teacher/Manage appears in the modal after clicking "View Grades"
+- [ ] Check for any edge cases or errors in the implementation
 
-## JavaScript Updates
-- [x] Modify `saveScoreFromModal` to not move student to completed on Save
-- [x] Add function to call `markAsDone` on Done button click
-- [x] Update `loadSubjectDetails` to properly separate enrolled and completed based on `is_done`
-- [x] Ensure summary table only updates on Done or final grade save
-- [x] Fix refresh persistence by relying on backend filtering
-
-## Route Updates
-- [x] Add new route for `markAsDone` endpoint
-
-## Testing
-- [ ] Test Save: Updates components, student stays in edit section
-- [ ] Test Done: Moves student to summary, sets `is_done=1`, persists on refresh
-- [ ] Test filtering: Completed students not in enrolled list on refresh
+## Notes
+- The modal now filters grades by the selected term (prelim, midterm, semi-final, final)
+- When a term is selected, term_grade shows the value for that specific term
+- Remarks are adjusted based on the term grade (Passed/Failed/Incomplete)
+- If no term is selected, it shows a message to select a term

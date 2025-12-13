@@ -182,56 +182,43 @@
 
   <!-- ====== Filters ====== -->
 <div class="card">
-    <h4>🔍 Filter Grades</h4>
-    <div class="row">
-        <!-- Teacher -->
-        <div class="col-md-3 mb-3">
-            <label for="teacherFilter" class="form-label">Teacher Name</label>
-            <select id="teacherFilter" class="form-select" onchange="loadSubjectsByTeacher(this.value)">
-                <option value="">Select Teacher</option>
-                @foreach($teachers as $teacher)
-                    <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
-                @endforeach
-            </select>
-        </div>
+    <h4>🔍 View Term Grades</h4>
+    <button class="btn btn-primary" onclick="showGradesModal()">View Grades</button>
+</div>
 
-        <!-- Subject -->
-        <div class="col-md-4 mb-3">
-            <label for="subjectFilter" class="form-label">Subject Code</label>
-            <select id="subjectFilter" class="form-select">
-                <option value="">Select Subject</option>
-                @foreach($subjects as $subject)
-                    <option value="{{ $subject->id }}">{{ $subject->subject_code }} - {{ $subject->subject_name }}</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- School Year -->
-        <div class="col-md-3 mb-3">
-            <label for="schoolYearFilter" class="form-label">School Year</label>
-            <select id="schoolYearFilter" class="form-select">
-                <option value="">Select School Year</option>
-                @foreach($schoolYears as $schoolYear)
-                    <option value="{{ $schoolYear->schoolyear }}">{{ $schoolYear->schoolyear }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <!-- Semester -->
-        <div class="col-md-3 mb-3">
-            <label for="semesterFilter" class="form-label">Semester</label>
-            <select id="semesterFilter" class="form-select">
-                <option value="">Select Semester</option>
-                <option value="1st Semester">1st Semester</option>
-                <option value="2nd Semester">2nd Semester</option>
-            </select>
-        </div>
-
-        <!-- Filter Button -->
-        <div class="col-md-3 mb-3 d-flex align-items-end">
-            <button class="btn btn-filter w-100" onclick="loadApprovedGrades()">Filter</button>
+<!-- Modal for Student Term Grades -->
+<div class="modal fade" id="gradesModal" tabindex="-1" aria-labelledby="gradesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gradesModalLabel">Student Term Grades</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="modalTermSelect" class="form-label">Select Term</label>
+                    <select id="modalTermSelect" class="form-select">
+                        <option value="">-- Select Term --</option>
+                        <option value="prelim">Prelim</option>
+                        <option value="midterm">Midterm</option>
+                        <option value="semi-final">Semi-Final</option>
+                        <option value="final">Final</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Term Grade</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalGradesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -262,12 +249,7 @@
     <script>
         // Load approved grades
         function loadApprovedGrades() {
-            const teacherId = document.getElementById('teacherFilter').value;
-            const subjectId = document.getElementById('subjectFilter').value;
-            const schoolYear = document.getElementById('schoolYearFilter').value;
-            const semester = document.getElementById('semesterFilter').value;
-
-            let url = `/dean/PostGrades/fetch-grades?subject_id=${subjectId}&school_year=${schoolYear}&semester=${semester}&teacher_id=${teacherId}`;
+            let url = `/dean/PostGrades/fetch-grades`;
 
             fetch(url)
                 .then(res => res.json())
@@ -294,6 +276,46 @@
                 });
         }
 
+        // Show grades modal
+        function showGradesModal() {
+            // Show the modal first
+            const modal = new bootstrap.Modal(document.getElementById('gradesModal'));
+            modal.show();
+
+            // Load grades when term is selected
+            document.getElementById('modalTermSelect').addEventListener('change', loadModalGrades);
+            // Load initial grades if a term is selected
+            loadModalGrades();
+        }
+
+        // Load grades for the modal based on selected term
+        function loadModalGrades() {
+            const term = document.getElementById('modalTermSelect').value;
+            if (!term) {
+                document.querySelector('#modalGradesTableBody').innerHTML = '<tr><td colspan="4">Please select a term to view grades.</td></tr>';
+                return;
+            }
+
+            let url = `/dean/PostGrades/fetch-grades?term=${term}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const modalBody = document.querySelector('#modalGradesTableBody');
+                    modalBody.innerHTML = '';
+
+                    data.forEach(grade => {
+                        modalBody.innerHTML += `
+                            <tr>
+                                <td>${grade.student_id}</td>
+                                <td><strong>${grade.student_name}</strong></td>
+                                <td>${grade.term_grade}</td>
+                                <td>${grade.remarks}</td>
+                            </tr>`;
+                    });
+                });
+        }
+
         // Post grade
         function postGrade(gradeId) {
             fetch(`/dean/PostGrades/post`, {
@@ -309,27 +331,6 @@
                 alert(data.message);
                 loadApprovedGrades();
             });
-        }
-
-        // Load subjects by teacher
-        function loadSubjectsByTeacher(teacherId) {
-            const subjectSelect = document.getElementById('subjectFilter');
-            subjectSelect.innerHTML = '<option value="">Select Subject</option>';
-
-            if (!teacherId) {
-                return;
-            }
-
-            fetch(`/dean/ApproveGrades/subjects-by-teacher/${teacherId}`)
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(subject => {
-                        subjectSelect.innerHTML += `<option value="${subject.id}">${subject.subject_code} - ${subject.subject_name}</option>`;
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading subjects:', error);
-                });
         }
 
         // Load grades on page load
