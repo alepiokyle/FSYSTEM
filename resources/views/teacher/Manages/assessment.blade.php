@@ -381,6 +381,24 @@
       </select>
     </div>
 
+    <div class="card">
+      <label for="term">Select Term</label>
+      <select id="term">
+        <option value="">-- Select Term --</option>
+        <option value="prelim">Prelim</option>
+        <option value="midterm">Midterm</option>
+        <option value="semi">Semi</option>
+        <option value="finals">Finals</option>
+      </select>
+
+      <label for="semester">Select Semester</label>
+      <select id="semester">
+        <option value="">-- Select Semester --</option>
+        <option value="first">First Semester</option>
+        <option value="second">Second Semester</option>
+      </select>
+    </div>
+
  <div class="card">
   <h3 style="margin-bottom: 10px;">Student Grades</h3>
   <div class="table-responsive">
@@ -460,6 +478,20 @@
         <h3 id="modalTitle">Compute Term Grade</h3>
         <form id="computeForm">
           <input type="hidden" id="modalStudentId">
+          <label for="modalTerm">Term</label>
+          <select id="modalTerm" required>
+            <option value="">-- Select Term --</option>
+            <option value="prelim">Prelim</option>
+            <option value="midterm">Midterm</option>
+            <option value="semi">Semi</option>
+            <option value="finals">Finals</option>
+          </select>
+          <label for="modalSemester">Semester</label>
+          <select id="modalSemester" required>
+            <option value="">-- Select Semester --</option>
+            <option value="first">First Semester</option>
+            <option value="second">Second Semester</option>
+          </select>
           <label>Prelim (20%)</label>
           <input type="number" id="prelim" min="0" max="100" required>
           <label>Midterm (30%)</label>
@@ -469,7 +501,7 @@
           <label>Final (30%)</label>
           <input type="number" id="final" min="0" max="100" required>
           <button type="submit">Compute</button>
-          <button type="button" class="btn btn-save" onclick="saveFromModal()">Save Grades</button>
+          <button type="button" class="btn btn-save" onclick="saveFromModal()">Save Final Grade</button>
         </form>
       </div>
 
@@ -507,13 +539,25 @@
     }
 
     // ===== Load Students =====
-    document.getElementById('subject').addEventListener('change', function() {
-      const subjectId = this.value;
+    document.getElementById('subject').addEventListener('change', loadStudents);
+    document.getElementById('term').addEventListener('change', loadStudents);
+    document.getElementById('semester').addEventListener('change', loadStudents);
+
+    function loadStudents() {
+      const subjectId = document.getElementById('subject').value;
+      const term = document.getElementById('term').value;
+      const semester = document.getElementById('semester').value;
       const tbody = document.getElementById('studentsTableBody');
       tbody.innerHTML = '';
       if (!subjectId) return;
 
-      fetch(`/teacher/Manages/${subjectId}/students`)
+      let url = `/teacher/Manages/${subjectId}/students`;
+      const params = new URLSearchParams();
+      if (term) params.append('term', term);
+      if (semester) params.append('semester', semester);
+      if (params.toString()) url += '?' + params.toString();
+
+      fetch(url)
         .then(response => response.json())
         .then(data => {
           data.forEach(student => {
@@ -526,7 +570,7 @@
   <td>${student.midterm ?? '—'}</td>
   <td>${student.semi_final ?? '—'}</td>
   <td>${student.final ?? '—'}</td>
-  <td>${student.term_grade ?? '—'}</td>
+          <td>${student.term_grade ?? '—'}</td>
   <td>${student.remarks ?? '—'}</td>
   <td>
     <button class="btn btn-compute" onclick="openComputeModal(${student.id})">Grade</button>
@@ -537,7 +581,7 @@
           });
         })
         .catch(() => alert('Error loading students.'));
-    });
+    }
 
     // ===== Save Grades =====
     function saveStudentGrades(studentId) {
@@ -609,6 +653,10 @@
     const computeModal = document.getElementById("computeModal");
 
     function openComputeModal(studentId = null) {
+      // Set modal term and semester to match page selectors
+      document.getElementById('modalTerm').value = document.getElementById('term').value;
+      document.getElementById('modalSemester').value = document.getElementById('semester').value;
+
       if (studentId) {
         // Populate modal for specific student
         document.getElementById('modalStudentId').value = studentId;
@@ -642,6 +690,14 @@
 
     document.getElementById("computeForm").addEventListener("submit", function(e) {
       e.preventDefault();
+      const term = document.getElementById("modalTerm").value;
+      const semester = document.getElementById("modalSemester").value;
+
+      if (!term || !semester) {
+        alert('Please select both Term and Semester.');
+        return;
+      }
+
       const prelim = parseFloat(document.getElementById("prelim").value);
       const midterm = parseFloat(document.getElementById("midterm").value);
       const semi = parseFloat(document.getElementById("semi").value);
@@ -653,40 +709,51 @@
       `;
     });
 
-    // ===== Save Grades from Modal =====
+    // ===== Save Final Grade from Modal =====
     function saveFromModal() {
       const studentId = document.getElementById('modalStudentId').value;
+      const term = document.getElementById('modalTerm').value;
+      const semester = document.getElementById('modalSemester').value;
       if (!studentId) {
         alert('No student selected.');
         return;
       }
+      if (!term || !semester) {
+        alert('Please select both Term and Semester.');
+        return;
+      }
       const subjectId = document.getElementById('subject').value;
-      const grades = {
-        prelim: document.getElementById('prelim').value || 0,
-        midterm: document.getElementById('midterm').value || 0,
-        semi_final: document.getElementById('semi').value || 0,
-        final: document.getElementById('final').value || 0
-      };
+      const prelim = parseFloat(document.getElementById('prelim').value) || 0;
+      const midterm = parseFloat(document.getElementById('midterm').value) || 0;
+      const semi = parseFloat(document.getElementById('semi').value) || 0;
+      const final = parseFloat(document.getElementById('final').value) || 0;
+      const finalGrade = (prelim * 0.2) + (midterm * 0.3) + (semi * 0.2) + (final * 0.3);
 
-      fetch(`/teacher/Manages/${subjectId}/save-grades`, {
+      fetch(`/teacher/Manages/${subjectId}/save-final-grade-from-summary`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ grades: { [studentId]: grades } })
+        body: JSON.stringify({
+          student_id: studentId,
+          term: term,
+          semester: semester,
+          final_grade: finalGrade.toFixed(2)
+        })
       })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert('Grades saved successfully!');
+          alert('Final grade saved successfully and displayed in the table!');
           closeComputeModal();
-          document.getElementById('subject').dispatchEvent(new Event('change'));
+          // Reload students to show updated term grade
+          loadStudents();
         } else {
-          alert(data.error || 'Error saving grades.');
+          alert(data.message || 'Error saving final grade.');
         }
       })
-      .catch(() => alert('Error saving grades.'));
+      .catch(() => alert('Error saving final grade.'));
     }
     
     function computeFinalGrade(studentId) {

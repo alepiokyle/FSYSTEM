@@ -551,12 +551,14 @@ class AttendanceController extends Controller
             'subject_id' => 'required|exists:subjects,id',
             'student_id' => 'required|exists:users,id',
             'term' => 'required|in:prelim,midterm,semi-final,final,term-grade',
+            'semester' => 'required|in:first,second',
             'grade' => 'required|numeric|min:0|max:100',
         ]);
 
         $subjectId = $request->subject_id;
         $studentId = $request->student_id;
         $term = $request->term;
+        $semester = $request->semester;
         $grade = $request->grade;
         $teacherId = Auth::guard('teacher')->id();
 

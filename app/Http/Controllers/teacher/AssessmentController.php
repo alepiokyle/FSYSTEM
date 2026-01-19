@@ -56,6 +56,21 @@ class AssessmentController extends Controller
                 ->where('teacher_id', $teacherId)
                 ->first();
 
+            // Calculate final grade from components if available
+            $finalGrade = null;
+            if ($grade && $grade->quiz !== null && $grade->total_quiz !== null &&
+                $grade->assignment !== null && $grade->total_assignment !== null &&
+                $grade->attendance_score !== null && $grade->total_attendance_score !== null &&
+                $grade->exam !== null && $grade->total_exam !== null &&
+                $grade->performance !== null && $grade->total_performance !== null) {
+                $quizWeighted = (($grade->quiz / $grade->total_quiz) * 100) * 0.1;
+                $assignmentWeighted = (($grade->assignment / $grade->total_assignment) * 100) * 0.1;
+                $attendanceWeighted = (($grade->attendance_score / $grade->total_attendance_score) * 100) * 0.1;
+                $examWeighted = (($grade->exam / $grade->total_exam) * 100) * 0.3;
+                $performanceWeighted = (($grade->performance / $grade->total_performance) * 100) * 0.4;
+                $finalGrade = $quizWeighted + $assignmentWeighted + $attendanceWeighted + $examWeighted + $performanceWeighted;
+            }
+
             return [
                 'id' => $student->id,
                 'name' => $student->name,
@@ -64,6 +79,7 @@ class AssessmentController extends Controller
                 'semi_final' => $grade ? $grade->semi_final : null,
                 'final' => $grade ? $grade->final : null,
                 'term_grade' => $grade ? $grade->term_grade : null,
+                'final_grade' => $finalGrade,
                 'remarks' => $grade ? $grade->remarks : '-',
                 'status' => $grade ? $grade->status : 'draft',
             ];
@@ -180,4 +196,6 @@ class AssessmentController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Grades submitted successfully to the Dean']);
     }
+
+
 }

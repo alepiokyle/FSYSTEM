@@ -1,22 +1,13 @@
-# Task: Display Quiz–Performance Results Summary Data in Dean PostGrades Modal
+# TODO: Implement Final Grade Calculation Based on Term and Semester Selection
 
-## Overview
-Implement functionality to display saved data from the "Quiz–Performance Results Summary" table in teacher/Manage section in the "Student Term Grades" modal in dean/PostGrades section for a specific term.
+## Tasks
+- [x] Add Term and Semester selectors to assessment.blade.php page
+- [x] Update the "Term-Based Grading Computation" modal to include Term and Semester selection
+- [x] Modify JavaScript to send term and semester data when computing/saving grades
+- [x] Update the controller to handle term and semester in the grade calculation and saving process
+- [x] Ensure the computed final grade displays in the Term Grade column after clicking Done
+- [x] Fix "Failed to save final grade. Please try again" error by adding missing semester validation and saveFinalGradeFromSummary method
 
-## Completed Tasks
-- [x] Analyzed the task requirements and existing code structure
-- [x] Identified relevant files: attendance.blade.php (teacher/Manage), post.blade.php (dean/PostGrades), PostGradesController.php
-- [x] Updated post.blade.php to add term select in the modal and simplified table to show Student ID, Name, Term Grade, Remarks
-- [x] Updated JavaScript in post.blade.php to load grades based on selected term
-- [x] Modified PostGradesController.php fetchGrades method to handle term parameter and filter grades accordingly
-
-## Pending Tasks
-- [ ] Test the implementation to ensure data displays correctly for each term
-- [ ] Verify that saved data from teacher/Manage appears in the modal after clicking "View Grades"
-- [ ] Check for any edge cases or errors in the implementation
-
-## Notes
-- The modal now filters grades by the selected term (prelim, midterm, semi-final, final)
-- When a term is selected, term_grade shows the value for that specific term
-- Remarks are adjusted based on the term grade (Passed/Failed/Incomplete)
-- If no term is selected, it shows a message to select a term
+## Files to Edit
+- [x] resources/views/teacher/Manages/assessment.blade.php
+- [x] app/Http/Controllers/teacher/TeacherController.php

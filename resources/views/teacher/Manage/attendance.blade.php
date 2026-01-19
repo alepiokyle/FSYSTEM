@@ -1,4 +1,4 @@
-<x-teacher-component>
+m<x-teacher-component>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -829,36 +829,60 @@
             <td>
                 <strong>${student.final_grade ? parseFloat(student.final_grade).toFixed(2) : '-'}</strong>
                 <br>
-                <button class="btn done-btn" onclick="markStudentDone('${student.id}')">Done</button>
+                <button class="btn done-btn" onclick="saveFinalGrade('${student.id}')">Save</button>
             </td>
         `;
         tbody.appendChild(row);
     });
 }
 
-function markStudentDone(studentId) {
+function saveFinalGrade(studentId) {
     const student = studentsData.find(s => s.id == studentId);
     if (!student) return;
 
-    fetch('/teacher/Manage/mark-as-done', {
+    if (!currentSubjectId) {
+        alert('Please select a subject first.');
+        return;
+    }
+
+    const term = document.getElementById('term').value;
+    const semester = document.getElementById('semester').value;
+
+    if (!term || !semester) {
+        alert('Please select both a term and a semester before saving.');
+        return;
+    }
+
+    if (!student.final_grade) {
+        alert('Final grade is not calculated yet.');
+        return;
+    }
+
+    // Save the final grade to the Manages section
+    fetch(`/teacher/Manages/${currentSubjectId}/save-final-grade-from-summary`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ subject_id: currentSubjectId, student_id: studentId })
+        body: JSON.stringify({
+            student_id: studentId,
+            term: term,
+            semester: semester,
+            final_grade: student.final_grade
+        })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Student marked as done!');
+            alert('Final grade saved to Student Grades and will display the specific term!');
             student.is_done = true;
             populateSummaryTable(studentsData); // refresh table
         } else {
-            alert(data.message || 'Error marking as done.');
+            alert(data.message || 'Error saving grade to Student Grades.');
         }
     })
-    .catch(() => alert('Error marking as done.'));
+    .catch(() => alert('Error saving grade to Student Grades.'));
 }
 
     // Grading modal handling

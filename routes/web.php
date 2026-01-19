@@ -149,6 +149,7 @@ Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
         Route::get('/Manages/{subjectId}/students', 'getStudents')->name('teacher.Manages.students');
         Route::post('/Manages/{subjectId}/save-grades', 'saveGrades')->name('teacher.Manages.save-grades');
         Route::post('/Manages/{subjectId}/submit-grades', 'submitGrades')->name('teacher.Manages.submit-grades');
+        Route::post('/Manages/{subjectId}/save-final-grade-from-summary', 'saveFinalGradeFromSummary')->name('teacher.Manages.save-final-grade-from-summary');
     });
 
     Route::controller(App\Http\Controllers\teacher\GradesController::class)->group(function () {
