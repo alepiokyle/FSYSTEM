@@ -1,4 +1,4 @@
-<x-student-component>
+<x-student-components>
     <div class="container mt-4">
         <h3 class="page-header mb-4">🔔 Notifications</h3>
 
@@ -34,4 +34,4 @@
             @endforelse
         </div>
     </div>
-</x-student-component>
+</x-student-components>

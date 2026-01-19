@@ -1,4 +1,4 @@
-<x-student-component>
+<x-student-components>
   <!-- Page Header -->
   <div class="page-header mb-4">
     <div class="page-block">
@@ -67,21 +67,6 @@
       </div>
     </div>
 
-    <!-- Section -->
-    <div class="col-md-6 col-xl-3 d-flex">
-      <div class="card shadow-sm border-0 rounded-3 hover-card flex-fill">
-        <div class="card-body text-center">
-          <h6 class="mb-2 text-muted">Section</h6>
-          <h4 class="mb-3 fw-bold">
-            BSIT 3A 
-            <span class="badge bg-light-danger border border-danger ms-2">
-              <i class="ti ti-users"></i>
-            </span>
-          </h4>
-          <p class="mb-0 text-muted small">Your assigned class section</p>
-        </div>
-      </div>
-    </div>
 
   </div>
 
@@ -95,4 +80,4 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.15);
     }
   </style>
-</x-student-component>
+</x-student-components>

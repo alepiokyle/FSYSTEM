@@ -1,4 +1,4 @@
-<x-student-component>
+<x-student-components>
     <style>
         x-student-component {
             background: linear-gradient(to right, #f0f4f8, #ffffff);
@@ -147,4 +147,4 @@
 
 
     </script>
-</x-student-component>
+</x-student-components>

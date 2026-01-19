@@ -1,4 +1,4 @@
-<x-student-component>
+<x-student-components>
     <style>
         /* Mobile responsiveness */
         @media (max-width: 768px) {
@@ -123,4 +123,4 @@
             </div>
         </div>
     </div>
-</x-student-component>
+</x-student-components>

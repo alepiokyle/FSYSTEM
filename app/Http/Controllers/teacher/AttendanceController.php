@@ -20,7 +20,19 @@ class AttendanceController extends Controller
             ->whereHas('students')
             ->get();
 
-        return view('teacher.Manage.attendance', compact('assignedSubjects'));
+        $students = []; // Initialize empty array to prevent undefined variable error
+
+        return view('teacher.Manage.attendance', compact('assignedSubjects', 'students'));
+    }
+
+    public function grading()
+    {
+        $teacherId = Auth::guard('teacher')->id();
+        $assignedSubjects = Subject::where('teacher_id', $teacherId)
+            ->whereHas('students')
+            ->get();
+
+        return view('teacher.grading', compact('assignedSubjects'));
     }
 
     public function getStudents(Request $request, $subjectId)
@@ -110,7 +122,7 @@ class AttendanceController extends Controller
         }
     }
 
-    public function getGradingStudents($subjectId)
+    public function getGradingStudents(Request $request, $subjectId)
     {
         try {
             $teacherId = Auth::guard('teacher')->id();
@@ -137,7 +149,10 @@ class AttendanceController extends Controller
                 ], 403);
             }
 
-            $students = $subject->students()->with(['profile.department'])->get()->unique('id')->map(function ($student) use ($subject, $teacherId) {
+            $term = $request->query('term');
+            $semester = $request->query('semester');
+
+            $students = $subject->students()->with(['profile.department'])->get()->unique('id')->map(function ($student) use ($subject, $teacherId, $term, $semester) {
                 try {
                     $profile = $student->profile;
                     if (!$profile) {
@@ -146,10 +161,16 @@ class AttendanceController extends Controller
                     $fullName = trim($profile->first_name . ' ' . ($profile->middle_name ? $profile->middle_name . ' ' : '') . $profile->last_name . ($profile->suffix ? ' ' . $profile->suffix : ''));
 
                     // Fetch existing grade record
-                    $grade = Grade::where('student_id', $student->id)
+                    $gradeQuery = Grade::where('student_id', $student->id)
                         ->where('subject_id', $subject->id)
-                        ->where('teacher_id', $teacherId)
-                        ->first();
+                        ->where('teacher_id', $teacherId);
+                    if ($term) {
+                        $gradeQuery->where('term', $term);
+                    }
+                    if ($semester) {
+                        $gradeQuery->where('semester', $semester);
+                    }
+                    $grade = $gradeQuery->first();
 
                     // Calculate attendance score (percentage of present days)
                     $totalAttendanceDays = Attendance::where('student_id', $student->id)
@@ -214,6 +235,8 @@ class AttendanceController extends Controller
             'student_id' => 'required|exists:users,id',
             'score' => 'nullable|numeric|min:0|max:100',
             'total' => 'nullable|numeric|min:1',
+            'term' => 'nullable|in:prelim,midterm,semi,finals',
+            'semester' => 'nullable|in:first,second',
         ]);
 
         $subjectId = $request->subject_id;
@@ -221,6 +244,8 @@ class AttendanceController extends Controller
         $studentId = $request->student_id;
         $score = $request->score;
         $total = $request->total;
+        $term = $request->term;
+        $semester = $request->semester;
         $teacherId = Auth::guard('teacher')->id();
 
         // Check if subject is assigned to teacher
@@ -232,26 +257,38 @@ class AttendanceController extends Controller
             ], 403);
         }
 
+        if (!$semester) {
+            $semester = $subject->semester;
+        }
+
         try {
-            // Ensure grade record exists
+            // Ensure grade record exists per term and semester
             $grade = Grade::firstOrCreate(
                 [
                     'student_id' => $studentId,
                     'subject_id' => $subjectId,
                     'teacher_id' => $teacherId,
+                    'term' => $term,
+                    'semester' => $semester,
                 ],
                 [
                     'status' => 'draft',
-                    'semester' => $subject->semester,
                     'school_year' => $subject->school_year,
                 ]
             );
 
-            // Update the specific component
-            $grade->update([
+            // Update the specific component and term/semester if provided
+            $updateData = [
                 $component => $score,
                 "total_{$component}" => $total,
-            ]);
+            ];
+            if ($term) {
+                $updateData['term'] = $term;
+            }
+            if ($semester) {
+                $updateData['semester'] = $semester;
+            }
+            $grade->update($updateData);
 
             // Recalculate final grade if all components are present
             $components = ['quiz', 'assignment', 'attendance_score', 'exam', 'performance'];
@@ -259,7 +296,7 @@ class AttendanceController extends Controller
             $finalGrade = 0;
 
             foreach ($components as $comp) {
-                if ($grade->$comp === null || $grade->{"total_{$comp}"} === null) {
+                if ($grade->$comp === null || $grade->{"total_{$comp}"} === null || $grade->{"total_{$comp}"} == 0) {
                     $allPresent = false;
                     break;
                 }
@@ -543,16 +580,17 @@ class AttendanceController extends Controller
             ];
             $column = $columnMap[$term];
 
-            // Ensure grade record exists
+            // Ensure grade record exists per term and semester
             $gradeRecord = Grade::firstOrCreate(
                 [
                     'student_id' => $studentId,
                     'subject_id' => $subjectId,
                     'teacher_id' => $teacherId,
+                    'term' => $term,
+                    'semester' => $semester,
                 ],
                 [
                     'status' => 'draft',
-                    'semester' => $subject->semester,
                     'school_year' => $subject->school_year,
                 ]
             );

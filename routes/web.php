@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -140,6 +141,7 @@ Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
         Route::post('/Manage/save-grading-component', 'saveGradingComponent')->name('teacher.Manage.save-grading-component');
         Route::post('/Manage/save-final-grade', 'saveFinalGrade')->name('teacher.Manage.save-final-grade');
         Route::post('/Manage/mark-as-done', 'markAsDone')->name('teacher.Manage.mark-as-done');
+        Route::get('/grading', 'grading')->name('teacher.grading');
     });
 
     Route::controller(App\Http\Controllers\teacher\TeacherController::class)->group(function () {
@@ -158,7 +160,7 @@ Route::prefix('teacher')->middleware('auth:teacher')->group(function () {
 
 // Student
 Route::prefix('student')->middleware('auth:web')->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\student\studentDashboardController::class, 'index'])->name('student.studentdashboard');
+    Route::get('/dashboard', [App\Http\Controllers\Student\StudentDashboardController::class, 'index'])->name('student.studentdashboard');
 
     Route::controller(App\Http\Controllers\Student\GradesController::class)->group(function () {
         Route::get('/grades', 'index')->name('student.grades');
@@ -166,15 +168,15 @@ Route::prefix('student')->middleware('auth:web')->group(function () {
     });
 });
 
-Route::controller(App\Http\Controllers\student\SubjectController::class)->group(function () {
+Route::controller(App\Http\Controllers\Student\SubjectController::class)->group(function () {
     Route::get('/Subject', 'index')->name('student.Subject');
 });
 
-Route::controller(App\Http\Controllers\student\NotifController::class)->group(function () {
+Route::controller(App\Http\Controllers\Student\NotifController::class)->group(function () {
     Route::get('/Notif', 'index')->name('student.Notif');
 });
 
-Route::middleware('auth:web')->controller(App\Http\Controllers\student\SectionController::class)->group(function () {
+Route::middleware('auth:web')->controller(App\Http\Controllers\Student\SectionController::class)->group(function () {
     Route::get('/Section', 'index')->name('student.Section');
     Route::post('/upload-profile-picture', 'uploadProfilePicture')->name('student.updateProfile');
 });

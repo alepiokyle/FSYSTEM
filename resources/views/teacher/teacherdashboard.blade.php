@@ -1,187 +1,133 @@
 <x-teacher-component>
     <style>
-        /* ====== Background & Page ====== */
-        x-teacher-component {
-            background: linear-gradient(to right, #f7f9fc, #ffffff);
-            min-height: 100vh;
-            padding: 20px 30px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* ====== Global Page Reset ====== */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            overflow-x: hidden;
+            animation: fadeIn 1s ease-in;
+        }
+
+        /* ====== Animated Background (SAME AS ADMIN) ====== */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #f3f7fd, #e3f2fd, #fce4ec, #f1f8e9);
+            background-size: 400% 400%;
+            z-index: -1;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ====== Page Header ====== */
-        .page-header { margin-bottom: 25px; }
-        .page-header-title h5 { font-weight: 700; font-size: 1.8rem; color: #222; }
-        .breadcrumb { padding: 0; margin-top: 5px; background: transparent; font-size: 0.9rem; }
-        .breadcrumb-item a { text-decoration: none; color: #555; }
-        .breadcrumb-item a:hover { text-decoration: underline; }
-
-        /* ====== Dashboard Cards ====== */
-        .row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 25px; }
-        .card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            flex: 1;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
+        .page-header-title h5 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #1e3a8a;
         }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .card h6 { font-weight: 600; color: #555; margin-bottom: 5px; font-size: 0.95rem; }
-        .card h4 { font-weight: 700; color: #333; display: flex; align-items: center; justify-content: space-between; font-size: 1.4rem; }
-        .card p { font-size: 0.85rem; color: #777; margin-top: 5px; }
+
+        .breadcrumb {
+            padding: 0;
+            margin-top: 5px;
+            background: transparent;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-item a {
+            text-decoration: none;
+            color: #1976d2;
+        }
+
+        .breadcrumb-item a:hover {
+            text-decoration: underline;
+            color: #0d47a1;
+        }
+
+        /* ====== Cards ====== */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .col-md-6.col-xl-3 {
+            display: flex;
+            flex: 1;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            animation: fadeIn 1s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .card h6 {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .card h4 {
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            padding: 0.35em 0.6em;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
 
         /* Badge Colors */
-        .badge { font-size: 0.8rem; padding: 0.35em 0.6em; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
         .bg-light-primary { background-color: #e1f0ff; color: #0d6efd; }
         .bg-light-success { background-color: #e6f4ea; color: #198754; }
         .bg-light-warning { background-color: #fff4e5; color: #fd7e14; }
-        .bg-light-danger { background-color: #fde2e2; color: #dc3545; }
 
-        /* ====== Table ====== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 15px;
-            font-size: 0.875rem;
+        .card p {
+            color: #777;
+            font-size: 0.75rem;
+            margin-top: 8px;
         }
-        thead { background-color: #f8f9fa; }
-        th, td { padding: 10px 12px; text-align: left; color: #333; }
-        tbody tr { transition: background 0.2s; }
-        tbody tr:hover { background-color: #f1f3f6; }
 
-        /* ====== Quick Action Buttons ====== */
-        .quick-actions { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 20px; }
-        .quick-actions .btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 600;
-            text-decoration: none;
-            color: #fff;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .btn-primary { background-color: #0d6efd; }
-        .btn-primary:hover { background-color: #0b5ed7; transform: translateY(-2px); }
-        .btn-success { background-color: #198754; }
-        .btn-success:hover { background-color: #157347; transform: translateY(-2px); }
-        .btn-warning { background-color: #fd7e14; }
-        .btn-warning:hover { background-color: #e36d0f; transform: translateY(-2px); }
-        .btn-danger { background-color: #dc3545; }
-        .btn-danger:hover { background-color: #b02a37; transform: translateY(-2px); }
-
-        /* Mobile Responsiveness */
+        /* Responsive */
         @media (max-width: 768px) {
-            x-teacher-component {
-                padding: 16px;
-            }
-
-            .page-header {
-                margin-bottom: 20px;
-            }
-
-            .page-header-title h5 {
-                font-size: 1.5rem;
-            }
-
-            .breadcrumb {
-                font-size: 14px;
-            }
-
-            .row {
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            .card {
-                padding: 16px;
-                border-radius: 8px;
-            }
-
-            .card h6 {
-                font-size: 0.9rem;
-                margin-bottom: 8px;
-            }
-
-            .card h4 {
-                font-size: 1.2rem;
-            }
-
-            .card p {
-                font-size: 0.8rem;
-            }
-
-            .badge {
-                font-size: 0.75rem;
-                padding: 0.3em 0.5em;
-            }
-
-            table {
-                font-size: 14px;
-            }
-
-            th, td {
-                padding: 8px 4px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .quick-actions {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .quick-actions .btn {
-                padding: 14px;
-                font-size: 16px; /* Prevent zoom on iOS */
-            }
-
-            /* Stack table on very small screens */
-            @media (max-width: 480px) {
-                table {
-                    display: block;
-                    border: none;
-                }
-
-                thead {
-                    display: none;
-                }
-
-                tbody,
-                tr,
-                td {
-                    display: block;
-                    width: 100%;
-                }
-
-                tr {
-                    border: 1px solid #e9ecef;
-                    border-radius: 8px;
-                    margin-bottom: 12px;
-                    padding: 12px;
-                    background: #fff;
-                }
-
-                td {
-                    border: none;
-                    padding: 4px 0;
-                    text-align: left;
-                }
-
-                td:before {
-                    content: attr(data-label) ": ";
-                    font-weight: bold;
-                    display: inline-block;
-                    min-width: 80px;
-                    color: #666;
-                }
+            .col-md-6.col-xl-3 {
+                flex: 0 0 100%;
             }
         }
     </style>
+
 
     <!-- ====== Page Header ====== -->
     <div class="page-header">
@@ -216,40 +162,7 @@
         </div>
     </div>
 
-    <!-- ====== Recent Activity Table ====== -->
-    <div class="card">
-        <h6>Recent Activities</h6>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Activity</th>
-                    <th>Subject</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td data-label="Date">2025-08-28</td>
-                    <td data-label="Activity">Graded Quiz 1</td>
-                    <td data-label="Subject">Database Management</td>
-                    <td data-label="Status"><span class="badge bg-light-success">Submitted</span></td>
-                </tr>
-                <tr>
-                    <td data-label="Date">2025-08-27</td>
-                    <td data-label="Activity">Took Attendance</td>
-                    <td data-label="Subject">College Algebra</td>
-                    <td data-label="Status"><span class="badge bg-light-primary">Done</span></td>
-                </tr>
-                <tr>
-                    <td data-label="Date">2025-08-26</td>
-                    <td data-label="Activity">Created Exam</td>
-                    <td data-label="Subject">English Communication</td>
-                    <td data-label="Status"><span class="badge bg-light-warning">Pending</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+   
 
    
 </x-teacher-component>

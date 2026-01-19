@@ -7,7 +7,135 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Manage Assessments - Teacher Dashboard</title>
 
-  <style>
+
+   <style>
+        /* ====== Global Page Reset ====== */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            overflow-x: hidden;
+            animation: fadeIn 1s ease-in;
+        }
+
+        /* ====== Animated Background (SAME AS ADMIN) ====== */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #f3f7fd, #e3f2fd, #fce4ec, #f1f8e9);
+            background-size: 400% 400%;
+            z-index: -1;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ====== Page Header ====== */
+        .page-header-title h5 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #1e3a8a;
+        }
+
+        .breadcrumb {
+            padding: 0;
+            margin-top: 5px;
+            background: transparent;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-item a {
+            text-decoration: none;
+            color: #1976d2;
+        }
+
+        .breadcrumb-item a:hover {
+            text-decoration: underline;
+            color: #0d47a1;
+        }
+
+        /* ====== Cards ====== */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .col-md-6.col-xl-3 {
+            display: flex;
+            flex: 1;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            animation: fadeIn 1s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .card h6 {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .card h4 {
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            padding: 0.35em 0.6em;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Badge Colors */
+        .bg-light-primary { background-color: #e1f0ff; color: #0d6efd; }
+        .bg-light-success { background-color: #e6f4ea; color: #198754; }
+        .bg-light-warning { background-color: #fff4e5; color: #fd7e14; }
+
+        .card p {
+            color: #777;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .col-md-6.col-xl-3 {
+                flex: 0 0 100%;
+            }
+        }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f8f9fa;
@@ -199,6 +327,41 @@
       border-radius: 8px;
       min-height: 250px;
     }
+    /* ===== Table Responsiveness ===== */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* smooth scroll for mobile */
+}
+
+.table-responsive table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* adjust as needed */
+}
+
+.table-responsive th,
+.table-responsive td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    white-space: nowrap; /* prevents columns from squishing */
+}
+
+.table-responsive th {
+    background: #f1f3f5;
+    font-weight: 600;
+}
+
+/* Optional: improve mobile readability */
+@media (max-width: 768px) {
+    .table-responsive th,
+    .table-responsive td {
+        font-size: 13px;
+        padding: 8px;
+    }
+}
+
   </style>
 </head>
 
@@ -218,25 +381,30 @@
       </select>
     </div>
 
-    <div class="card">
-      <h3 style="margin-bottom: 10px;">Student Grades</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Student ID</th>
-            <th>Name</th>
-            <th>Prelim</th>
-            <th>Midterm</th>
-            <th>Semi-Final</th>
-            <th>Final</th>
-            <th>Term Grade</th>
-            <th>Remarks</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="studentsTableBody"></tbody>
-      </table>
-    </div>
+ <div class="card">
+  <h3 style="margin-bottom: 10px;">Student Grades</h3>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Name</th>
+          <th>Prelim</th>
+          <th>Midterm</th>
+          <th>Semi-Final</th>
+          <th>Final</th>
+          <th>Term Grade</th>
+          <th>Remarks</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+     <tbody id="studentsTableBody">
+      <!-- Students will be populated dynamically via JavaScript -->
+     </tbody>
+
+  </div>
+</div>
+
 
     <div class="actions">
       <button class="btn btn-submit" id="submitBtn" onclick="showSubmitModal()">Submit to Dean</button>
@@ -351,21 +519,20 @@
           data.forEach(student => {
             const row = document.createElement('tr');
             const isEditable = student.status === 'draft' || student.status === 'saved';
-            row.innerHTML = `
-              <td>${student.id}</td>
-              <td>${student.name || 'N/A'}</td>
-              <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="prelim" value="${student.prelim ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
-              <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="midterm" value="${student.midterm ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
-              <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="semi_final" value="${student.semi_final ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
-              <td><input type="number" class="grade-input" data-student-id="${student.id}" data-field="final" value="${student.final ?? ''}" ${isEditable ? '' : 'disabled'} /></td>
-              <td>${student.term_grade ?? '—'}</td>
-              <td>${student.remarks ?? '—'}</td>
-              <td>
-                <button class="btn btn-save" onclick="saveStudentGrades(${student.id})" ${isEditable ? '' : 'disabled'}>Save</button>
-                <button class="btn btn-edit" onclick="openEditModal(${student.id})" ${isEditable ? '' : 'disabled'}>Edit</button>
-                <button class="btn btn-compute" onclick="openComputeModal(${student.id})" ${isEditable ? '' : 'disabled'}>Grade</button>
-              </td>
-            `;
+           row.innerHTML = `
+  <td>${student.id}</td>
+  <td>${student.name || 'N/A'}</td>
+  <td>${student.prelim ?? '—'}</td>
+  <td>${student.midterm ?? '—'}</td>
+  <td>${student.semi_final ?? '—'}</td>
+  <td>${student.final ?? '—'}</td>
+  <td>${student.term_grade ?? '—'}</td>
+  <td>${student.remarks ?? '—'}</td>
+  <td>
+    <button class="btn btn-compute" onclick="openComputeModal(${student.id})">Grade</button>
+  </td>
+`;
+
             tbody.appendChild(row);
           });
         })
@@ -521,6 +688,21 @@
       })
       .catch(() => alert('Error saving grades.'));
     }
+    
+    function computeFinalGrade(studentId) {
+        const prelim = parseFloat(document.querySelector(`#studentRow-${studentId} td:nth-child(3)`).textContent) || 0;
+        const midterm = parseFloat(document.querySelector(`#studentRow-${studentId} td:nth-child(4)`).textContent) || 0;
+        const semi = parseFloat(document.querySelector(`#studentRow-${studentId} td:nth-child(5)`).textContent) || 0;
+        const finalExam = parseFloat(document.querySelector(`#studentRow-${studentId} td:nth-child(6)`).textContent) || 0;
+
+        // Example weight: Prelim 10%, Midterm 10%, Semi 10%, Final 70%
+        const termGrade = (prelim * 0.1) + (midterm * 0.1) + (semi * 0.1) + (finalExam * 0.7);
+        
+        // Show in table
+        document.getElementById(`termGrade-${studentId}`).textContent = termGrade.toFixed(2);
+    }
+  
+
   </script>
 </body>
 </html>

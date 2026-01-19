@@ -1,4 +1,4 @@
-<x-student-component>
+<x-student-components>
     <style>
         /* Mobile responsiveness */
         @media (max-width: 768px) {
@@ -146,4 +146,4 @@
             loadGrades();
         });
     </script>
-</x-student-component>
+</x-student-components>
