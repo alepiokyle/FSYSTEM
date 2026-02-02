@@ -48,4 +48,12 @@ class Subject extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    /**
+     * Get the grades for this subject.
+     */
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
 }

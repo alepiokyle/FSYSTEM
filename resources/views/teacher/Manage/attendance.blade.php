@@ -1,4 +1,4 @@
-m<x-teacher-component>
+<x-teacher-component>
 <!DOCTYPE html>
 <html lang="en">
 <head>

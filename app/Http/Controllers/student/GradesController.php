@@ -7,13 +7,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Grade;
 use App\Models\SchoolYear;
+use App\Models\Subject;
 
 class GradesController extends Controller
 {
     public function index()
     {
+        $studentId = Auth::id();
         $schoolYears = SchoolYear::orderBy('schoolyear', 'desc')->get();
-        return view('student.View.Grades', compact('schoolYears'));
+        $enrolledSubjects = Subject::whereHas('grades', function ($query) use ($studentId) {
+            $query->where('student_id', $studentId)->where('status', 'posted');
+        })->distinct()->get();
+        return view('student.View.Grades', compact('schoolYears', 'enrolledSubjects'));
     }
 
     public function fetch(Request $request)
@@ -21,6 +26,8 @@ class GradesController extends Controller
         $studentId = Auth::id();
         $schoolYear = $request->input('school_year');
         $semester = $request->input('semester');
+        $subjectId = $request->input('subject_id');
+        $term = $request->input('term');
 
         $query = Grade::with(['subject.teacher'])
             ->where('student_id', $studentId)
@@ -31,6 +38,12 @@ class GradesController extends Controller
         }
         if ($semester) {
             $query->where('semester', $semester);
+        }
+        if ($subjectId) {
+            $query->where('subject_id', $subjectId);
+        }
+        if ($term) {
+            $query->whereNotNull($term);
         }
 
         $grades = $query->get();

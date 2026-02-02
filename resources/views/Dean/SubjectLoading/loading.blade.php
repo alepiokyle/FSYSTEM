@@ -294,11 +294,6 @@
             </div>
 
             <div class="mb-3">
-                <label for="yearLevel" class="form-label">Year Level:</label>
-                <input type="text" id="yearLevel" class="form-control" name="year_level" placeholder="e.g., 1st Year" required>
-            </div>
-
-            <div class="mb-3">
                 <label for="students" class="form-label">Select Students:</label>
                 <select id="students" class="form-select" name="student_ids[]" multiple required>
                     @foreach($students as $student)

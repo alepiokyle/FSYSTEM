@@ -14,7 +14,6 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         Department::create(['name' => 'Computer Science']);
-        Department::create(['name' => 'Information Technology']);
         Department::create(['name' => 'Business Administration']);
         Department::create(['name' => 'Engineering']);
         Department::create(['name' => 'Mathematics']);

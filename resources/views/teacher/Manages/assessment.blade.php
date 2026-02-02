@@ -413,7 +413,6 @@
           <th>Final</th>
           <th>Term Grade</th>
           <th>Remarks</th>
-          <th>Action</th>
         </tr>
       </thead>
      <tbody id="studentsTableBody">
@@ -426,11 +425,6 @@
 
     <div class="actions">
       <button class="btn btn-submit" id="submitBtn" onclick="showSubmitModal()">Submit to Dean</button>
-      <button class="btn btn-export">Export to Excel</button>
-      <button class="btn btn-compute" onclick="openComputeModal()">Term-Based Grading Computation</button>
-   
-    
-
     </div>
 
     <p class="note">
@@ -469,74 +463,10 @@
     </div>
   </div>
 
-  <!-- ===== Compute Grade Modal (Landscape) ===== -->
-  <div id="computeModal" class="modal">
-    <div class="modal-content landscape">
-      <span class="close" onclick="closeComputeModal()">&times;</span>
 
-      <div class="left">
-        <h3 id="modalTitle">Compute Term Grade</h3>
-        <form id="computeForm">
-          <input type="hidden" id="modalStudentId">
-          <label for="modalTerm">Term</label>
-          <select id="modalTerm" required>
-            <option value="">-- Select Term --</option>
-            <option value="prelim">Prelim</option>
-            <option value="midterm">Midterm</option>
-            <option value="semi">Semi</option>
-            <option value="finals">Finals</option>
-          </select>
-          <label for="modalSemester">Semester</label>
-          <select id="modalSemester" required>
-            <option value="">-- Select Semester --</option>
-            <option value="first">First Semester</option>
-            <option value="second">Second Semester</option>
-          </select>
-          <label>Prelim (20%)</label>
-          <input type="number" id="prelim" min="0" max="100" required>
-          <label>Midterm (30%)</label>
-          <input type="number" id="midterm" min="0" max="100" required>
-          <label>Semi-Final (20%)</label>
-          <input type="number" id="semi" min="0" max="100" required>
-          <label>Final (30%)</label>
-          <input type="number" id="final" min="0" max="100" required>
-          <button type="submit">Compute</button>
-          <button type="button" class="btn btn-save" onclick="saveFromModal()">Save Final Grade</button>
-        </form>
-      </div>
-
-      <div class="right">
-        <!-- Toggle Button -->
-        <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;" onclick="toggleFormulaNote()">
-          <strong>▼ Term-Based Grading Computation</strong>
-          <span id="arrowIcon" style="font-size: 18px;">▼</span>
-        </div>
-
-        <!-- Hidden Note -->
-        <div id="formulaNote" class="note" style="background:#f1f3f5; padding:10px; border-radius:6px; font-size:13px; color:#333; margin-top: 30px;">
-          Final Grade = (Prelim × 20%) + (Midterm × 30%) + (Semi-Final × 20%) + (Final × 30%)<br>
-          Example: (85 × 0.20) + (90 × 0.30) + (80 × 0.20) + (88 × 0.30) = <strong>85.4</strong><br>
-          <em>Remarks:</em> “PASSED” if Final Grade ≥ 75, otherwise “FAILED”.
-        </div>
-
-        <div id="computeResult"></div>
-      </div>
-    </div>
-  </div>
 
   <script>
-    // ===== Toggle Note Section =====
-    function toggleFormulaNote() {
-      const note = document.getElementById("formulaNote");
-      const arrow = document.getElementById("arrowIcon");
-      if (note.style.display === "none" || note.style.display === "") {
-        note.style.display = "block";
-        arrow.textContent = "▼";
-      } else {
-        note.style.display = "none";
-        arrow.textContent = "▶";
-      }
-    }
+
 
     // ===== Load Students =====
     document.getElementById('subject').addEventListener('change', loadStudents);
@@ -572,9 +502,6 @@
   <td>${student.final ?? '—'}</td>
           <td>${student.term_grade ?? '—'}</td>
   <td>${student.remarks ?? '—'}</td>
-  <td>
-    <button class="btn btn-compute" onclick="openComputeModal(${student.id})">Grade</button>
-  </td>
 `;
 
             tbody.appendChild(row);
@@ -649,125 +576,7 @@
       });
     }
 
-    // ===== Compute Modal =====
-    const computeModal = document.getElementById("computeModal");
 
-    function openComputeModal(studentId = null) {
-      // Set modal term and semester to match page selectors
-      document.getElementById('modalTerm').value = document.getElementById('term').value;
-      document.getElementById('modalSemester').value = document.getElementById('semester').value;
-
-      if (studentId) {
-        // Populate modal for specific student
-        document.getElementById('modalStudentId').value = studentId;
-        const studentName = document.querySelector(`tr:has([data-student-id="${studentId}"]) td:nth-child(2)`).textContent;
-        document.getElementById('modalTitle').textContent = `Grade for ${studentName}`;
-        // Populate inputs with existing grades
-        document.getElementById('prelim').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="prelim"]`).value || '';
-        document.getElementById('midterm').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="midterm"]`).value || '';
-        document.getElementById('semi').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="semi_final"]`).value || '';
-        document.getElementById('final').value = document.querySelector(`.grade-input[data-student-id="${studentId}"][data-field="final"]`).value || '';
-      } else {
-        // General compute modal
-        document.getElementById('modalStudentId').value = '';
-        document.getElementById('modalTitle').textContent = 'Compute Term Grade';
-        document.getElementById("computeForm").reset();
-      }
-      computeModal.style.display = "flex";
-    }
-
-    function closeComputeModal() {
-      computeModal.style.display = "none";
-      document.getElementById("computeResult").innerHTML = "";
-      document.getElementById("computeForm").reset();
-      document.getElementById('modalStudentId').value = '';
-      document.getElementById('modalTitle').textContent = 'Compute Term Grade';
-    }
-
-    window.onclick = function(e) {
-      if (e.target === computeModal) closeComputeModal();
-    }
-
-    document.getElementById("computeForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const term = document.getElementById("modalTerm").value;
-      const semester = document.getElementById("modalSemester").value;
-
-      if (!term || !semester) {
-        alert('Please select both Term and Semester.');
-        return;
-      }
-
-      const prelim = parseFloat(document.getElementById("prelim").value);
-      const midterm = parseFloat(document.getElementById("midterm").value);
-      const semi = parseFloat(document.getElementById("semi").value);
-      const final = parseFloat(document.getElementById("final").value);
-      const grade = (prelim * 0.2) + (midterm * 0.3) + (semi * 0.2) + (final * 0.3);
-      const remark = grade >= 75 ? "PASSED ✅" : "FAILED ❌";
-      document.getElementById("computeResult").innerHTML = `
-        <p>Final Grade: <b>${grade.toFixed(2)}</b><br>Remarks: <b>${remark}</b></p>
-      `;
-    });
-
-    // ===== Save Final Grade from Modal =====
-    function saveFromModal() {
-      const studentId = document.getElementById('modalStudentId').value;
-      const term = document.getElementById('modalTerm').value;
-      const semester = document.getElementById('modalSemester').value;
-      if (!studentId) {
-        alert('No student selected.');
-        return;
-      }
-      if (!term || !semester) {
-        alert('Please select both Term and Semester.');
-        return;
-      }
-      const subjectId = document.getElementById('subject').value;
-      const prelim = parseFloat(document.getElementById('prelim').value) || 0;
-      const midterm = parseFloat(document.getElementById('midterm').value) || 0;
-      const semi = parseFloat(document.getElementById('semi').value) || 0;
-      const final = parseFloat(document.getElementById('final').value) || 0;
-      const finalGrade = (prelim * 0.2) + (midterm * 0.3) + (semi * 0.2) + (final * 0.3);
-
-      fetch(`/teacher/Manages/${subjectId}/save-final-grade-from-summary`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({
-          student_id: studentId,
-          term: term,
-          semester: semester,
-          final_grade: finalGrade.toFixed(2)
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          alert('Final grade saved successfully and displayed in the table!');
-          closeComputeModal();
-          // Reload students to show updated term grade
-          loadStudents();
-        } else {
-          alert(data.message || 'Error saving final grade.');
-        }
-      })
-      .catch(() => alert('Error saving final grade.'));
-    }
-    
-    function computeFinalGrade(studentId) {
-        const prelim = parseFloat(document.querySelector(`#studentRow-${studentId} td:nth-child(3)`).textContent) || 0;
-        const midterm = parseFloat(document.querySelector(`#studentRow-${studentId} td:nth-child(4)`).textContent) || 0;
-        const semi = parseFloat(document.querySelector(`#studentRow-${studentId} td:nth-child(5)`).textContent) || 0;
-        const finalExam = parseFloat(document.querySelector(`#studentRow-${studentId} td:nth-child(6)`).textContent) || 0;
-
-        // Example weight: Prelim 10%, Midterm 10%, Semi 10%, Final 70%
-        const termGrade = (prelim * 0.1) + (midterm * 0.1) + (semi * 0.1) + (finalExam * 0.7);
-        
-        // Show in table
-        document.getElementById(`termGrade-${studentId}`).textContent = termGrade.toFixed(2);
-    }
   
 
   </script>

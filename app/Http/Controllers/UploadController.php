@@ -16,8 +16,8 @@ class UploadController extends Controller
         // Debug: Log that this controller method is being called
         \Log::info('UploadController@index called - returning latest 10 subjects');
 
-        $subjects = Subject::latest()->take(10)->get(); // Get latest 10 subjects
-        $departments = Department::all(); // Get all departments
+        $subjects = Subject::with('department')->latest()->get(); // Get latest subjects with department
+        $departments = Department::whereNotIn('name', ['Law', 'Information Technology', 'School of Nursing'])->get(); // Get departments excluding specified ones
         return view('admin.uploadSubject.subject', compact('subjects', 'departments'));
     }
 

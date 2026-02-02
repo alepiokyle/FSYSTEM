@@ -157,7 +157,7 @@
     <h4>🔍 Filter Grades</h4>
     <div class="row">
         <!-- Teacher -->
-        <div class="col-md-3 mb-3">
+        <div class="col-md-4 mb-3">
             <label for="teacherFilter" class="form-label">Teacher Name</label>
             <select id="teacherFilter" class="form-select" onchange="loadSubjectsByTeacher(this.value)">
                 <option value="">Select Teacher</option>
@@ -175,6 +175,18 @@
                 @foreach($subjects as $subject)
                     <option value="{{ $subject->id }}">{{ $subject->subject_code }} - {{ $subject->subject_name }}</option>
                 @endforeach
+            </select>
+        </div>
+
+        <!-- Term -->
+        <div class="col-md-4 mb-3">
+            <label for="termFilter" class="form-label">Term</label>
+            <select id="termFilter" class="form-select">
+                <option value="">Select Term</option>
+                <option value="prelim">Prelim</option>
+                <option value="midterm">Midterm</option>
+                <option value="semi_final">Semi-Final</option>
+                <option value="final">Final</option>
             </select>
         </div>
     </div>
@@ -214,180 +226,50 @@
 
         <!-- Filter Button -->
         <div class="col-md-3 mb-3 d-flex align-items-end">
-            <button class="btn btn-filter w-100" onclick="loadPendingGrades()">Filter</button>
+            <button class="btn btn-filter w-100">Filter</button>
         </div>
     </div>
 </div>
 
-    <!-- ====== Pending Grades Table ====== -->
-    <div class="card">
-        <h4>Pending Grades</h4>
-        <div class="table-responsive">
-            <table id="pendingTable" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Prelim</th>
-                        <th>Midterm</th>
-                        <th>Semi-Final</th>
-                        <th>Final</th>
-                        <th>Term Grade</th>
-                        <th>Remarks</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
+    <form>
+        <button type="button" class="btn btn-primary" id="pendingBtn">Pending Grades</button>
+        <button type="button" class="btn btn-danger" id="rejectedBtn">Rejected Grades</button>
+        <button type="button" class="btn btn-success" id="approvedBtn">Approved Grades</button>
+    </form>
 
-    <!-- ====== Approved Grades Table ====== -->
-    <div class="card">
-        <h4>Approved Grades</h4>
-        <div class="table-responsive">
-            <table id="approvedTable" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Prelim</th>
-                        <th>Midterm</th>
-                        <th>Semi-Final</th>
-                        <th>Final</th>
-                        <th>Term Grade</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- ====== Rejected Grades Table ====== -->
-    <div class="card">
-        <h4>Rejected Grades</h4>
-        <div class="table-responsive">
-            <table id="rejectedTable" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Name</th>
-                        <th>Prelim</th>
-                        <th>Midterm</th>
-                        <th>Semi-Final</th>
-                        <th>Final</th>
-                        <th>Term Grade</th>
-                        <th>Remarks</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+    <!-- Modal -->
+    <div class="modal fade" id="gradesModal" tabindex="-1" aria-labelledby="gradesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gradesModalLabel">Grades</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped" id="gradesTable">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Prelim</th>
+                                <th>Midterm</th>
+                                <th>Semi-Final</th>
+                                <th>Final</th>
+                                <th>Term Grade</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Load pending and approved grades
-        function loadPendingGrades() {
-            const teacherId = document.getElementById('teacherFilter').value;
-            const subjectId = document.getElementById('subjectFilter').value;
-            const schoolYear = document.getElementById('schoolYearFilter').value;
-            const semester = document.getElementById('semesterFilter').value;
-            const status = document.getElementById('statusFilter').value;
-
-            let url = `/dean/ApproveGrades/fetch-grades?subject_id=${subjectId}&school_year=${schoolYear}&semester=${semester}&teacher_id=${teacherId}&status=${status}`;
-
-            fetch(url)
-                .then(res => res.json())
-                .then(data => {
-                    const pendingBody = document.querySelector('#pendingTable tbody');
-                    const approvedBody = document.querySelector('#approvedTable tbody');
-                    const rejectedBody = document.querySelector('#rejectedTable tbody');
-                    pendingBody.innerHTML = '';
-                    approvedBody.innerHTML = '';
-                    rejectedBody.innerHTML = '';
-
-                    data.pending.forEach(grade => {
-                        pendingBody.innerHTML += `
-                            <tr>
-                                <td>${grade.student_id}</td>
-                                <td><strong>${grade.student_name}</strong></td>
-                                <td>${grade.prelim}</td>
-                                <td>${grade.midterm}</td>
-                                <td>${grade.semi_final}</td>
-                                <td>${grade.final}</td>
-                                <td>${grade.term_grade}</td>
-                                <td>${grade.remarks}</td>
-                                <td>
-                                    <button class="btn btn-approve btn-action" onclick="approveGrade(${grade.id})">Approve</button>
-                                    <button class="btn btn-reject btn-action" onclick="rejectGrade(${grade.id})">Reject</button>
-                                </td>
-                            </tr>`;
-                    });
-
-                    data.approved.forEach(grade => {
-                        approvedBody.innerHTML += `
-                            <tr>
-                                <td>${grade.student_id}</td>
-                                <td><strong>${grade.student_name}</strong></td>
-                                <td>${grade.prelim}</td>
-                                <td>${grade.midterm}</td>
-                                <td>${grade.semi_final}</td>
-                                <td>${grade.final}</td>
-                                <td>${grade.term_grade}</td>
-                                <td>${grade.remarks}</td>
-                            </tr>`;
-                    });
-
-                    data.rejected.forEach(grade => {
-                        rejectedBody.innerHTML += `
-                            <tr>
-                                <td>${grade.student_id}</td>
-                                <td><strong>${grade.student_name}</strong></td>
-                                <td>${grade.prelim}</td>
-                                <td>${grade.midterm}</td>
-                                <td>${grade.semi_final}</td>
-                                <td>${grade.final}</td>
-                                <td>${grade.term_grade}</td>
-                                <td>${grade.remarks}</td>
-                            </tr>`;
-                    });
-                });
-        }
-
-        // Approve grade
-        function approveGrade(gradeId) {
-            fetch(`/dean/ApproveGrades/approve`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ grade_id: gradeId })
-            })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                loadPendingGrades();
-            });
-        }
-
-        // Reject grade
-        function rejectGrade(gradeId) {
-            fetch(`/dean/ApproveGrades/reject`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ grade_id: gradeId })
-            })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                loadPendingGrades();
-            });
-        }
+        let currentStatus = '';
 
         // Load subjects by teacher
         function loadSubjectsByTeacher(teacherId) {
@@ -395,6 +277,7 @@
             subjectSelect.innerHTML = '<option value="">Select Subject</option>';
 
             if (!teacherId) {
+                return;
                 return;
             }
 
@@ -410,9 +293,124 @@
                 });
         }
 
-        // Load grades on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadPendingGrades();
+        // Event listeners for buttons
+        document.getElementById('pendingBtn').addEventListener('click', function() {
+            fetchGrades('Pending');
         });
+
+        document.getElementById('rejectedBtn').addEventListener('click', function() {
+            fetchGrades('Rejected');
+        });
+
+        document.getElementById('approvedBtn').addEventListener('click', function() {
+            fetchGrades('Approved');
+        });
+
+        function fetchGrades(status) {
+            currentStatus = status;
+            const schoolYear = document.getElementById('schoolYearFilter').value;
+            const semester = document.getElementById('semesterFilter').value;
+            const subjectId = document.getElementById('subjectFilter').value;
+            const teacherId = document.getElementById('teacherFilter').value;
+            const term = document.getElementById('termFilter').value;
+
+            fetch(`/dean/ApproveGrades/fetch-grades?school_year=${schoolYear}&semester=${semester}&subject_id=${subjectId}&teacher_id=${teacherId}&term=${term}&status=${status}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayGrades(data, status);
+                    document.getElementById('gradesModalLabel').textContent = `${status} Grades`;
+                    $('#gradesModal').modal('show');
+                })
+                .catch(error => {
+                    console.error('Error fetching grades:', error);
+                });
+        }
+
+        function displayGrades(data, status) {
+            const tbody = document.getElementById('gradesTableBody');
+            tbody.innerHTML = '';
+
+            let grades = [];
+            if (status === 'Pending') {
+                grades = data.pending;
+            } else if (status === 'Approved') {
+                grades = data.approved;
+            } else if (status === 'Rejected') {
+                grades = data.rejected;
+            }
+
+            grades.forEach(grade => {
+                let actionHtml = '';
+                if (status === 'Pending') {
+                    actionHtml = `
+                        <button class="btn btn-approve btn-action" onclick="approveGrade(${grade.id})">Approve</button>
+                        <button class="btn btn-reject btn-action" onclick="rejectGrade(${grade.id})">Reject</button>
+                    `;
+                } else {
+                    actionHtml = grade.status;
+                }
+
+                const row = `
+                    <tr>
+                        <td>${grade.student_id}</td>
+                        <td>${grade.student_name}</td>
+                        <td>${grade.prelim}</td>
+                        <td>${grade.midterm}</td>
+                        <td>${grade.semi_final}</td>
+                        <td>${grade.final}</td>
+                        <td>${grade.term_grade}</td>
+                        <td>${grade.remarks}</td>
+                        <td>${actionHtml}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function approveGrade(gradeId) {
+            fetch('/dean/ApproveGrades/approve', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ grade_id: gradeId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Grade approved successfully');
+                    fetchGrades(currentStatus); // Refresh the table
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error approving grade:', error);
+            });
+        }
+
+        function rejectGrade(gradeId) {
+            fetch('/dean/ApproveGrades/reject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ grade_id: gradeId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Grade rejected successfully');
+                    fetchGrades(currentStatus); // Refresh the table
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error rejecting grade:', error);
+            });
+        }
     </script>
 </x-dean-component>

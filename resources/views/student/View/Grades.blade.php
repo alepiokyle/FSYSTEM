@@ -42,25 +42,49 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">School Year</label>
-                        <select id="schoolYearFilter" class="form-select">
-                            <option value="">Select School Year</option>
-                            @foreach($schoolYears as $year)
-                                <option value="{{ $year->schoolyear }}">{{ $year->schoolyear }}</option>
-                            @endforeach
-                        </select>
+                        <div class="mb-3">
+                            <label class="form-label">School Year</label>
+                            <select id="schoolYearFilter" class="form-select">
+                                <option value="">Select School Year</option>
+                                @foreach($schoolYears as $year)
+                                    <option value="{{ $year->schoolyear }}">{{ $year->schoolyear }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Enrolled Subject</label>
+                            <select id="subjectFilter" class="form-select">
+                                <option value="">Select Subject</option>
+                                @foreach($enrolledSubjects as $subject)
+                                    <option value="{{ $subject->id }}">{{ $subject->subject_name }} ({{ $subject->subject_code }})</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Semester</label>
-                        <select id="semesterFilter" class="form-select">
-                            <option value="">Select Semester</option>
-                            <option value="1st Semester">1st Semester</option>
-                            <option value="2nd Semester">2nd Semester</option>
-                        </select>
+                        <div class="mb-3">
+                            <label class="form-label">Semester</label>
+                            <select id="semesterFilter" class="form-select">
+                                <option value="">Select Semester</option>
+                                <option value="1st Semester">1st Semester</option>
+                                <option value="2nd Semester">2nd Semester</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Select Term</label>
+                            <select id="termFilter" class="form-select">
+                                <option value="">Select Term</option>
+                                <option value="prelim">Prelim</option>
+                                <option value="midterm">Midterm</option>
+                                <option value="semi_final">Semi-Final</option>
+                                <option value="final">Final</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="mt-3">
                     <button class="btn btn-primary" onclick="loadGrades()">Filter Grades</button>
+                    <button class="btn btn-secondary">Attendance record</button>
                 </div>
             </div>
         </div>
@@ -102,8 +126,9 @@
         function loadGrades() {
             const schoolYear = document.getElementById('schoolYearFilter').value;
             const semester = document.getElementById('semesterFilter').value;
+            const subjectId = document.getElementById('subjectFilter').value;
 
-            fetch(`/student/grades/fetch?school_year=${schoolYear}&semester=${semester}`)
+            fetch(`/student/grades/fetch?school_year=${schoolYear}&semester=${semester}&subject_id=${subjectId}`)
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.getElementById('gradesTableBody');

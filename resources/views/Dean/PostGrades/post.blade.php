@@ -196,7 +196,7 @@
         </div>
 
         <!-- Subject -->
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
             <label for="subjectFilter" class="form-label">Subject Code</label>
             <select id="subjectFilter" class="form-select">
                 <option value="">Select Subject</option>
@@ -204,6 +204,23 @@
                     <option value="{{ $subject->id }}">{{ $subject->subject_code }} - {{ $subject->subject_name }}</option>
                 @endforeach
             </select>
+        </div>
+
+        <!-- Term -->
+        <div class="col-md-3 mb-3">
+            <label for="termFilter" class="form-label">Term</label>
+            <select id="termFilter" class="form-select">
+                <option value="">Select Term</option>
+                <option value="prelim">Prelim</option>
+                <option value="midterm">Midterm</option>
+                <option value="semi-final">Semi-Final</option>
+                <option value="final">Final</option>
+            </select>
+        </div>
+
+        <!-- Filter Button -->
+        <div class="col-md-3 mb-3 d-flex align-items-end">
+            <button class="btn btn-filter w-100" onclick="loadApprovedGrades()">Filter</button>
         </div>
     </div>
 
@@ -227,11 +244,6 @@
                 <option value="1st Semester">1st Semester</option>
                 <option value="2nd Semester">2nd Semester</option>
             </select>
-        </div>
-
-        <!-- Filter Button -->
-        <div class="col-md-3 mb-3 d-flex align-items-end">
-            <button class="btn btn-filter w-100" onclick="loadApprovedGrades()">Filter</button>
         </div>
     </div>
 </div>
@@ -264,10 +276,11 @@
         function loadApprovedGrades() {
             const teacherId = document.getElementById('teacherFilter').value;
             const subjectId = document.getElementById('subjectFilter').value;
+            const term = document.getElementById('termFilter').value;
             const schoolYear = document.getElementById('schoolYearFilter').value;
             const semester = document.getElementById('semesterFilter').value;
 
-            let url = `/dean/PostGrades/fetch-grades?subject_id=${subjectId}&school_year=${schoolYear}&semester=${semester}&teacher_id=${teacherId}`;
+            let url = `/dean/PostGrades/fetch-grades?subject_id=${subjectId}&school_year=${schoolYear}&semester=${semester}&teacher_id=${teacherId}&term=${term}`;
 
             fetch(url)
                 .then(res => res.json())

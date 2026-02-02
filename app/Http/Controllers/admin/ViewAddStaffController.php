@@ -16,12 +16,22 @@ use Illuminate\Support\Str;
 
 class ViewAddStaffController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $deans = DeanAccount::with('profile')->get();
-        $teachers = TeacherAccount::with('profile')->get();
+        $filter = $request->get('filter', 'deans'); // Default to 'deans'
 
-        return view('admin.AddStaff.addstaff', compact('deans', 'teachers'));
+        $deans = collect();
+        $teachers = collect();
+
+        if ($filter === 'deans') {
+            $deans = DeanAccount::with('profile')->get();
+        }
+
+        if ($filter === 'teachers') {
+            $teachers = TeacherAccount::with('profile')->get();
+        }
+
+        return view('admin.AddStaff.addstaff', compact('deans', 'teachers', 'filter'));
     }
 
     public function store(Request $request)

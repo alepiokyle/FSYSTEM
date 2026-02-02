@@ -297,6 +297,12 @@
       <i class="fas fa-user-plus"></i> Add Staff
     </button>
 
+    <!-- Filter Buttons -->
+    <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+      <a href="{{ route('view.addstaff', ['filter' => 'deans']) }}" class="filter-btn {{ $filter === 'deans' ? 'active' : '' }}" style="padding: 8px 16px; background: {{ $filter === 'deans' ? '#007bff' : '#f0f0f0' }}; color: {{ $filter === 'deans' ? 'white' : '#333' }}; border: 1px solid #ccc; border-radius: 6px; text-decoration: none; font-size: 14px;">Deans</a>
+      <a href="{{ route('view.addstaff', ['filter' => 'teachers']) }}" class="filter-btn {{ $filter === 'teachers' ? 'active' : '' }}" style="padding: 8px 16px; background: {{ $filter === 'teachers' ? '#007bff' : '#f0f0f0' }}; color: {{ $filter === 'teachers' ? 'white' : '#333' }}; border: 1px solid #ccc; border-radius: 6px; text-decoration: none; font-size: 14px;">Teachers</a>
+    </div>
+
     <div class="table-responsive">
       <table>
         <thead>
